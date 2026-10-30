@@ -1,5 +1,19 @@
 # Journal des versions
 
+## 0.13.0 — Nouveau menu « cassette mascotte »
+- **La cassette devient une mascotte cartoon.** Ses bobines sont des yeux qui suivent le mouvement et clignent. Elle a des joues, un sourire avec la langue, des gants (un poing et un « peace » qui salue) et des baskets qui battent la mesure.
+- Une cassette verrouillée dort : yeux fermés, cadenas, « zz ».
+- Les cassettes voisines dépassent sur les côtés.
+- **Nouveau mur street art clair** : giclées nettes rose, cyan et jaune avec coulures, trames de points, coups de pinceau noirs, couronnes et étoiles. De grosses giclées derrière la cassette pulsent sur le temps.
+- **« TOUCHE ! » en gros graffiti jaune** sur une bande noire « POUR LANCER LA CASSETTE ». Sa taille s'ajuste pour ne jamais passer sous le badge.
+- **Le reste du menu adopte le même style :**
+  - badge jaune pour les disques, le talent et le titre ;
+  - carte en papier déchiré avec le nom surligné au feutre jaune ;
+  - bande jaune avec une couronne pour la difficulté et une tache rose pour le multiplicateur ;
+  - boutons ronds cerclés de jaune ;
+  - gros bouton JOUER rose avec une icône lecture.
+- La cassette prend la place libre entre le titre et le bas, et tient sur les petits écrans.
+
 ## 0.12.0 — La fresque, une voix de combo, plus de chevauchements
 - **Ta fresque street art.** Chaque geste réussi peint le mur au-dessus de la piste, de gauche à droite au fil du morceau :
   - une coupe = un trait de bombe dans le sens du geste ;
