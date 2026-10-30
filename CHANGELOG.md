@@ -1,5 +1,19 @@
 # Journal des versions
 
+## 0.15.0 — En jeu façon BD explosive
+- **Nouveau fond** (d'après la maquette) : papier crème, grandes bandes de pinceau noires et rouges en diagonale, trames de points, giclées, étoiles, éclairs, traits de vitesse et confettis. Chaque cassette garde sa couleur d'accent.
+- **Score et pourcentage dans des taches jaunes qui coulent**, avec de gros chiffres et des disques cerclés. Le bouton du haut devient un carré noir bordé de blanc.
+- **Jugements en autocollants** : PARFAIT en jaune, RATÉ en rouge avec une éclaboussure qui coule, le reste en noir.
+- **La scène :**
+  - la roue est un jeton jaune cerclé d'encre, avec des traits de vitesse ;
+  - les ronds à taper ont un cœur ;
+  - les obstacles qui arrivent ont des traits d'action et un anneau en pointillés ;
+  - la piste a des graduations jaunes et une tête de lecture rouge ;
+  - les bobines sont des vinyles avec sillons et arcs de mouvement ;
+  - l'égaliseur est noir, rouge et jaune ;
+  - la foule est en contre-jour, avec des liserés de couleur et des mains « cornes » levées.
+- **Les textes des tutos tiennent dans l'écran** : chaque ligne s'ajuste à la largeur du téléphone. Les grands messages et les jugements près des bords restent aussi visibles.
+
 ## 0.14.0 — Accueil, ralenti de bande, roue gourmande, toile vivante
 - **Écran d'accueil** (d'après la maquette) :
   - le titre TOUCHÉ, avec le É en rouge, dont les lettres giclent sur ta voix ;
