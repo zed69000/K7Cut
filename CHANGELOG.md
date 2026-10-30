@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.10.0 — La forme dit le geste, plus de vies
+- **Chaque forme a son geste.** Bloc debout = glisser de bas en haut. Bloc couché = glisser de gauche à droite. Les chevrons rouges montrent le sens. Rond = un tap. Ruban = tenir. Zigzag = gratter.
+- Le mauvais sens coupe quand même, mais compte au mieux « OK », avec « coupe vers le haut ↑ » ou « coupe vers la droite → » affiché.
+- **Tutos plus clairs.** « FORME DEBOUT = GLISSE VERS LE HAUT », etc. Une grosse flèche et le doigt montrent le sens. Un geste dans le mauvais sens affiche « PAS DANS CE SENS ! » et on recommence. Un tuto par forme.
+- **Sons plus doux.** Le scratch joue un petit « tchic » accordé à la musique au lieu du bruit. Le doigt maintenu joue une nappe douce lancée par ta voix au lieu du synthé criard.
+- **Plus de vies ni de game over.** On joue toujours la face jusqu'au bout. Un pourcentage de super rythme s'affiche en direct, et la fin de face donne 0 à 3 disques selon ce pourcentage. Les seuils dépendent du niveau : Apprenti 70/85/95 %, Musicien 60/80/92 %, Virtuose 55/75/90 %, Roi 50/70/86 %.
+- **Les disques ouvrent les cassettes** : 0, 2, 4, 6, 9, 12, 15, 18 disques. On compte le meilleur résultat par cassette, 3 disques maximum chacune. Le talent ♪ sert toujours aux titres.
+
 ## 0.9.0 — Gestes stricts + intro chantée
 - **Taper = sauter, glisser = couper, point.** Un tap ne coupe plus jamais un bloc, un glissé ne fait plus jamais sauter. Le geste est jugé à l'instant où le doigt touche l'écran, sur le premier obstacle du bon type.
 - Glisser près d'une bombe coupe le bloc en priorité au lieu de faire exploser la bombe.

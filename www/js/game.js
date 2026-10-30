@@ -25,35 +25,35 @@ const TRACKS = [
   { id: 'soleil', face: 'A', name: 'Soleil', style: 'disco', label: 'Disco · 104 BPM', bpm: 104, root: 65.41, scale: MAJ, prog: [0, 5, 3, 4], swing: 0, cost: 0,
     bg: ['#f2cd4c', '#d6a93a'], deco: 'rays', gestures: 'Couper · Sauter', delay: .75,
     sections: plan([['kick','bass'], ['kick','bass','hat','snare'], ['kick','bass','hat','snare','chords'], ['chords','hat','perc'], ['kick','bass','hat','snare','chords','perc'], ALL, ['chords']], {finalBars: 6}) },
-  { id: 'bobine', face: 'B', name: 'Bobine', style: 'hiphop', label: 'Boom bap · 88 BPM', bpm: 88, root: 55, scale: MIN, prog: [0, 5, 6, 4], swing: .2, cost: 25,
+  { id: 'bobine', face: 'B', name: 'Bobine', style: 'hiphop', label: 'Boom bap · 88 BPM', bpm: 88, root: 55, scale: MIN, prog: [0, 5, 6, 4], swing: .2, cost: 2,
     bg: ['#f2a65a', '#d9763f'], deco: 'vinyl', gestures: '+ Scratch', delay: .5,
     sections: plan([['kick','snare','perc'], ['kick','snare','hat','bass','perc'], ['kick','snare','hat','bass','chords','perc'], ['chords','perc'], ['kick','snare','hat','bass','chords','perc','lead'], ALL, ['chords','perc']], {newAct: 'S', newName: 'Scratch !', all: 'CJS'}) },
-  { id: 'dub', face: 'C', name: 'Dub', style: 'reggae', label: 'Reggae dub · 76 BPM', bpm: 76, root: 55, scale: MIN, prog: [0, 3, 0, 4], swing: .08, cost: 55,
+  { id: 'dub', face: 'C', name: 'Dub', style: 'reggae', label: 'Reggae dub · 76 BPM', bpm: 76, root: 55, scale: MIN, prog: [0, 3, 0, 4], swing: .08, cost: 4,
     bg: ['#8fce6a', '#3f8a4f'], deco: 'speakers', gestures: '+ Notes longues', delay: .75,
     sections: plan([['kick','hat','bass'], ['kick','snare','hat','bass','chords'], ['kick','snare','hat','bass','chords','lead'], ['bass','chords','perc'], ['kick','snare','hat','bass','chords','perc','lead'], ALL, ['bass','chords']], {newAct: 'H', newName: 'Maintiens !', all: 'CJH'}) },
-  { id: 'neon', face: 'D', name: 'Néon', style: 'synthwave', label: 'Synthwave · 116 BPM', bpm: 116, root: 82.41, scale: MIN, prog: [0, 5, 2, 6], swing: 0, cost: 90,
+  { id: 'neon', face: 'D', name: 'Néon', style: 'synthwave', label: 'Synthwave · 116 BPM', bpm: 116, root: 82.41, scale: MIN, prog: [0, 5, 2, 6], swing: 0, cost: 6,
     bg: ['#f58fb2', '#c9568a'], deco: 'grid', gestures: 'Maintiens + scratch', delay: .75,
     sections: plan([['kick','bass','chords'], ['kick','snare','hat','bass','chords'], ['kick','snare','hat','bass','chords','arp'], ['chords','arp'], ALL, ALL, ['chords','arp']], {newAct: 'SH', newName: 'Mélange !', all: 'CJSH'}) },
-  { id: 'robot', face: 'E', name: 'Robot', style: 'french', label: 'French touch · 122 BPM', bpm: 122, root: 73.42, scale: DOR, prog: [0, 3, 5, 4], swing: 0, cost: 130,
+  { id: 'robot', face: 'E', name: 'Robot', style: 'french', label: 'French touch · 122 BPM', bpm: 122, root: 73.42, scale: DOR, prog: [0, 3, 5, 4], swing: 0, cost: 9,
     bg: ['#b7a6ff', '#6b55d6'], deco: 'leds', gestures: 'Tout + filtres', delay: .75,
     sections: plan([['kick','chords'], ['kick','snare','hat','bass','chords'], ['kick','snare','hat','bass','chords','perc'], ['chords','lead'], ['kick','snare','hat','bass','chords','perc','lead'], ALL, ['chords']], {all: 'CJSH', verseActs: 'CJH'}) },
-  { id: 'rush', face: 'F', name: 'Rush', style: 'dnb', label: 'Breakbeat · 132 BPM', bpm: 132, root: 73.42, scale: MIN, prog: [0, 3, 5, 4], swing: 0, cost: 175,
+  { id: 'rush', face: 'F', name: 'Rush', style: 'dnb', label: 'Breakbeat · 132 BPM', bpm: 132, root: 73.42, scale: MIN, prog: [0, 3, 5, 4], swing: 0, cost: 12,
     bg: ['#6fd3c7', '#2f9c95'], deco: 'stripes', gestures: 'Tout à la fois', delay: .5,
     sections: plan([['kick','hat','bass'], ['kick','snare','hat','bass','chords'], ['kick','snare','hat','bass','chords','arp'], ['chords','arp'], ALL, ALL, ['chords']], {all: 'CJSH', verseActs: 'CJS'}) },
-  { id: 'pogo', face: 'G', name: 'Pogo', style: 'punk', label: 'Punk · 168 BPM', bpm: 168, root: 82.41, scale: MAJ, prog: [0, 3, 4, 3], swing: 0, cost: 225,
+  { id: 'pogo', face: 'G', name: 'Pogo', style: 'punk', label: 'Punk · 168 BPM', bpm: 168, root: 82.41, scale: MAJ, prog: [0, 3, 4, 3], swing: 0, cost: 15,
     bg: ['#c8f04a', '#86b22a'], deco: 'scribble', gestures: 'Vite et fort', delay: .5,
     sections: plan([['kick','snare','gtr'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','hat'], ['kick','snare','hat','bass','gtr','perc'], ALL, ['gtr']], {all: 'CJS'}) },
-  { id: 'riff', face: 'H', name: 'Riff', style: 'metal', label: 'Métal · 150 BPM', bpm: 150, root: 41.2, scale: PHR, prog: [0, 0, 1, 0], swing: 0, cost: 290,
+  { id: 'riff', face: 'H', name: 'Riff', style: 'metal', label: 'Métal · 150 BPM', bpm: 150, root: 41.2, scale: PHR, prog: [0, 0, 1, 0], swing: 0, cost: 18,
     bg: ['#e0533f', '#7a1d14'], deco: 'flames', gestures: 'Le boss final', delay: .375,
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.9.0';
+const VERSION = '0.10.0';
 const DIFFS = [
-  {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
-  {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
-  {id: 'virtuose', name: 'Virtuose', note: 'Plus dense, plus précis', mult: 2.5, win: .85, dens: 1.25, hearts: 3},
-  {id: 'roi', name: 'Roi', note: 'Une seule vie, aucune pitié', mult: 4, win: .72, dens: 1.45, hearts: 1}
+  {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges', mult: 1, win: 1.3, dens: .7, hearts: 5, disc: [70, 85, 95]},
+  {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3, disc: [60, 80, 92]},
+  {id: 'virtuose', name: 'Virtuose', note: 'Plus dense, plus précis', mult: 2.5, win: .85, dens: 1.25, hearts: 3, disc: [55, 75, 90]},
+  {id: 'roi', name: 'Roi', note: 'Fenêtres serrées, aucune pitié', mult: 4, win: .72, dens: 1.45, hearts: 1, disc: [50, 70, 86]}
 ];
 const TITLES = [[0, 'Apprenti'], [60, 'Musicien'], [180, 'Virtuose'], [400, 'Maître du scratch'], [800, 'Roi du scratch et du rythme']];
 function rngFrom(str){ let h = 2166136261; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } let s = h >>> 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
@@ -71,6 +71,10 @@ G.trancheroute = { mount(stage, api){
   /* ---------- sauvegarde ---------- */
   const bank = () => api.load('notes', 0);
   const bests = () => api.load('bests', {});
+  // les disques : le meilleur résultat de chaque cassette (0 à 3), tous niveaux confondus
+  const discsOf = t => { const b = bests(); return Math.max(b[t.id] ? b[t.id].discs || 0 : 0, ...DIFFS.map(d => b[t.id + '.' + d.id] ? b[t.id + '.' + d.id].discs || 0 : 0)); };
+  const discs = () => TRACKS.reduce((a, t) => a + discsOf(t), 0);
+  const DISC = n => '◉'.repeat(n) + '○'.repeat(3 - n);
   const titleOf = n => TITLES.filter(x => n >= x[0]).pop()[1];
   const unlocked = t => t.cost === 0 || api.load('unlock.' + t.id, false);
 
@@ -202,7 +206,9 @@ G.trancheroute = { mount(stage, api){
     pluck(bus, at, f, v, o2){ osc(bus, 'square', f, at, .16, v, {lp: [4200, 900, 4], ...(o2 || {})}); osc(bus, 'triangle', f*2, at, .1, v*.4, o2); hit('lead', at); },
     bell(at, f, v){ osc(music, 'sine', f, at, .4, v, {rev: .3}); osc(music, 'sine', f*2.76, at, .14, v*.3); hit('lead', at); },
     boing(bus, at, f, v){ osc(bus, 'triangle', f, at, .18, v, {glide: f*2, gt: .12}); },
-    wik(at, up){ osc(master, 'sawtooth', up ? 260 : 900, at, .09, .14, {glide: up ? 900 : 240, gt: .08, lp: [2400, 1200, 6]}); noise(master, at, .07, .12, 'bandpass', up ? 900 : 2400, up ? 2600 : 700); },
+    // scratch : un petit « tchic » accordé sur l'accord en cours, au lieu du bruit
+    wik(at, up){ const c = tr ? chordOf(Math.floor(at/bpb/4)) : 0, f = tr ? freq(c + (up ? 4 : 2), 3) : (up ? 523 : 440);
+      osc(master, 'triangle', f, at, .09, .07, {glide: f*(up ? 1.06 : .94), gt: .06, lp: [2200, 900, 1]}); osc(master, 'sine', f/2, at, .06, .05); noise(master, at, .025, .025, 'bandpass', up ? 3800 : 2800, null, false, {q: 1.2}); },
     perc(at, kind){
       if(kind === 'cowbell'){ osc(music, 'square', 560, at, .08, .045, {pan: .3}); osc(music, 'square', 845, at, .08, .035, {pan: .3}); }
       else if(kind === 'crackle') noise(music, at, .015, .05, 'highpass', 3000, null, false, {pan: Math.random()*1.6 - .8});
@@ -327,7 +333,7 @@ G.trancheroute = { mount(stage, api){
       if(e){ const f = freq(e.deg, 4);
         if(e.k === 'C'){ if(!(voiceOn() && sing(master, at, f, e.deg, .6, {pan: -.2}))) I.pluck(master, at, f, .1); }
         if(e.k === 'J') I.boing(master, at, freq(deg, 2), .14);
-        if(e.k === 'H') osc(master, 'square', f, at, .08, .07, {sus: e.len*bpb/2, lp: [2500, 1500, 2]});
+        if(e.k === 'H') osc(master, 'triangle', f, at, .08, .06, {sus: e.len*bpb/2, lp: [1400, 1000, 1]});
         if(e.k === 'S'){ for(let i=0;i<e.len;i++) I.wik(at + i*bpb/2, i % 2 === 0); }
       }
     }
@@ -344,7 +350,7 @@ G.trancheroute = { mount(stage, api){
     if(sec.tier === 'rest'){
       if(acts.includes('C') && rng() < .7) slots[0] = {k: 'C'};
       for(let i=1;i<8;i++) if(rng() < .55) slots[i] = {k: rng() < .2 ? 'A' : 'N'};
-      if(bar === sec.start + 1 && rng() < .9) slots[6] = {k: 'L'};
+      if(bar === sec.start + 1 && rng() < .9) slots[6] = {k: 'A'};
     } else {
       const tier = sec.tier, fast = tr.bpm >= 140 ? .4 : tr.bpm >= 125 ? .75 : 1;
       let pos = tier === 0 ? [0, 4] : tier === 1 ? [0, 2, 4, 6].filter((_, i) => i === 0 || rng() < .75) : tier === 2 ? [0, 2, 4, 6].concat([1, 3, 5, 7].filter(() => rng() < .3*fast)) : [0, 1, 2, 3, 4, 5, 6, 7].filter(i => i % 2 === 0 || rng() < .55*fast);
@@ -360,7 +366,7 @@ G.trancheroute = { mount(stage, api){
         slots[i] = {k}; }
       for(let i=0;i<8;i++) if(!slots[i] && !blocked.has(i) && rng() < .14) slots[i] = {k: tier >= 1 && rng() < .35 ? 'A' : 'N'};
     }
-    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'J' && sec.tier !== 'rest' && sec.tier >= 2 && rng() < .3) s.bomb = true; if(s.k === 'C') s.shape = ['block','block','tall','flyer'][Math.floor(rng()*4)]; } });
+    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'J' && sec.tier !== 'rest' && sec.tier >= 2 && rng() < .3) s.bomb = true; if(s.k === 'C') s.shape = rng() < .5 ? 'tall' : 'wide'; } });
     return barCache[bar] = slots;
   }
   function spawnBar(bar){
@@ -408,10 +414,9 @@ G.trancheroute = { mount(stage, api){
     const x = xOf(Math.min(o.beat, Math.max(o.beat, beatNow))), y = objY(o);
     if(g === 'miss'){
       if(trance >= 1) tapeStop(t); setTrance(0, t);
-      combo = 0; hearts--; hurtT = .6; flashR = 1; bump = 1;
+      combo = 0; hurtT = .6; flashR = .6; bump = 1;
       osc(master, 'sawtooth', 110, t, .3, .22, {glide: 50}); noise(master, t, .2, .3, 'lowpass', 900);
       api.vibe(120); api.shake(9); confetti(x, y, [INK, RED], 14, 1.1);
-      if(hearts <= 0) fail();
     } else {
       combo++; maxCombo = Math.max(maxCombo, combo); setTrance(TIERS.filter(x => combo >= x).length - 1, t);
       const base = g === 'perfect' ? 100 : g === 'good' ? 60 : 25; score += Math.round(base*(1 + Math.min(combo, 50)/10)*TMULT[trance]);
@@ -425,7 +430,7 @@ G.trancheroute = { mount(stage, api){
       if(combo > 100 && combo % 50 === 0) celebrate(4, 'ENCORE ' + combo + ' !');
       if(combo % 25 === 0 && !TIERS.includes(combo)) judges.push({txt: combo + ' COMBO', x: W/2, y: H*.2, t: 0, big: true});
     }
-    judges.push({txt: LABEL[g], g, x: o.k === 'H' || o.k === 'S' ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? 'en retard' : 'en avance') : null});
+    judges.push({txt: LABEL[g], g, x: o.k === 'H' || o.k === 'S' ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: o.wrongWay ? (o.shape === 'tall' ? 'coupe vers le haut ↑' : 'coupe vers la droite →') : (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? 'en retard' : 'en avance') : null});
   }
 
   /* ---------- gestes : un geste par doigt, la cible est l'obstacle le plus proche dans le temps ---------- */
@@ -482,12 +487,14 @@ G.trancheroute = { mount(stage, api){
 
   function holdVoice(h){
     if(!useAudio) return null; const T = actx.currentTime, f = freq(h.deg, 4);
+    // note tenue : une nappe douce (sinus + triangle feutré), avec ta voix qui lance la note
+    if(voiceOn()) sing(master, T - t0, f, h.deg, .45, {long: true, rev: .3});
     const o1 = actx.createOscillator(), o2 = actx.createOscillator(), lfo = actx.createOscillator(), lg = actx.createGain(), gn = actx.createGain(), fl = actx.createBiquadFilter();
-    o1.type = 'sawtooth'; o2.type = 'square'; o1.frequency.value = f; o2.frequency.value = f*1.005; lfo.frequency.value = 6; lg.gain.value = f*.012; lfo.connect(lg); lg.connect(o1.frequency); lg.connect(o2.frequency);
-    fl.type = 'lowpass'; fl.frequency.setValueAtTime(800, T); fl.frequency.linearRampToValueAtTime(3200, T + .3); fl.Q.value = 4;
-    gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(.09, T + .03);
+    o1.type = 'triangle'; o2.type = 'sine'; o1.frequency.value = f; o2.frequency.value = f/2; lfo.frequency.value = 4.5; lg.gain.value = f*.006; lfo.connect(lg); lg.connect(o1.frequency);
+    fl.type = 'lowpass'; fl.frequency.setValueAtTime(900, T); fl.frequency.linearRampToValueAtTime(1500, T + .5); fl.Q.value = .7;
+    gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(.06, T + .08);
     o1.connect(fl); o2.connect(fl); fl.connect(gn).connect(master); o1.start(); o2.start(); lfo.start();
-    return {stop(){ const T2 = actx.currentTime; gn.gain.cancelScheduledValues(T2); gn.gain.setValueAtTime(gn.gain.value, T2); gn.gain.exponentialRampToValueAtTime(.0001, T2 + .12); [o1, o2, lfo].forEach(o => o.stop(T2 + .15)); }};
+    return {stop(){ const T2 = actx.currentTime; gn.gain.cancelScheduledValues(T2); gn.gain.setValueAtTime(gn.gain.value, T2); gn.gain.exponentialRampToValueAtTime(.0001, T2 + .25); [o1, o2, lfo].forEach(o => o.stop(T2 + .3)); }};
   }
   function endHold(t, g){ const h = holdState.o; if(holdState.voice) holdState.voice.stop(); holdState = null; h.holding = false; h.released = t; resolve(h, g, t); }
 
@@ -503,13 +510,15 @@ G.trancheroute = { mount(stage, api){
     const l = Math.hypot(dir.x, dir.y) || 1; slash = {dx: dir.x/l, dy: dir.y/l, t: 0};
     const o = firstOf(t, q => q.k === 'C') || firstOf(t, q => q.bomb);
     if(window.__k7log) window.__k7log.push({cut: t, got: o && (o.k + o.beat), near: objs.filter(q => Math.abs(q.time - t) < .35).map(q => q.k + (q.bomb ? 'b' : '') + q.beat + (q.done ? '✓' : '') + ':' + Math.round((t - q.time)*1000))});
-    if(o && o.bomb) explode(o, t); else if(o) cutObj(o, t, dir); else noise(master, t, .05, .05, 'highpass', 3000);
+    if(o && o.bomb) explode(o, t); else if(o) cutObj(o, t, dir); else noise(master, t, .04, .025, 'highpass', 4000);
   }
   function doJump(t){
     const o = firstOf(t, q => q.k === 'J');
     if(o) jumpObj(o, t); else { jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); }
   }
-  function cutObj(o, t, dir){ o.dt = t - o.time; resolve(o, grade(o.dt), t, dir); }
+  const wantDir = o => o.shape === 'tall' ? {x: 0, y: -1} : o.shape === 'wide' ? {x: 1, y: 0} : null;
+  function rightWay(o, dir){ const w = wantDir(o); if(!w) return true; const l = Math.hypot(dir.x, dir.y) || 1; return (dir.x*w.x + dir.y*w.y)/l > .5; }
+  function cutObj(o, t, dir){ o.dt = t - o.time; let g = grade(o.dt); if(g !== 'miss' && !rightWay(o, dir)){ g = 'ok'; o.wrongWay = true; } resolve(o, g, t, dir); }
   function jumpObj(o, t){ jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); o.dt = t - o.time; resolve(o, grade(o.dt), t); }
   function explode(o, t){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); }
   function split(o, dir){
@@ -524,35 +533,35 @@ G.trancheroute = { mount(stage, api){
     confetti(xOf(o.beat), objY(o), [PAPER, RED], 8, .6);
   }
 
+  function rhythmPct(){ const tot = stats.perfect + stats.good + stats.ok + stats.miss; return tot ? Math.round((stats.perfect + stats.good*.8 + stats.ok*.4)/tot*100) : null; }
   function finishRun(won){
     if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; }
-    const total = stats.perfect + stats.good + stats.ok + stats.miss || 1;
-    const acc = Math.round((stats.perfect + stats.good*.7 + stats.ok*.35)/total*100);
-    const stars = !won ? 0 : acc >= 95 ? 3 : acc >= 85 ? 2 : 1;
-    const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + (won ? stars*5*diff.mult : 0));
+    const acc = rhythmPct() || 0, stars = diff.disc.filter(x => acc >= x).length, discsBefore = discs();
+    const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + stars*5*diff.mult);
     api.save('notes', bank() + gained);
     const titleAfter = titleOf(bank());
-    const bk = tr.id + '.' + diff.id, b = bests(), prev = b[bk] || {score: 0, stars: 0}; const rec = won && score > prev.score;
-    if(won) { b[bk] = {score: Math.max(prev.score, score), stars: Math.max(prev.stars, stars)}; b[tr.id] = b[tr.id] && b[tr.id].score > score ? b[tr.id] : {score: Math.max(prev.score, score), stars: Math.max(prev.stars, stars)}; api.save('bests', b); }
-    const nextT = TRACKS[TRACKS.indexOf(tr) + 1];
-    const canUnlock = nextT && !unlocked(nextT) && bank() >= nextT.cost;
-    if(canUnlock){ api.save('unlock.' + nextT.id, true); }
-    TRACKS.forEach(x => { if(!unlocked(x) && bank() >= x.cost) api.save('unlock.' + x.id, true); });
-    const lines = [won ? `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}  ·  ${score} points${rec ? ' (record)' : ''}` : `${score} points · ${Math.round(beatNow/4/totalBars*100)} % de la face`,
-      `Précision ${acc} % · combo max ${maxCombo} · ${diff.name}`, `+${gained} talent ♪ (${notesRun} notes x${diff.mult}${won ? ' + étoiles' : ''}) · total ${bank()}`];
+    const bk = tr.id + '.' + diff.id, b = bests(), prev = b[bk] || {score: 0, stars: 0, discs: 0, pct: 0}; const rec = score > prev.score;
+    b[bk] = {score: Math.max(prev.score, score), stars: Math.max(prev.stars || 0, stars), discs: Math.max(prev.discs || 0, stars), pct: Math.max(prev.pct || 0, acc)}; api.save('bests', b);
+    const nextT = TRACKS[TRACKS.indexOf(tr) + 1], got = discs() - discsBefore;
+    const opened = TRACKS.filter(x => !unlocked(x) && discs() >= x.cost); opened.forEach(x => api.save('unlock.' + x.id, true));
+    const lines = [`${acc} % de super rythme  ·  ${DISC(stars)}`,
+      stars < 3 ? `Disque suivant à ${diff.disc[stars]} % (${diff.name})` : 'Les 3 disques de cette face !',
+      `${score} points${rec ? ' (record)' : ''} · combo max ${maxCombo}`,
+      `+${gained} talent ♪ · total ${bank()}`, `Disques : ${discs()}${got > 0 ? ` (+${got})` : ''}`];
     if(titleAfter !== titleBefore) lines.push(`Nouveau titre : ${titleAfter} !`);
-    if(canUnlock) lines.push(`Nouvelle cassette débloquée : ${nextT.name}`);
-    else if(nextT && !unlocked(nextT)) lines.push(`${nextT.name} : encore ${nextT.cost - bank()} notes`);
-    const actions = [{label: won ? 'Rejouer' : 'Réessayer', fn: () => startTrack(tr)}];
+    if(opened.length) lines.push(`Nouvelle cassette : ${opened.map(x => x.name).join(', ')} !`);
+    else if(nextT && !unlocked(nextT)) lines.push(`${nextT.name} : encore ${nextT.cost - discs()} disque${nextT.cost - discs() > 1 ? 's' : ''}`);
+    const actions = [{label: 'Rejouer', fn: () => startTrack(tr)}];
     if(nextT && unlocked(nextT)) actions.unshift({label: `Face ${nextT.face} : ${nextT.name}`, fn: () => startTrack(nextT)});
     actions.push({label: 'Choisir une cassette', fn: showMenu});
-    api.after(won ? 900 : 1000, () => api.end({win: won, title: won ? (stars === 3 ? 'FACE PARFAITE' : 'FACE TERMINÉE') : 'BANDE CASSÉE', text: lines.join('\n'), actions}));
+    const TT = ['PAS ENCORE CALÉ', 'ÇA GROOVE', 'SUPER RYTHME', 'RYTHME PARFAIT'];
+    api.after(900, () => api.end({win: stars > 0, title: TT[stars], text: lines.join('\n'), actions}));
   }
   function fail(){ if(state !== 'play') return; state = 'over'; if(useAudio){ music.gain.setTargetAtTime(0, actx.currentTime, .2); osc(master, 'sawtooth', 220, now(), 1.2, .2, {glide: 40}); api.after(1500, () => { if(music) music.gain.setValueAtTime(.9, actx.currentTime); }); } finishRun(false); }
   function win(){ if(state !== 'play') return; state = 'over'; I.crash(now()); judges.push({txt: 'FIN DE FACE', x: W/2, y: H*.25, t: 0, big: true}); finishRun(true); }
 
   /* ---------- boucle ---------- */
-  const objY = o => o.k === 'A' || o.k === 'L' ? Y0 - 62 : o.shape === 'flyer' ? Y0 - 56 : o.shape === 'tall' ? Y0 - 30 : o.k === 'N' ? Y0 - 14 : o.k === 'H' || o.k === 'S' ? Y0 - 8 : Y0 - 15;
+  const objY = o => o.k === 'A' || o.k === 'L' ? Y0 - 62 : o.shape === 'flyer' ? Y0 - 56 : o.shape === 'tall' ? Y0 - 32 : o.shape === 'wide' ? Y0 - 13 : o.k === 'N' ? Y0 - 14 : o.k === 'H' || o.k === 'S' ? Y0 - 8 : Y0 - 15;
   let lastBeatI = -1, secShown = -1;
   api.loop((dt, rt) => {
     if(state === 'play'){
@@ -646,12 +655,16 @@ G.trancheroute = { mount(stage, api){
   let backdrop = null, backdropFor = null;
 
   /* ---------- tutos en jeu : arrêt sur image, doigt animé, on fait le geste sur le vrai écran ---------- */
+  // chaque forme a son geste : la forme EST la consigne
   const TUTO = {
-    C: {verb: 'GLISSE !', hint: 'un coup sec, n\'importe où', need: 1},
-    J: {verb: 'TAPE !', hint: 'sans glisser, pour sauter', need: 1},
-    H: {verb: 'POSE ET TIENS !', hint: 'garde le doigt jusqu\'au bout du ruban', need: 1},
-    S: {verb: 'GRATTE !', hint: 'allers-retours rapides de haut en bas', need: 4}
+    CV: {verb: 'GLISSE VERS LE HAUT', shape: 'FORME DEBOUT', hint: 'du bas vers le haut, n\'importe où sur l\'écran', need: 1},
+    CH: {verb: 'GLISSE À DROITE', shape: 'FORME COUCHÉE', hint: 'de gauche à droite, n\'importe où sur l\'écran', need: 1},
+    J: {verb: 'TAPE UNE FOIS', shape: 'FORME RONDE', hint: 'un simple tap, sans glisser', need: 1},
+    H: {verb: 'POSE ET TIENS', shape: 'RUBAN', hint: 'garde le doigt posé jusqu\'au bout du ruban', need: 1},
+    S: {verb: 'GRATTE', shape: 'ZIGZAG', hint: 'allers-retours rapides de haut en bas', need: 4}
   };
+  const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : 'CV') : o.k;
+  let tutoWrong = 0;
   let tutoOpen = false, pauseRaw = 0, tutoObj = null, tutoT = 0, tutoCount = 0, tutoTouch = null, holdHint = 0;
   const rawNow = () => useAudio ? actx.currentTime : performance.now()/1000;
   function startTuto(o){
@@ -660,7 +673,7 @@ G.trancheroute = { mount(stage, api){
     gestures.clear(); api.vibe(30);
   }
   function resumeTuto(){
-    api.save('tuto.' + tutoObj.k, true);
+    api.save('tuto.' + tk(tutoObj), true);
     t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play';
     if(useAudio && music) music.gain.setTargetAtTime(.9, actx.currentTime, .04);
   }
@@ -671,7 +684,9 @@ G.trancheroute = { mount(stage, api){
   }
   function tutoMove(e){
     if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj;
-    if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 14){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null; resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); slash = {dx: dir.x/Math.hypot(dir.x, dir.y), dy: dir.y/Math.hypot(dir.x, dir.y), t: 0}; }
+    if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 22){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null;
+      if(!rightWay(o, dir)){ tutoWrong = 1; api.vibe(40); osc(master, 'triangle', 180, clock(), .12, .06); return; }
+      resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); slash = {dx: dir.x/Math.hypot(dir.x, dir.y), dy: dir.y/Math.hypot(dir.x, dir.y), t: 0}; }
     if(o.k === 'S'){ const v = p.y - tutoTouch.ly; tutoTouch.ly = p.y; const s = Math.sign(v);
       if(s && s !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; I.wik(clock(), s < 0); api.vibe(10); confetti(HXs + 10, Y0 - 10, [PAPER, INK], 4, .5);
           if(tutoCount >= TUTO.S.need){ const id = tutoTouch.id; tutoTouch = null; resumeTuto(); o.strokes = tutoCount; scratchState = {o, id, last: p, dir: s, acc: 0}; } }
@@ -680,10 +695,10 @@ G.trancheroute = { mount(stage, api){
   }
   function tutoUp(e){
     if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj, st = tutoTouch, d = Math.hypot(p.x - st.x, p.y - st.y); tutoTouch = null;
-    if(o.k === 'J' && d < 14){ resumeTuto(); jumpT = 0; o.dt = 0; resolve(o, 'perfect', now()); }
-    if(o.k === 'C' && d > 8){ resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), {x: p.x - st.x, y: p.y - st.y}); }
+    if(o.k === 'J'){ if(d < 18){ resumeTuto(); jumpT = 0; o.dt = 0; resolve(o, 'perfect', now()); } else { tutoWrong = 1; api.vibe(40); } }
+    if(o.k === 'C' && d > 10){ const dir = {x: p.x - st.x, y: p.y - st.y}; if(rightWay(o, dir)){ resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); } else { tutoWrong = 1; api.vibe(40); } }
   }
-  const nextTutoObj = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db <= .02 && db > -.15 && !api.load('tuto.' + o.k, false)) return o; } return null; };
+  const nextTutoObj = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db <= .02 && db > -.15 && !api.load('tuto.' + tk(o), false)) return o; } return null; };
   // un doigt cartoon
   function finger(x, y, press, a){
     ctx.save(); ctx.translate(x, y); ctx.rotate(a || -.35); ctx.scale(1 - press*.08, 1 - press*.08);
@@ -696,25 +711,33 @@ G.trancheroute = { mount(stage, api){
   }
   function drawTuto(rt){
     const o = tutoObj; if(!o) return; tutoT += 1/60;
-    const ox = xOf(o.beat), oy = objY(o), d = TUTO[o.k];
+    const ox = xOf(o.beat), oy = objY(o), d = TUTO[tk(o)]; tutoWrong = Math.max(0, tutoWrong - 1/60/1.2);
     // projecteur : tout s'assombrit sauf l'obstacle et la tête de lecture
     ctx.save(); ctx.fillStyle = 'rgba(28,27,25,.6)'; ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283, true); ctx.fill('evenodd'); ctx.restore();
     ctx.strokeStyle = PAPER; ctx.lineWidth = 3; ctx.setLineDash([8, 7]); ctx.lineDashOffset = -rt*30; ctx.beginPath(); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
     // le doigt fait le geste
     const cx = W*.62, cy = H*.34; let fx = cx, fy = cy, pr = 0, trail = null;
-    if(o.k === 'C'){ const k = (tutoT % 1.1)/1.1, m = Math.min(1, k/.6); fx = cx - 60 + m*120; fy = cy - 50 + m*100; pr = k < .65 ? 1 : 0; trail = m; }
+    let sx = cx, sy = cy;
+    if(o.k === 'C'){ const k = (tutoT % 1.3)/1.3, m = Math.min(1, Math.max(0, (k - .1)/.5)), e = 1 - Math.pow(1 - m, 3), v = o.shape !== 'wide';
+      sx = v ? cx : cx - 80; sy = v ? cy + 70 : cy; fx = v ? cx : sx + e*160; fy = v ? sy - e*140 : cy; pr = k > .08 && k < .65 ? 1 : 0; trail = e;
+      // grosse flèche fantôme qui montre le sens
+      ctx.save(); ctx.globalAlpha = .35 + .25*Math.sin(rt*6); ctx.strokeStyle = SPRAY[1]; ctx.fillStyle = SPRAY[1]; ctx.lineWidth = 10; ctx.lineCap = 'round';
+      const ex = v ? cx : cx + 95, ey = v ? cy - 85 : cy; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.translate(ex, ey); ctx.rotate(v ? -Math.PI/2 : 0); ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(-8, -18); ctx.lineTo(-8, 18); ctx.closePath(); ctx.fill(); ctx.restore(); }
     if(o.k === 'J'){ const k = (tutoT % .9)/.9; pr = k > .3 && k < .55 ? 1 : 0; fy = cy - (pr ? 0 : 10); }
     if(o.k === 'H'){ const k = (tutoT % 1.6)/1.6; pr = k > .15 && k < .85 ? 1 : 0; fy = cy - (pr ? 0 : 12);
       if(pr){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(cx, cy, 26, -Math.PI/2, -Math.PI/2 + (k - .15)/.7*6.283); ctx.stroke(); } }
     if(o.k === 'S'){ fy = cy + Math.sin(tutoT*18)*40; pr = 1; }
-    if(trail != null){ ctx.strokeStyle = 'rgba(244,240,230,.85)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(cx - 60, cy - 50); ctx.lineTo(fx, fy); ctx.stroke(); }
+    if(trail != null && pr){ ctx.strokeStyle = 'rgba(244,240,230,.9)'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(fx, fy); ctx.stroke(); }
     finger(fx, fy, pr);
     // la consigne, style pochoir
     ctx.save(); ctx.translate(W/2, H*.12); ctx.rotate(-.05); ctx.scale(1 + Math.sin(rt*8)*.03, 1 + Math.sin(rt*8)*.03);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `${Math.min(34, W*.085)}px ${FONT}`;
+    ctx.font = `${Math.min(17, W*.044)}px ${FONT}`; ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(d.shape + ' =', 0, -30); ctx.fillStyle = SPRAY[1]; ctx.fillText(d.shape + ' =', 0, -30);
+    ctx.font = `${Math.min(30, W*.074)}px ${FONT}`;
     ctx.lineWidth = 10; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 3, 4); ctx.fillStyle = LABELRED; ctx.fillText(d.verb, 3, 4); ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 0, 0); ctx.fillStyle = PAPER; ctx.fillText(d.verb, 0, 0);
-    ctx.font = '700 15px "Chakra Petch", sans-serif'; ctx.fillStyle = PAPER; ctx.fillText(d.hint, 0, 36);
-    if(o.k === 'S') { ctx.font = `16px ${FONT}`; ctx.fillText(`${tutoCount} / ${d.need}`, 0, 62); }
+    ctx.font = '700 15px "Chakra Petch", sans-serif'; ctx.fillStyle = PAPER; ctx.fillText(d.hint, 0, 34);
+    if(tutoWrong > 0){ ctx.globalAlpha = Math.min(1, tutoWrong*2); ctx.font = `${Math.min(20, W*.05)}px ${FONT}`; ctx.lineWidth = 6; ctx.strokeStyle = INK; const msg = o.k === 'J' ? 'SANS GLISSER !' : 'PAS DANS CE SENS !'; ctx.strokeText(msg, 0, 64); ctx.fillStyle = LABELRED; ctx.fillText(msg, 0, 64); ctx.globalAlpha = 1; }
+    else if(o.k === 'S') { ctx.font = `16px ${FONT}`; ctx.fillText(`${tutoCount} / ${d.need}`, 0, 62); }
     ctx.restore();
   }
 
@@ -765,10 +788,19 @@ G.trancheroute = { mount(stage, api){
     ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc*(1 - (dance || 0)*.5)); if(o.tilt) ctx.rotate(o.tilt);
     shadow(true, 10, 5);
     if(o.k === 'C'){
-      if(o.shape === 'tall'){ ctx.fillStyle = PAPER; rrect(-11, -30, 22, 60, 5); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke(); ctx.fillStyle = RED; for(let i=0;i<3;i++) ctx.fillRect(-11, -20 + i*16, 22, 4); }
+      // debout = coupe de bas en haut, couché = coupe de gauche à droite : les chevrons montrent le sens
+      if(o.shape === 'tall' || o.shape === 'wide'){ const v = o.shape === 'tall'; ctx.save(); if(!v) ctx.rotate(Math.PI/2);
+        ctx.fillStyle = PAPER; rrect(-12, -32, 24, 64, 7); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+        ctx.save(); rrect(-12, -32, 24, 64, 7); ctx.clip(); ctx.fillStyle = 'rgba(28,27,25,.12)'; ctx.fillRect(-12, -32, 7, 64); ctx.restore();
+        const ph = (beatNow*2) % 1; ctx.strokeStyle = RED; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        for(let i=0;i<3;i++){ const yy = 18 - i*16 - ph*6; ctx.globalAlpha = .45 + i*.27; ctx.beginPath(); ctx.moveTo(-7, yy + 5); ctx.lineTo(0, yy - 3); ctx.lineTo(7, yy + 5); ctx.stroke(); }
+        ctx.globalAlpha = 1; ctx.restore(); }
       else if(o.shape === 'flyer'){ ctx.fillStyle = PAPER; ctx.beginPath(); ctx.arc(0, 0, 13, 0, 6.283); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke(); ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(0, 0, 5, 0, 6.283); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 9, rot, rot + 1.4); ctx.stroke(); }
       else { ctx.fillStyle = PAPER; rrect(-14, -14, 28, 28, 5); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke(); ctx.save(); rrect(-14, -14, 28, 28, 5); ctx.clip(); ctx.strokeStyle = 'rgba(28,27,25,.18)'; ctx.lineWidth = 1; for(let i=-28;i<28;i+=5){ ctx.beginPath(); ctx.moveTo(i, 14); ctx.lineTo(i + 28, -14); ctx.stroke(); } ctx.restore(); ctx.fillStyle = RED; ctx.fillRect(-14, -4, 28, 6); ctx.fillStyle = INK; ctx.fillRect(-8, 6, 16, 2); }
-    } else if(o.k === 'J' && !o.bomb){ ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(-15, 15); ctx.lineTo(0, -15); ctx.lineTo(15, 15); ctx.closePath(); ctx.fill(); shadow(false); ctx.fillStyle = 'rgba(255,255,255,.14)'; ctx.beginPath(); ctx.moveTo(0, -15); ctx.lineTo(4, 15); ctx.lineTo(15, 15); ctx.closePath(); ctx.fill(); }
+    } else if(o.k === 'J' && !o.bomb){ // rond = un tap : un gros bouton qui s'enfonce sur le temps
+      const pr = Math.max(0, 1 - Math.abs(o.beat - beatNow)*4); ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(0, 3, 16, 0, 6.283); ctx.fill(); shadow(false);
+      ctx.fillStyle = PAPER; ctx.beginPath(); ctx.arc(0, -1 + pr*3, 13, 0, 6.283); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(0, -1 + pr*3, 5.5 + energy.kick*1.5, 0, 6.283); ctx.fill(); }
     else if(o.bomb){ ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(0, 2, 13, 0, 6.283); ctx.fill(); shadow(false); ctx.fillStyle = INK; ctx.fillRect(-4, -14, 8, 5); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(6, -22, 10, -18); ctx.stroke(); ctx.fillStyle = energy.hat > .5 ? PAPER : '#ffd23f'; ctx.beginPath(); ctx.arc(10, -18, 2.5 + energy.kick*2, 0, 6.283); ctx.fill(); }
     else if(o.k === 'N' || o.k === 'A'){ ctx.fillStyle = INK; ctx.beginPath(); ctx.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); ctx.fill(); shadow(false); ctx.fillRect(1.5, -12, 3, 18); ctx.beginPath(); ctx.moveTo(4.5, -12); ctx.quadraticCurveTo(14, -8, 10, 0); ctx.quadraticCurveTo(11, -6, 4.5, -6); ctx.fill(); if(o.k === 'A'){ ctx.strokeStyle = PAPER; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 17, 0, 6.283); ctx.stroke(); } }
     else if(o.k === 'L'){ ctx.fillStyle = RED; rrect(-10, -13, 20, 26, 4); ctx.fill(); shadow(false); ctx.fillStyle = PAPER; ctx.font = `12px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('+', 0, 1); ctx.textBaseline = 'alphabetic'; }
@@ -857,10 +889,9 @@ G.trancheroute = { mount(stage, api){
       o.tilt = o.done ? .3 : (Math.floor(beatNow) % 2 ? .08 : -.08)*(o.k === 'C' || o.k === 'J' ? 1 : 0);
       if(o.done){ drawObj(o, x, y - 4); continue; }
       const bd = o.beat - beatNow;
-      if((o.k === 'C' || o.k === 'J') && bd < 1.6 && bd > -.15){ const r = (o.shape === 'tall' ? 34 : 22) + Math.max(0, bd)*70, a = Math.min(1, (1.6 - bd)*1.2);
+      if((o.k === 'C' || o.k === 'J') && bd < 1.6 && bd > -.15){ const r = (o.shape === 'tall' || o.shape === 'wide' ? 36 : 22) + Math.max(0, bd)*70, a = Math.min(1, (1.6 - bd)*1.2);
         ctx.strokeStyle = o.bomb ? `rgba(215,38,61,${a})` : o.k === 'J' ? `rgba(28,27,25,${a})` : `rgba(244,240,230,${a})`; ctx.lineWidth = 3 + (bd < .25 ? 2 : 0); ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.stroke(); }
       drawObj(o, x, y, dance);
-      if(o.k === 'J' && bd < 3){ ctx.fillStyle = o.bomb ? RED : INK; ctx.font = `11px ${FONT}`; ctx.textAlign = 'center'; ctx.fillText('▲', x, Y0 - 42); }
     }
     // héros
     const jp = jumpT < .12 ? Math.sin(jumpT/.12*Math.PI/2) : jumpT < .42 ? Math.cos((jumpT - .12)/.3*Math.PI/2) : 0;
@@ -892,9 +923,10 @@ G.trancheroute = { mount(stage, api){
     // interface
     ctx.textAlign = 'left'; ctx.fillStyle = INK; ctx.font = `${24 + bump*6 + ek*2}px ${FONT}`; ctx.fillText(score, 16, 42);
     ctx.font = `11px ${FONT}`; ctx.fillStyle = INK; ctx.fillText(`♪ ${notesRun}`, 17, 62);
-    for(let i=0;i<Math.max(3, hearts);i++){ ctx.fillStyle = i < hearts ? RED : 'rgba(28,27,25,.18)'; rrect(W - 22 - i*18, 24 - (i < hearts ? ek*2 : 0), 13, 19, 3); ctx.fill(); }
-    if(combo > 2){ ctx.textAlign = 'right'; ctx.fillStyle = INK; ctx.font = `${15 + Math.min(combo, 60)/4 + ek*3}px ${FONT}`; ctx.fillText(combo + 'x', W - 16, 70);
-      if(trance){ ctx.font = `${11 + ek*3}px ${FONT}`; ctx.fillStyle = RED; ctx.fillText(TNAME[trance] + ' · x' + TMULT[trance], W - 16, 90); } }
+    { const pc = rhythmPct(), nd = pc == null ? 0 : diff.disc.filter(x => pc >= x).length; ctx.textAlign = 'right'; ctx.font = `${20 + ek*2}px ${FONT}`; ctx.fillStyle = pc == null ? 'rgba(28,27,25,.35)' : nd >= 2 ? RED : INK; ctx.fillText((pc == null ? '--' : pc) + '%', W - 16, 40);
+      ctx.font = `13px ${FONT}`; for(let i=0;i<3;i++){ ctx.fillStyle = i < nd ? INK : 'rgba(28,27,25,.22)'; ctx.beginPath(); ctx.arc(W - 22 - (2 - i)*17, 52, 6.5, 0, 6.283); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke(); ctx.fillStyle = i < nd ? PAPER : 'rgba(0,0,0,0)'; ctx.beginPath(); ctx.arc(W - 22 - (2 - i)*17, 52, 2, 0, 6.283); ctx.fill(); } ctx.textAlign = 'left'; }
+    if(combo > 2){ ctx.textAlign = 'right'; ctx.fillStyle = INK; ctx.font = `${15 + Math.min(combo, 60)/4 + ek*3}px ${FONT}`; ctx.fillText(combo + 'x', W - 16, 82);
+      if(trance){ ctx.font = `${11 + ek*3}px ${FONT}`; ctx.fillStyle = RED; ctx.fillText(TNAME[trance] + ' · x' + TMULT[trance], W - 16, 100); } }
     if(state === 'play' && isListen(bar)){ ctx.textAlign = 'center'; ctx.font = `14px ${FONT}`; ctx.fillStyle = INK; ctx.globalAlpha = .45 + ek*.55; ctx.fillText('ÉCOUTE', W/2, Y0 - 112); ctx.globalAlpha = 1; }
     if(state === 'play' && beatNow < 4){ const n = 4 - Math.floor(Math.max(0, beatNow)); ctx.textAlign = 'center'; ctx.font = `${44 + ek*14}px ${FONT}`; ctx.fillStyle = INK; ctx.fillText(n > 1 ? n - 1 : 'GO', W/2, Y0 - 100); }
     for(const j of judges){
@@ -1001,7 +1033,7 @@ G.trancheroute = { mount(stage, api){
   for(let i=0;i<14;i++) mFloat.push({x: Math.random()*W, y: Math.random()*H, s: .6 + Math.random()*.9, v: 14 + Math.random()*22, ph: Math.random()*6});
   const menuBg = makeWall(Math.round(W) + 40, Math.round(H) + 40);
   const wrapI = i => ((i % TRACKS.length) + TRACKS.length) % TRACKS.length;
-  function cassImg(t){ const open = unlocked(t) || bank() >= t.cost, key = t.id + (open ? 1 : 0); if(!imgCache[key]){ const im = new Image(); im.src = makeCassette(t, open); imgCache[key] = im; } return imgCache[key]; }
+  function cassImg(t){ const open = unlocked(t) || discs() >= t.cost, key = t.id + (open ? 1 : 0); if(!imgCache[key]){ const im = new Image(); im.src = makeCassette(t, open); imgCache[key] = im; } return imgCache[key]; }
   const ui = {};
   menu.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:flex-end;gap:10px;align-items:flex-start">
@@ -1017,19 +1049,19 @@ G.trancheroute = { mount(stage, api){
   ['k7tal','k7gear','k7info','k7dl','k7dr','k7diffbox','k7play'].forEach(id => ui[id] = menu.querySelector('#' + id));
 
   function refreshUI(pop){
-    const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost, d = DIFFS[dIdx], bk = bests()[t.id + '.' + d.id];
-    ui.k7tal.innerHTML = `♪ ${bank()}<div style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;font-weight:700;opacity:.85">${titleOf(bank())}</div>`;
+    const t = TRACKS[cur], open = unlocked(t), afford = !open && discs() >= t.cost, d = DIFFS[dIdx], bk = bests()[t.id + '.' + d.id];
+    ui.k7tal.innerHTML = `◉ ${discs()} · ♪ ${bank()}<div style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;font-weight:700;opacity:.85">${titleOf(bank())}</div>`;
     ui.k7info.innerHTML = `<div style="font-family:${MARKER};font-size:26px;line-height:1.1;color:${SPRAY[cur % SPRAY.length]};text-shadow:2px 2px 0 ${INK}">${t.name}</div><div style="font-size:13.5px">${t.label} · ${t.gestures}</div>
-      <div style="font-size:13.5px;font-weight:700;margin-top:3px;color:${open ? INK : LABELRED}">${open ? (bk ? `${'★'.repeat(bk.stars)}${'☆'.repeat(3 - bk.stars)} record ${bk.score}` : 'Jamais jouée à ce niveau') : afford ? 'Tu as assez de talent pour l\'ouvrir !' : `Il te faut ${t.cost} ♪ de talent`}</div>`;
+      <div style="font-size:13.5px;font-weight:700;margin-top:3px;color:${open ? INK : LABELRED}">${open ? (bk ? `${DISC(bk.discs || 0)} · ${bk.pct || 0} % de rythme` : 'Jamais jouée à ce niveau') : afford ? 'Tu as assez de disques pour l\'ouvrir !' : `Il te faut ${t.cost} disques (tu en as ${discs()})`}</div>`;
     if(pop){ ui.k7info.classList.remove('k7pop'); void ui.k7info.offsetWidth; ui.k7info.classList.add('k7pop'); }
     ui.k7diffbox.innerHTML = `<div class="k7tape"><div style="font-family:${MARKER};font-size:22px;line-height:1;color:${dIdx >= 3 ? LABELRED : INK}">${d.name}</div><div style="font-size:12px;font-weight:700">${d.note} · talent x${d.mult}</div></div>`;
-    ui.k7play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR !' : `${t.cost} ♪`;
+    ui.k7play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR !' : `${t.cost} ◉`;
     ui.k7play.style.filter = open || afford ? '' : 'grayscale(1)';
   }
   ui.k7dl.onclick = () => { dIdx = Math.max(0, dIdx - 1); api.save('diff', dIdx); api.sfx.click(); refreshUI(); squash = .6; };
   ui.k7dr.onclick = () => { dIdx = Math.min(DIFFS.length - 1, dIdx + 1); api.save('diff', dIdx); api.sfx.click(); refreshUI(); squash = .6; };
   ui.k7play.onclick = () => {
-    const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost;
+    const t = TRACKS[cur], open = unlocked(t), afford = !open && discs() >= t.cost;
     if(!open && !afford){ api.sfx.lose(); squash = -1; return; }
     if(!open){ api.save('unlock.' + t.id, true); api.sfx.coin(); squash = 1.2; for(let i=0;i<24;i++) mFloat.push({x: W/2, y: H*.42, s: 1, v: 0, ph: 0, burst: {vx: (Math.random() - .5)*500, vy: -200 - Math.random()*400, life: 1.2}}); refreshUI(true); return; }
     diff = DIFFS[dIdx]; startTrack(t);
@@ -1052,7 +1084,7 @@ G.trancheroute = { mount(stage, api){
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
-    sh.querySelector('#k7tuto').onclick = e => { ['C','J','H','S'].forEach(k => api.save('tuto.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','J','H','S'].forEach(k => api.save('tuto.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
   };
 
   // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
@@ -1136,7 +1168,7 @@ G.trancheroute = { mount(stage, api){
     const base = Math.floor(mPos);
     for(const off of [-2, -1, 2, 1, 0].map(o => o + (mPos - base > .5 ? 1 : 0))){
       const i = base + off, d = i - mPos, ad = Math.abs(d); if(ad > 2.2) continue;
-      const t = TRACKS[wrapI(i)], im = cassImg(t), open = unlocked(t) || bank() >= t.cost;
+      const t = TRACKS[wrapI(i)], im = cassImg(t), open = unlocked(t) || discs() >= t.cost;
       const sc = Math.max(.35, 1 - ad*.32) * Math.min(1, W*.86/320), x = cx + d*SP()*.78, y = cy + ad*ad*16 + Math.sin(mTime*2.2 + i)*6*(1 - Math.min(1, ad));
       const sq = ad < .5 ? squash : 0;
       g.save(); g.translate(x, y); g.rotate(d*.16 + Math.sin(mTime*1.7 + i)*.03); g.scale(sc*(1 + sq*.08), sc*(1 - sq*.08)); g.globalAlpha = Math.max(.25, 1 - ad*.45);
