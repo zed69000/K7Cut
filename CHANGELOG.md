@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.20.0 — Vrai scratch de la musique, écran stable
+- **Le scratch scratche vraiment le morceau.** Le jeu garde en continu les 3 dernières secondes de musique. Au premier geste d'un scratch, il pose « l'aiguille » sur l'attaque du dernier temps (batterie + accord) : chaque aller lit ce bout de disque à l'endroit, chaque retour le relit à l'envers, avec une vitesse qui monte puis retombe comme une main sur la platine. Même chose pour l'appel du scratch et pour le tuto.
+- **L'écran ne bouge plus pendant le scratch** : chaque aller-retour déclenchait un petit zoom de toute la scène.
+
 ## 0.19.0 — Ronds-cœurs en rythme, sens de glisse strict, tutos sur les vraies formes
 - **Les ronds-cœurs partent au toucher.** Le tap était validé quand le doigt se levait, donc le son arrivait environ 0,1 s en retard : on avait l'impression de ne pas être en rythme. Le coup part maintenant dès que le doigt touche l'écran.
 - **Le son du rond-cœur est celui du morceau** : la caisse claire ou le clap exact du style (rimshot en dub, clap filtré en French touch, caisse saturée en métal…), plus de son ajouté.

@@ -56,7 +56,7 @@ const RHY = [
   ['C.JCC.J.', 'C.J.CCJ.', 'CC.JC.J.', 'C.JC.CJ.', 'C..CJ.C.', 'C.J..CJC', 'CCJ.C.J.'],
   ['CCJCCCJC', 'C.JCCJCJ', 'CCJ.CCJC', 'C.JCC.JC', 'CCJCC.JJ', 'C.JCCJ.C']
 ];
-const VERSION = '0.19.0';
+const VERSION = '0.20.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Pour apprendre, tout en douceur', mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -105,6 +105,7 @@ G.trancheroute = { mount(stage, api){
       vduck = actx.createGain(); vduck.connect(tone);
       const low = actx.createBiquadFilter(); low.type = 'lowshelf'; low.frequency.value = 110; low.gain.value = 3.5; low.connect(vduck);
       music = actx.createGain(); music.gain.value = .8; music.connect(low);
+      capInit(low);
       // bus de la voix : on coupe le grave qui bave, on avance la présence, on tient le volume
       const vhp = actx.createBiquadFilter(), vpk = actx.createBiquadFilter(), vcomp = actx.createDynamicsCompressor();
       vhp.type = 'highpass'; vhp.frequency.value = 230; vpk.type = 'peaking'; vpk.frequency.value = 2800; vpk.Q.value = 1; vpk.gain.value = 4;
@@ -116,6 +117,38 @@ G.trancheroute = { mount(stage, api){
       dlyIn = actx.createGain(); dlyIn.connect(dly); dly.connect(dlf).connect(fb).connect(dly); dlf.connect(dlyOut).connect(master);
     }catch(e){ actx = null; }
   }
+  /* ---------- la platine : on garde en continu les 3 dernières secondes de la musique, pour la scratcher pour de vrai ---------- */
+  let ring = null, ringW = 0, ringT = 0;
+  function capInit(src){
+    try{ const cap = actx.createScriptProcessor(2048, 2, 1), z = actx.createGain(); ring = new Float32Array(Math.round(actx.sampleRate*3)); z.gain.value = 0;
+      cap.onaudioprocess = e => { const ib = e.inputBuffer, a = ib.getChannelData(0), b = ib.numberOfChannels > 1 ? ib.getChannelData(1) : a;
+        for(let i=0;i<a.length;i++){ ring[ringW] = (a[i] + b[i])*.5; ringW = (ringW + 1) % ring.length; } ringT = e.playbackTime || actx.currentTime; };
+      src.connect(cap); cap.connect(z).connect(actx.destination); }catch(e){ ring = null; }
+  }
+  // le disque sous l'aiguille : le dernier temps entier du morceau (une attaque de batterie + l'accord), à l'endroit et à l'envers
+  function grabRecord(){
+    if(!useAudio || !ring || !ringT) return null;
+    const sr = actx.sampleRate, len = Math.round(sr*.5), bt = (Math.floor(clock()/bpb) - 1)*bpb, back = Math.round((ringT - RT(bt))*sr);
+    if(back < len || back > ring.length - 64) return null;
+    const f = actx.createBuffer(1, len, sr), r = actx.createBuffer(1, len, sr), fd = f.getChannelData(0), rd = r.getChannelData(0); let e2 = 0;
+    let pk = 0; for(let i=0;i<len;i++){ const v = ring[(ringW - back + i + ring.length) % ring.length]; fd[i] = v; e2 += v*v; pk = Math.max(pk, Math.abs(v)); }
+    if(Math.sqrt(e2/len) < .002) return null;
+    // on remet le disque à niveau (la musique a pu être baissée), puis on fabrique sa version à l'envers
+    const k = Math.min(10, .8/pk); for(let i=0;i<len;i++){ fd[i] *= k; rd[len - 1 - i] = fd[i]; }
+    // l'aiguille se pose sur l'attaque : le coup le plus fort du début du temps
+    let cue = 0, best = 0; for(let i=0;i<Math.round(sr*.22);i++){ const v = Math.abs(fd[i]); if(v > best){ best = v; cue = i; } }
+    return {f, r, len: .5, cue: Math.max(0, cue/sr - .004)};
+  }
+  // un coup de main sur le disque : vers l'avant on lit l'attaque, vers l'arrière on la relit à l'envers ; la vitesse suit le geste (lente, rapide, lente)
+  function scratchHit(at, back, rec){
+    if(!useAudio) return; rec = rec || (lastRec = lastRec || grabRecord()); if(!rec){ I.wik(at, back); return; }
+    const T = RT(at), D = Math.min(.2, bpb/3), L = .12, src = actx.createBufferSource(), g = actx.createGain(), hp = actx.createBiquadFilter();
+    src.buffer = back ? rec.r : rec.f; hp.type = 'highpass'; hp.frequency.value = 140;
+    src.playbackRate.setValueAtTime(.25, T); src.playbackRate.linearRampToValueAtTime(1.5, T + D*.35); src.playbackRate.linearRampToValueAtTime(.12, T + D);
+    g.gain.setValueAtTime(0, T); g.gain.linearRampToValueAtTime(.95, T + .006); g.gain.setValueAtTime(.95, T + D*.75); g.gain.linearRampToValueAtTime(0, T + D);
+    src.connect(hp).connect(g).connect(master); src.start(T, back ? Math.max(0, rec.len - rec.cue - L) : rec.cue); src.stop(T + D + .03); hit('lead', at);
+  }
+  let lastRec = null;
   /* ---------- la voix : 7 syllabes chantées, transposées sur la mélodie ---------- */
   const VSEG = [[.05, .28, 183.9], [.65, .94, 216.2], [1.25, 1.54, 242.4], [1.91, 2.2, 280.7], [2.53, 2.84, 326.5], [3.13, 3.54, 363.6], [3.77, 4.6, 363.6]];
   let voiceBuf = null;
@@ -448,7 +481,7 @@ G.trancheroute = { mount(stage, api){
         if(e.k === 'C') lead(at, f, .09);
         if(e.k === 'J') I.tap(music, at, .8);
         if(e.k === 'H') osc(master, 'triangle', f, at, .08, .06, {sus: e.len*bpb/2, lp: [1400, 1000, 1]});
-        if(e.k === 'S'){ for(let i=0;i<e.len;i++) I.wik(at + i*bpb/2, i % 2 === 0); }
+        if(e.k === 'S'){ const rec = grabRecord(); for(let i=0;i<e.len;i++) scratchHit(at + i*bpb/2, i % 2 === 1, rec); }
       }
     }
   }
@@ -518,7 +551,7 @@ G.trancheroute = { mount(stage, api){
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
-    trance = 0; voiceFrom = voiceUntil = 0; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
+    trance = 0; lastRec = null; voiceFrom = voiceUntil = 0; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
     lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     resetRate(); t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
     cueN = api.load('cue', {});
@@ -614,7 +647,7 @@ G.trancheroute = { mount(stage, api){
     if(state === 'tuto'){ tutoMove(e); return; }
     const p = pt(e), t = now();
     if(scratchState && scratchState.id === e.pointerId){ const s = scratchState, dy = p.y - s.last.y, dx = p.x - s.last.x, v = Math.abs(dy) > Math.abs(dx) ? dy : dx; s.last = p;
-      const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
+      const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; if(!s.o.rec) s.o.rec = grabRecord(); scratchHit(t, d < 0, s.o.rec); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
     const g = gestures.get(e.pointerId); if(!g || g.done) return;
     const dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
     if(d > 18){ g.done = true; doCut(g.t, {x: dx, y: dy}); }
@@ -1116,6 +1149,7 @@ G.trancheroute = { mount(stage, api){
   const rawNow = () => useAudio ? actx.currentTime : performance.now()/1000;
   // le tuto fige le jeu quand une forme jamais vue arrive sur la bande (deux temps avant la ligne rouge) : on montre le geste sur la vraie forme
   function startTuto(o){
+    if(o.k === 'S' && !o.rec) o.rec = grabRecord(); // le disque est pris avant que la musique ne se baisse
     tutoOpen = true; tutoObj = o; tutoT = 0; tutoCount = 0; tutoTouch = null; tutoOk = 0; tutoWrong = 0; tutoHeld = 0; state = 'tuto'; pauseRaw = rawNow();
     if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(.15, actx.currentTime, .05); }
     gestures.clear(); api.vibe(30);
@@ -1141,7 +1175,7 @@ G.trancheroute = { mount(stage, api){
     if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj;
     if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 22){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null; if(rightWay(o, dir)) tutoSuccess(dir); else tutoWrongMsg(); return; }
     if(o.k === 'S'){ const v = p.y - tutoTouch.ly; tutoTouch.ly = p.y; const sg = Math.sign(v);
-      if(sg && sg !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; I.wik(clock(), sg < 0); api.vibe(10); if(tutoCount >= TUTO.S.need){ tutoSuccess(); return; } }
+      if(sg && sg !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; scratchHit(clock(), sg < 0, tutoObj.rec); api.vibe(10); if(tutoCount >= TUTO.S.need){ tutoSuccess(); return; } }
         tutoTouch.dir = sg; tutoTouch.acc = 0; }
       tutoTouch.acc += Math.abs(v); }
   }
