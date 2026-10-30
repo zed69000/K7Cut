@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.8.0
+- Ta voix dans le jeu : les 7 syllabes chantées du mémo deviennent un instrument. Chaque coupe réussie chante la note de la mélodie, transposée automatiquement ; les appels « écoute », le compte à rebours et les paliers de transe (en chœur) chantent aussi
+- Réglage « Mélodie : ta voix / synthé » dans l'engrenage
+
 ## 0.7.2
 - Plus aucune devinette sur le geste : l'obstacle visé décide (bloc = coupe, pic = saut), seule la bombe exige un tap
 - Les obstacles sont joués dans l'ordre, comme une partition : un geste un peu en retard ne vole plus l'obstacle suivant

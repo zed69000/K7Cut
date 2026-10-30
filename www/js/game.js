@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.7.2';
+const VERSION = '0.8.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -89,9 +89,29 @@ G.trancheroute = { mount(stage, api){
       tone = actx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 20000; tone.Q.value = .8; tone.connect(shelf);
       music = actx.createGain(); music.gain.value = .9; music.connect(tone);
       const rev = actx.createConvolver(); rev.buffer = impulse(2.4, 3); const revOut = actx.createGain(); revOut.gain.value = .32; revIn = actx.createGain(); revIn.connect(rev).connect(revOut).connect(master);
+      setTimeout(loadVoice, 0);
       dly = actx.createDelay(2); const fb = actx.createGain(), dlf = actx.createBiquadFilter(), dlyOut = actx.createGain(); fb.gain.value = .42; dlf.type = 'lowpass'; dlf.frequency.value = 2400; dlyOut.gain.value = .38;
       dlyIn = actx.createGain(); dlyIn.connect(dly); dly.connect(dlf).connect(fb).connect(dly); dlf.connect(dlyOut).connect(master);
     }catch(e){ actx = null; }
+  }
+  /* ---------- la voix : 7 syllabes chantées, transposées sur la mélodie ---------- */
+  const VSEG = [[.05, .28, 183.9], [.65, .94, 216.2], [1.25, 1.54, 242.4], [1.91, 2.2, 280.7], [2.53, 2.84, 326.5], [3.13, 3.54, 363.6], [3.77, 4.6, 363.6]];
+  let voiceBuf = null;
+  function loadVoice(){
+    if(voiceBuf || !actx || !window.K7_VOICE) return;
+    try{ const bin = atob(window.K7_VOICE.split(',')[1]), u = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i);
+      actx.decodeAudioData(u.buffer, buf => { voiceBuf = buf; }, () => {}); }catch(e){}
+  }
+  const voiceOn = () => api.load('voice', true) && voiceBuf;
+  function sing(bus, at, f, idx, vol, o2){
+    if(!useAudio || !voiceBuf) return false; o2 = o2 || {};
+    const sg = VSEG[((idx % 7) + 7) % 7], T = at + t0, src = actx.createBufferSource(), gn = actx.createGain();
+    let rate = f/sg[2]; while(rate > 2.1) rate /= 2; while(rate < .55) rate *= 2;
+    const dur = (o2.long ? sg[1] - sg[0] : Math.min(sg[1] - sg[0], .26))/rate;
+    src.buffer = voiceBuf; src.playbackRate.value = rate;
+    gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(vol, T + .012); gn.gain.setValueAtTime(vol, T + Math.max(.02, dur - .05)); gn.gain.linearRampToValueAtTime(0, T + dur);
+    route(src, gn, bus, {rev: o2.rev ?? .18, dly: o2.dly || 0, pan: o2.pan || 0}, T); src.start(T, sg[0], dur*rate + .02); src.stop(T + dur + .05);
+    hit('lead', at); return true;
   }
   function curve(k){ if(curves[k]) return curves[k]; const n = 1024, c = new Float32Array(n); for(let i=0;i<n;i++){ const x = i/(n - 1)*2 - 1; c[i] = Math.tanh(k*x)/Math.tanh(k); } return curves[k] = c; }
   let lat = 0;
@@ -200,7 +220,7 @@ G.trancheroute = { mount(stage, api){
   function chordOf(bar){ return tr.prog[((bar - 1) % tr.prog.length + tr.prog.length) % tr.prog.length]; }
   function scheduleStep(s){
     const beat = s/4, bar = Math.floor(beat/4), p = s % 16, sw = (p % 2 ? tr.swing*bpb/4 : 0), at = beat*bpb + sw;
-    if(bar === 0){ if(p % 4 === 0){ osc(master, 'square', p === 0 ? 1568 : 1046, at, .06, .12); hit('kick', at); } if(p === 0) I.riser(at, 4*bpb); return; }
+    if(bar === 0){ if(p % 4 === 0){ if(!(voiceOn() && sing(master, at, freq([0, 2, 4, 7][p/4], 4), [0, 2, 4, 6][p/4], .8, {long: p === 12}))) osc(master, 'square', p === 0 ? 1568 : 1046, at, .06, .12); hit('kick', at); } if(p === 0) I.riser(at, 4*bpb); return; }
     const sec = sectionOf(bar); if(!sec) return;
     const L = new Set(sec.layers), st = tr.style, deg = chordOf(bar), chord = [deg, deg + 2, deg + 4], T = sec.tier === 'rest' ? 0 : sec.tier;
     const lastBar = bar === sec.start + sec.bars - 1, next = sectionOf(bar + 1), r = freq(deg, 1);
@@ -305,7 +325,7 @@ G.trancheroute = { mount(stage, api){
     if(isListen(bar) && p % 2 === 0){
       const nb = buildBar(bar + 1); const e = nb && nb[p/2];
       if(e){ const f = freq(e.deg, 4);
-        if(e.k === 'C') I.pluck(master, at, f, .1);
+        if(e.k === 'C'){ if(!(voiceOn() && sing(master, at, f, e.deg, .6, {pan: -.2}))) I.pluck(master, at, f, .1); }
         if(e.k === 'J') I.boing(master, at, freq(deg, 2), .14);
         if(e.k === 'H') osc(master, 'square', f, at, .08, .07, {sus: e.len*bpb/2, lp: [2500, 1500, 2]});
         if(e.k === 'S'){ for(let i=0;i<e.len;i++) I.wik(at + i*bpb/2, i % 2 === 0); }
@@ -375,7 +395,7 @@ G.trancheroute = { mount(stage, api){
   const TIERS = [0, 10, 25, 50, 100], TNAME = ['', 'EN RYTHME', 'TRANSE', 'HYPNOSE', 'NIRVANA'], TMULT = [1, 1.5, 2, 3, 4];
   function setTrance(n, t){
     if(n === trance) return; const up = n > trance; trance = n;
-    if(up){ celebrate(n); judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
+    if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)); [0, 2, 4].forEach((k2, i) => sing(master, t + i*.04, freq(d0 + k2 + 7, 4), 6, .55, {long: true, pan: (i - 1)*.5, rev: .4})); } celebrate(n); judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
       if(useAudio){ const T = actx.currentTime; tone.frequency.setTargetAtTime(20000, T, .05); shelf.gain.setTargetAtTime(n*1.5, T, .4); } }
   }
   function tapeStop(t){
@@ -397,7 +417,7 @@ G.trancheroute = { mount(stage, api){
       const base = g === 'perfect' ? 100 : g === 'good' ? 60 : 25; score += Math.round(base*(1 + Math.min(combo, 50)/10)*TMULT[trance]);
       const when = Math.max(t, o.time);
       // le joueur joue la mélodie
-      if(o.k === 'C'){ I.pluck(master, when, freq(o.deg, 4), g === 'perfect' ? .13 : .08); noise(master, t, .05, .2, 'highpass', 5000); split(o, dir); }
+      if(o.k === 'C'){ if(!(voiceOn() && sing(master, when, freq(o.deg, 4), o.deg, g === 'perfect' ? .9 : .65))) I.pluck(master, when, freq(o.deg, 4), g === 'perfect' ? .13 : .08); noise(master, t, .05, .2, 'highpass', 5000); split(o, dir); }
       if(o.k === 'J') I.boing(master, when, freq(chordOf(Math.floor(o.beat/4)), 2), .14);
       confetti(x, y - 10, g === 'perfect' ? [RED, PAPER, INK] : [PAPER, INK], g === 'perfect' ? 16 : 8, 1);
       if(g === 'perfect') bump = Math.max(bump, .5);
@@ -1005,6 +1025,7 @@ G.trancheroute = { mount(stage, api){
     const sh = document.createElement('div'); sh.className = 'k7sheet';
     sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">RÉGLAGES</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="Fermer">✕</button></div>
       <button class="k7btn" id="k7mute" style="padding:12px;font-size:13px">${api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'}</button>
+      <button class="k7btn" id="k7voice" style="padding:12px;font-size:13px">${api.load('voice', true) ? 'MÉLODIE : TA VOIX' : 'MÉLODIE : SYNTHÉ'}</button>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px">Calage du rythme <span style="display:flex;gap:8px;align-items:center"><button class="k7btn" id="k7offm" style="width:40px;height:38px;padding:0">−</button><b id="k7off" style="font-family:${FONT};min-width:62px;text-align:center">${api.load('offset', 0)} ms</b><button class="k7btn" id="k7offp" style="width:40px;height:38px;padding:0">+</button></span></div>
       <div style="font-size:12.5px;opacity:.8;margin-top:-6px">Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.</div>
       <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">REVOIR LES TUTOS</button>
@@ -1012,6 +1033,7 @@ G.trancheroute = { mount(stage, api){
     menu.appendChild(sh);
     const close = () => sh.remove();
     sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
+    sh.querySelector('#k7voice').onclick = e => { api.save('voice', !api.load('voice', true)); e.target.textContent = api.load('voice', true) ? 'MÉLODIE : TA VOIX' : 'MÉLODIE : SYNTHÉ'; };
     sh.querySelector('#k7mute').onclick = e => { api.store.save('muted', !api.store.load('muted', false)); e.target.textContent = api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'; };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
@@ -1082,7 +1104,7 @@ G.trancheroute = { mount(stage, api){
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 
-  window.__k7 = {get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
   showMenu();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};

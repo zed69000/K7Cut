@@ -1,7 +1,7 @@
 # Assemble la page autonome (un seul fichier) publiée sur claude.ai à partir de www/
 import pathlib
 w = pathlib.Path(__file__).parent / 'www'
-css = (w/'css/style.css').read_text(); game = (w/'js/game.js').read_text(); main = (w/'js/main.js').read_text()
+css = (w/'css/style.css').read_text(); game = (w/'js/voice.js').read_text() + '\n' + (w/'js/game.js').read_text(); main = (w/'js/main.js').read_text()
 assert '</script' not in game + main
 html = f'''<title>K7 CUT</title>
 <meta name="claude:viewport-fit-sides" content="cover">
