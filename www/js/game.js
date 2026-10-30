@@ -48,6 +48,14 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
+const VERSION = '0.5.0';
+const DIFFS = [
+  {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
+  {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
+  {id: 'virtuose', name: 'Virtuose', note: 'Plus dense, plus précis', mult: 2.5, win: .85, dens: 1.25, hearts: 3},
+  {id: 'roi', name: 'Roi', note: 'Une seule vie, aucune pitié', mult: 4, win: .72, dens: 1.45, hearts: 1}
+];
+const TITLES = [[0, 'Apprenti'], [60, 'Musicien'], [180, 'Virtuose'], [400, 'Maître du scratch'], [800, 'Roi du scratch et du rythme']];
 function rngFrom(str){ let h = 2166136261; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } let s = h >>> 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
 
 G.trancheroute = { mount(stage, api){
@@ -58,11 +66,12 @@ G.trancheroute = { mount(stage, api){
   const REELY = Math.round(H*.83), REELR = Math.min(W*.19, H*.11), EQY = Math.round(H*.665);
   let PPB = 100;
   let actx = null, master = null, music = null, pump = null, t0 = 0, useAudio = false;
-  let tr = null, sections, totalBars, bpb, objs, bits, judges, state = 'menu', score, combo, maxCombo, hearts, stats, beatNow, nextStep, jumpT, hurtT, energy, events, bump, flashR, gesture, motif, notesRun, holdState, scratchState, rot, finished, trance = 0, rings = [];
+  let diff = DIFFS[1], tr = null, sections, totalBars, bpb, objs, bits, judges, state = 'menu', score, combo, maxCombo, hearts, stats, beatNow, nextStep, jumpT, hurtT, energy, events, bump, flashR, gesture, motif, notesRun, holdState, scratchState, rot, finished, trance = 0, rings = [], hookMask = [1,0,0,1,0,1,0,0];
 
   /* ---------- sauvegarde ---------- */
   const bank = () => api.load('notes', 0);
   const bests = () => api.load('bests', {});
+  const titleOf = n => TITLES.filter(x => n >= x[0]).pop()[1];
   const unlocked = t => t.cost === 0 || api.load('unlock.' + t.id, false);
 
   /* ---------- audio : bus musique (filtre, pompe) + réverb + écho, compresseur et limiteur ---------- */
@@ -198,8 +207,16 @@ G.trancheroute = { mount(stage, api){
     if(bar === sec.start && p === 0 && bar > 1 && sec.tier !== 'rest') I.crash(at);
     if(lastBar && next && next.tier !== 'rest' && p === 0) I.riser(at, 4*bpb);
     if(lastBar && next && p >= 12 && L.has('snare')) I.snare(at, .4 + (p - 12)*.15);
-    const K = L.has('kick'), S = L.has('snare'), Hh = L.has('hat'), B = L.has('bass'), Ch = L.has('chords'), A = L.has('arp'), P = L.has('perc'), Ld = L.has('lead'), Gt = L.has('gtr');
-    const mel = motif[(bar % 2)*8 + (p >> 1)];
+    const brk = lastBar && next && next.tier !== 'rest' && next.tier >= 2 && sec.tier !== next.tier && p >= 8;
+    if(p === 0 && bar === sec.start && useAudio && trance === 0){ const T0 = at + t0, T1 = T0 + sec.bars*4*bpb; tone.frequency.cancelScheduledValues(T0);
+      if(sec.tier === 0 || sec.tier === 'rest'){ tone.frequency.setValueAtTime(sec.tier === 'rest' ? 700 : 900, T0); tone.frequency.exponentialRampToValueAtTime(sec.tier === 'rest' ? 2500 : 9000, T1); }
+      else tone.frequency.setTargetAtTime(20000, T0, .05); }
+    if(brk && p === 8 && useAudio){ tone.frequency.setValueAtTime(20000, at + t0); tone.frequency.exponentialRampToValueAtTime(600, at + t0 + 2*bpb); }
+    if(p === 0 && !['punk', 'metal'].includes(st) && sec.tier !== 0) I.chord(at, [deg, deg + 2, deg + 4, deg + 6], 4*bpb*.95, 'pad');
+    if(sec.tier === 'rest' && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 4, 7, 9, 11, 9, 7, 4][(p/2) % 8], 8), .02, {dly: .45, pan: (p % 4 ? .5 : -.5)});
+    const K0 = L.has('kick'), B0 = L.has('bass');
+    const K = K0 && !brk, S = L.has('snare'), Hh = L.has('hat'), B = B0 && !brk, Ch = L.has('chords'), A = L.has('arp'), P = L.has('perc'), Ld = L.has('lead'), Gt = L.has('gtr');
+    const mel = motif[(bar % 4)*8 + (p >> 1)], hk = p % 2 === 0 && hookMask[p >> 1] === 1;
     if(st === 'disco'){
       if(K && p % 4 === 0) I.kick(at);
       if(S && (p === 4 || p === 12)){ I.snare(at, .6); I.clap(at); }
@@ -208,7 +225,7 @@ G.trancheroute = { mount(stage, api){
       if(B && p % 2 === 0) I.bass(at, p % 4 ? r*2 : r, .16, T >= 2 ? 'acid' : 'saw');
       if(Ch && [2, 6, 10, 14].includes(p)) I.chord(at, chord, .14, 'stab');
       if(A && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 2, 4, 7][(p/2) % 4], 4), .03, {dly: .2, pan: .4});
-      if(Ld && [0, 6, 10].includes(p)) I.bell(at, freq(mel, 8), .035);
+      if(Ld && hk) I.bell(at, freq(mel, 8), .04);
     }
     if(st === 'hiphop'){
       if(K && [0, 7, 10].includes(p)) I.kick(at, p ? .8 : 1);
@@ -217,7 +234,7 @@ G.trancheroute = { mount(stage, api){
       if(P){ if(Math.random() < .3) I.perc(at, 'crackle'); if(p === 14 && bar % 2) I.tom(at, 180); }
       if(B && (p === 0 || p === 10)) I.bass(at, r, p ? .4 : .7, 'sub');
       if(Ch && (p === 0 || p === 8)) I.chord(at, chord, .8, 'rhodes');
-      if(Ld && [0, 6, 10].includes(p)) I.bell(at, freq(mel, 8), .035);
+      if(Ld && hk) I.bell(at, freq(mel, 8), .04);
       if(A && p % 4 === 2) I.pluck(music, at, freq(deg + 4, 8), .02, {dly: .3});
     }
     if(st === 'reggae'){
@@ -226,7 +243,7 @@ G.trancheroute = { mount(stage, api){
       if(Hh && p % 2 === 0) I.hat(at, p % 4 ? .07 : .04, false, .25);
       if(Ch && (p === 4 || p === 12)) I.chord(at, chord, .1, 'skank');
       if(B){ const line = {0: 0, 3: 0, 6: 4, 10: 2, 11: 4, 14: 7}; if(line[p] !== undefined) I.bass(at, freq(deg + line[p], 1), .3, 'dub'); }
-      if(Ld && (p === 0 || p === 6 || p === 10)) I.melodica(at, freq(mel, 4), .3);
+      if(Ld && hk) I.melodica(at, freq(mel, 4), .3);
       if(P && p === 0 && bar % 4 === 2) I.perc(at, 'siren');
     }
     if(st === 'synthwave'){
@@ -236,7 +253,7 @@ G.trancheroute = { mount(stage, api){
       if(B && p % 2 === 0) I.bass(at, p % 4 === 2 ? r*2 : r, .12, 'saw');
       if(Ch && p === 0) I.chord(at, chord, 4*bpb*.9, 'pad');
       if(A && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 2, 4, 7, 9, 7, 4, 2][(p/2) % 8], 4), .03, {dly: .25, pan: .3});
-      if(Ld && [0, 6, 10].includes(p)) I.supersaw(at, freq(mel, 4), .25, .07);
+      if(Ld && hk) I.supersaw(at, freq(mel, 4), .25, .08);
     }
     if(st === 'french'){
       const cut = 500 + 3200*(.5 + .5*Math.sin((bar + p/16)*Math.PI/4));
@@ -246,7 +263,7 @@ G.trancheroute = { mount(stage, api){
       if(Ch && [0, 3, 6, 8, 11, 14].includes(p)) I.chord(at, chord, .15, 'filter', cut);
       if(B && [0, 3, 6, 10, 12, 14].includes(p)) I.bass(at, [0, 6, 14].includes(p) ? r : r*2, .14, 'funk');
       if(P && p % 2) I.perc(at, 'shaker');
-      if(Ld && [0, 3, 6, 10].includes(p)) I.talk(at, freq(mel, 4), .22);
+      if(Ld && hk) I.talk(at, freq(mel, 4), .24);
       if(A && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 4, 7, 9][(p/2) % 4], 8), .02, {dly: .3});
     }
     if(st === 'dnb'){
@@ -256,7 +273,7 @@ G.trancheroute = { mount(stage, api){
       if(B && (p === 0 || p === 6 || p === 10)) I.bass(at, r, p ? .3 : .55, 'reese');
       if(Ch && p === 0) I.chord(at, chord, 4*bpb*.9, 'pad');
       if(A && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 4, 7, 11][(p/2) % 4], 4), .025, {dly: .3});
-      if(Ld && [0, 6, 10].includes(p)) I.supersaw(at, freq(mel, 4), .2, .06);
+      if(Ld && hk) I.supersaw(at, freq(mel, 4), .2, .07);
     }
     if(st === 'punk'){
       if(K && (p === 0 || p === 8 || (T >= 2 && (p === 6 || p === 10)))) I.kick(at, 1, 'tight');
@@ -265,7 +282,7 @@ G.trancheroute = { mount(stage, api){
       if(Gt && p % 2 === 0) I.gtr(at, r*2, .17, false);
       if(B && p % 2 === 0) I.bass(at, r, .15, 'grit');
       if(P && p === 0 && bar % 4 === 0) I.crash(at);
-      if(Ld && [0, 8].includes(p)) I.supersaw(at, freq(mel, 4), .3, .05);
+      if(Ld && hk) I.supersaw(at, freq(mel, 4), .2, .06);
     }
     if(st === 'metal'){
       const dbl = T >= 2;
@@ -277,7 +294,7 @@ G.trancheroute = { mount(stage, api){
       if(B && p % 2 === 0) I.bass(at, freq(deg, 1), .14, 'grit');
       if(Ch && p === 0) I.chord(at, chord, 4*bpb*.9, 'choir');
       if(P && p === 0 && T >= 3) I.crash(at);
-      if(Ld && [0, 3, 6, 10, 12].includes(p)) I.supersaw(at, freq(mel + 7, 4), .16, .06);
+      if(Ld && hk) I.supersaw(at, freq(mel + 7, 4), .18, .07);
     }
     // couches de transe : plus le combo monte, plus le morceau s'épaissit
     if(trance >= 1 && sec.tier !== 'rest') I.perc(at, 'shaker');
@@ -302,8 +319,8 @@ G.trancheroute = { mount(stage, api){
   function buildBar(bar){
     if(barCache[bar] !== undefined) return barCache[bar];
     const sec = sectionOf(bar); if(!sec || isListen(bar)) return barCache[bar] = null;
-    const rng = rngFrom(tr.id + ':' + bar), acts = sec.acts, slots = new Array(8).fill(null);
-    const mdeg = i => motif[(bar % 2)*8 + i];
+    const rng = rngFrom(tr.id + ':' + diff.id + ':' + bar), acts = sec.acts, slots = new Array(8).fill(null);
+    const mdeg = i => motif[(bar % 4)*8 + i];
     if(sec.tier === 'rest'){
       if(acts.includes('C') && rng() < .7) slots[0] = {k: 'C'};
       for(let i=1;i<8;i++) if(rng() < .55) slots[i] = {k: rng() < .2 ? 'A' : 'N'};
@@ -313,8 +330,10 @@ G.trancheroute = { mount(stage, api){
       let pos = tier === 0 ? [0, 4] : tier === 1 ? [0, 2, 4, 6].filter((_, i) => i === 0 || rng() < .75) : tier === 2 ? [0, 2, 4, 6].concat([1, 3, 5, 7].filter(() => rng() < .3*fast)) : [0, 1, 2, 3, 4, 5, 6, 7].filter(i => i % 2 === 0 || rng() < .55*fast);
       let blocked = new Set();
       // gestes longs d'abord
-      if(acts.includes('H') && rng() < (sec.call ? 1 : .45)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 3 + Math.floor(rng()*3)); slots[s0] = {k: 'H', len}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
-      else if(acts.includes('S') && rng() < (sec.call ? 1 : .4)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 2 + Math.floor(rng()*3)); slots[s0] = {k: 'S', len}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
+      if(acts.includes('H') && rng() < (sec.call ? 1 : .45)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 3 + Math.floor(rng()*3)); slots[s0] = {k: 'H', len: Math.min(len, 7 - s0)}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
+      else if(acts.includes('S') && rng() < (sec.call ? 1 : .4)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 2 + Math.floor(rng()*3)); slots[s0] = {k: 'S', len: Math.min(len, 7 - s0)}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
+      if(diff.dens < 1) pos = pos.filter(i => i === 0 || i === 4 || rng() < diff.dens);
+      if(diff.dens > 1 && tier >= 1) for(const i of [1, 3, 5, 7]) if(!pos.includes(i) && rng() < (diff.dens - 1)*.5*(tr.bpm >= 140 ? .4 : 1)) pos.push(i);
       for(const i of pos){ if(blocked.has(i) || slots[i]) continue;
         let k = 'C'; if(acts.includes('J') && rng() < .32 && !(slots[i - 1] && slots[i - 1].k === 'J')) k = 'J';
         if(!acts.includes('C') && !acts.includes('J')) continue; if(!acts.includes('C')) k = 'J';
@@ -333,28 +352,30 @@ G.trancheroute = { mount(stage, api){
   /* ---------- partie ---------- */
   function startTrack(t){
     tr = t; sections = t.sections; totalBars = 1 + sections.reduce((a, s) => a + s.bars, 0); bpb = 60/t.bpm; PPB = Math.max(86, W*.23)*Math.pow(100/t.bpm, .25);
-    const r = rngFrom(t.id + 'motif'); motif = []; let d = 4; for(let i=0;i<16;i++){ d += [-2, -1, -1, 0, 1, 1, 2][Math.floor(r()*7)]; d = Math.max(0, Math.min(9, d)); motif.push(d); }
+    const r = rngFrom(t.id + 'motif'); const phrase = (start, end) => { const a = []; let d = start; for(let i=0;i<8;i++){ if(i === 0 || i === 4) d = [0, 2, 4][Math.floor(r()*3)] + 7*(d >= 7 ? 1 : 0) || start; else d += [-2, -1, 1, 1, 2, -1, 0][Math.floor(r()*7)]; d = Math.max(0, Math.min(11, d)); a.push(i === 7 ? end : d); } return a; };
+    const A = phrase(4, 2), A2 = A.slice(0, 6).concat([A[6] + 1, 4]), Bp = phrase(7, 4); motif = A.concat(A2, Bp, A);
+    hookMask = [[1,0,0,1,0,1,0,0],[1,0,1,1,0,1,1,0],[1,1,0,1,0,0,1,0],[1,0,1,0,1,1,0,1]][Math.floor(r()*4)];
     for(const k in barCache) delete barCache[k];
-    objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = 3; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0;
+    objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = diff.hearts; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0;
     beatNow = 0; nextStep = 0; jumpT = 9; hurtT = 0; energy = {kick: 0, snare: 0, hat: 0, bass: 0, chords: 0, lead: 0}; events = []; bump = 0; flashR = 0; gestures.clear(); holdState = null; scratchState = null; rot = 0; finished = false; spawned = 1; secShown = -1;
     hideMenu(); api.closeEnd(); api.hud(`FACE ${t.face} · ${t.name.toUpperCase()}`);
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
-    trance = 0; rings = [];
+    trance = 0; rings = []; celeb = null; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
     lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
     state = 'play';
   }
   let spawned = 1;
 
-  const grade = d => { const a = Math.abs(d); return a < .055 ? 'perfect' : a < .11 ? 'good' : 'ok'; };
+  const grade = d => { const a = Math.abs(d)/diff.win; return a < .055 ? 'perfect' : a < .11 ? 'good' : 'ok'; };
   const LABEL = {perfect: 'PARFAIT', good: 'BIEN', ok: 'OK', miss: 'RATÉ'};
   const xOf = beat => HXs + (beat - beatNow)*PPB;
   const TIERS = [0, 10, 25, 50, 100], TNAME = ['', 'EN RYTHME', 'TRANSE', 'HYPNOSE', 'NIRVANA'], TMULT = [1, 1.5, 2, 3, 4];
   function setTrance(n, t){
     if(n === trance) return; const up = n > trance; trance = n;
-    if(up){ judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.3, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
+    if(up){ celebrate(n); judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
       if(useAudio){ const T = actx.currentTime; tone.frequency.setTargetAtTime(20000, T, .05); shelf.gain.setTargetAtTime(n*1.5, T, .4); } }
   }
   function tapeStop(t){
@@ -381,6 +402,7 @@ G.trancheroute = { mount(stage, api){
       confetti(x, y - 10, g === 'perfect' ? [RED, PAPER, INK] : [PAPER, INK], g === 'perfect' ? 16 : 8, 1);
       if(g === 'perfect') bump = Math.max(bump, .5);
       api.vibe(g === 'perfect' ? 16 : 8);
+      if(combo > 100 && combo % 50 === 0) celebrate(4, 'ENCORE ' + combo + ' !');
       if(combo % 25 === 0 && !TIERS.includes(combo)) judges.push({txt: combo + ' COMBO', x: W/2, y: H*.2, t: 0, big: true});
     }
     judges.push({txt: LABEL[g], g, x: o.k === 'H' || o.k === 'S' ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? 'en retard' : 'en avance') : null});
@@ -389,7 +411,7 @@ G.trancheroute = { mount(stage, api){
   /* ---------- gestes : un geste par doigt, la cible est l'obstacle le plus proche dans le temps ---------- */
   const gestures = new Map();
   function pickAt(t){
-    let best = null, bd = .2;
+    let best = null, bd = .2*diff.win;
     for(const o of objs){
       if(o.done) continue; let d;
       if(o.k === 'C' || o.k === 'J' || (o.k === 'H' && !o.holding)) d = Math.abs(t - o.time);
@@ -403,6 +425,7 @@ G.trancheroute = { mount(stage, api){
     if(state !== 'play') return;
     const p = pt(e), t = now(); try{ cv.setPointerCapture(e.pointerId); }catch(err){}
     const o = pickAt(t);
+    if(o && o.k === 'H' && holdState && holdState.o.endTime - t < .2){ const old = holdState.o; endHold(t, old.startGrade); }
     if(o && o.k === 'H' && !holdState){ o.holding = true; o.startGrade = grade(t - o.time); o.dt = t - o.time; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; api.vibe(10); return; }
     if(o && o.k === 'S'){ scratchState = {o, id: e.pointerId, last: p, dir: 0, acc: 0}; return; }
     gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false});
@@ -440,7 +463,7 @@ G.trancheroute = { mount(stage, api){
   function endHold(t, g){ const h = holdState.o; if(holdState.voice) holdState.voice.stop(); holdState = null; h.holding = false; h.released = t; resolve(h, g, t); }
 
   let slash = null;
-  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
+  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2*diff.win).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
   function cut(t, dir){
     const o = nearest(t, o => o.k === 'C' || o.bomb);
     if(o && o.bomb){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); return; }
@@ -468,15 +491,18 @@ G.trancheroute = { mount(stage, api){
     const total = stats.perfect + stats.good + stats.ok + stats.miss || 1;
     const acc = Math.round((stats.perfect + stats.good*.7 + stats.ok*.35)/total*100);
     const stars = !won ? 0 : acc >= 95 ? 3 : acc >= 85 ? 2 : 1;
-    api.save('notes', bank() + notesRun);
-    const b = bests(), prev = b[tr.id] || {score: 0, stars: 0}; const rec = won && score > prev.score;
-    if(won) { b[tr.id] = {score: Math.max(prev.score, score), stars: Math.max(prev.stars, stars)}; api.save('bests', b); }
+    const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + (won ? stars*5*diff.mult : 0));
+    api.save('notes', bank() + gained);
+    const titleAfter = titleOf(bank());
+    const bk = tr.id + '.' + diff.id, b = bests(), prev = b[bk] || {score: 0, stars: 0}; const rec = won && score > prev.score;
+    if(won) { b[bk] = {score: Math.max(prev.score, score), stars: Math.max(prev.stars, stars)}; b[tr.id] = b[tr.id] && b[tr.id].score > score ? b[tr.id] : {score: Math.max(prev.score, score), stars: Math.max(prev.stars, stars)}; api.save('bests', b); }
     const nextT = TRACKS[TRACKS.indexOf(tr) + 1];
     const canUnlock = nextT && !unlocked(nextT) && bank() >= nextT.cost;
     if(canUnlock){ api.save('unlock.' + nextT.id, true); }
     TRACKS.forEach(x => { if(!unlocked(x) && bank() >= x.cost) api.save('unlock.' + x.id, true); });
     const lines = [won ? `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}  ·  ${score} points${rec ? ' (record)' : ''}` : `${score} points · ${Math.round(beatNow/4/totalBars*100)} % de la face`,
-      `Précision ${acc} % · combo max ${maxCombo}`, `+${notesRun} notes ♪ (total ${bank()})`];
+      `Précision ${acc} % · combo max ${maxCombo} · ${diff.name}`, `+${gained} talent ♪ (${notesRun} notes x${diff.mult}${won ? ' + étoiles' : ''}) · total ${bank()}`];
+    if(titleAfter !== titleBefore) lines.push(`Nouveau titre : ${titleAfter} !`);
     if(canUnlock) lines.push(`Nouvelle cassette débloquée : ${nextT.name}`);
     else if(nextT && !unlocked(nextT)) lines.push(`${nextT.name} : encore ${nextT.cost - bank()} notes`);
     const actions = [{label: won ? 'Rejouer' : 'Réessayer', fn: () => startTrack(tr)}];
@@ -494,6 +520,7 @@ G.trancheroute = { mount(stage, api){
     if(state === 'play'){
       const t = now();
       beatNow = t/bpb;
+      if(!tutoOpen){ const tk = nextTuto(); if(tk){ openTuto(tk); draw(rt); return; } }
       while(nextStep/4*bpb < clock() + .15 && nextStep < totalBars*16){ scheduleStep(nextStep); nextStep++; }
       while(spawned*4 < beatNow + 10 && spawned < totalBars){ spawnBar(spawned); spawned++; }
       const air = jumpT < .42 && jumpT > .04;
@@ -502,8 +529,8 @@ G.trancheroute = { mount(stage, api){
         if(o.k === 'N' && t >= o.time) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && Math.abs(t - o.time) < .12 && air) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && t > o.time + .12){ o.done = true; o.result = 'gone'; }
-        else if((o.k === 'C' || o.k === 'J') && t > o.time + .2 && !(pendingNear(o) && t < o.time + .6)) resolve(o, 'miss', t);
-        else if(o.k === 'H'){ if(!o.holding && t > o.time + .2) resolve(o, 'miss', t); else if(o.holding){ if(t > o.endTime + .04) endHold(t, o.startGrade); else if(Math.random() < .5) confetti(HXs, Y0 - 12, [RED, PAPER], 1, .3); } }
+        else if((o.k === 'C' || o.k === 'J') && t > o.time + .2*diff.win && !(pendingNear(o) && t < o.time + .6)) resolve(o, 'miss', t);
+        else if(o.k === 'H'){ if(!o.holding && t > o.time + .2*diff.win) resolve(o, 'miss', t); else if(o.holding){ if(t > o.endTime + .04) endHold(t, o.startGrade); else if(Math.random() < .5) confetti(HXs, Y0 - 12, [RED, PAPER], 1, .3); } }
         else if(o.k === 'S' && t > o.endTime + .1){ const r = o.strokes/o.need; resolve(o, r >= 1.5 ? 'perfect' : r >= 1 ? 'good' : r > 0 ? 'ok' : 'miss', t); if(scratchState && scratchState.o === o) scratchState = null; }
       }
       objs = objs.filter(o => o.endBeat > beatNow - 3);
@@ -520,6 +547,7 @@ G.trancheroute = { mount(stage, api){
     if(bits) bits = bits.filter(b => b.life > 0 && b.y < H + 60);
     if(judges){ for(const j of judges) j.t += dt; judges = judges.filter(j => j.t < (j.big ? 1.5 : .6)); }
     if(slash){ slash.t += dt; if(slash.t > .2) slash = null; }
+    if(celeb && state === 'play'){ celeb.t += dt; if(celeb.t > 4) celeb = null; }
     for(const g of rings){ g.r += dt*W*1.6/(bpb || .5); g.a -= dt*1.4; } rings = rings.filter(g => g.a > 0);
     if(tr && state !== 'menu') draw(rt);
   });
@@ -578,6 +606,92 @@ G.trancheroute = { mount(stage, api){
     return c.toDataURL('image/png');
   }
   let backdrop = null, backdropFor = null;
+
+  /* ---------- tutos interactifs : pause, démonstration, entraînement ---------- */
+  const TUTO = {
+    C: {title: 'COUPER', need: 3, unit: 'coupes', text: 'Quand un bloc blanc arrive sur la tête rouge, glisse le doigt d\'un coup sec, n\'importe où sur l\'écran.', anim: 'k7swipe 1.1s ease-in-out infinite'},
+    J: {title: 'SAUTER', need: 3, unit: 'sauts', text: 'Pics noirs et bombes rouges : tape l\'écran sans glisser au moment où ils passent la tête rouge. Ne coupe jamais une bombe.', anim: 'k7tap .9s ease-in-out infinite'},
+    H: {title: 'MAINTENIR', need: 2, unit: 'notes tenues', text: 'Un ruban rouge sur la bande : pose le doigt au début du ruban et garde-le appuyé jusqu\'au bout. Le synthé chante tant que tu tiens.', anim: 'k7hold 1.6s ease-in-out infinite'},
+    S: {title: 'SCRATCHER', need: 8, unit: 'allers-retours', text: 'Une zone en zigzag : pose le doigt et fais des allers-retours rapides de haut en bas, comme un DJ qui gratte un vinyle. Chaque aller-retour fait « wik ». Remplis le compteur avant la fin du zigzag.', anim: 'k7scr .32s ease-in-out infinite'}
+  };
+  if(!document.getElementById('k7-tuto-css')){ const st = document.createElement('style'); st.id = 'k7-tuto-css'; st.textContent = `
+    @keyframes k7swipe{0%{transform:translate(-50px,-34px);opacity:0}15%{opacity:1}70%{transform:translate(50px,34px);opacity:1}100%{transform:translate(50px,34px);opacity:0}}
+    @keyframes k7tap{0%,100%{transform:scale(1)}40%{transform:scale(.55)}}
+    @keyframes k7hold{0%{transform:scale(1)}15%,85%{transform:scale(.6)}100%{transform:scale(1)}}
+    @keyframes k7scr{0%,100%{transform:translateY(-34px)}50%{transform:translateY(34px)}}
+    @keyframes k7in{from{transform:translateY(30px) scale(.9);opacity:0}}
+    @media (prefers-reduced-motion:reduce){.k7demo{animation-duration:3s!important}}`; document.head.appendChild(st); }
+  let tutoOpen = false, pauseRaw = 0;
+  const rawNow = () => useAudio ? actx.currentTime : performance.now()/1000;
+  function openTuto(k){
+    const d = TUTO[k]; tutoOpen = true; state = 'tuto'; pauseRaw = rawNow();
+    if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .03); }
+    gestures.clear();
+    const o = document.createElement('div'); o.id = 'k7tutoov';
+    o.style.cssText = `position:absolute;inset:0;z-index:8;background:rgba(28,27,25,.55);display:flex;align-items:center;justify-content:center;padding:16px`;
+    o.innerHTML = `<div style="width:100%;max-width:360px;background:${PAPERBG};border-radius:10px;box-shadow:0 14px 30px rgba(0,0,0,.4);overflow:hidden;animation:k7in .35s cubic-bezier(.2,1.3,.4,1);font-family:'Chakra Petch',sans-serif;color:${INK}">
+      <div style="background:${INK};color:${PAPER};padding:12px 16px;display:flex;justify-content:space-between;align-items:baseline"><b style="font-family:${FONT};font-size:20px">${d.title}</b><span style="font-size:12px;opacity:.7">nouveau geste</span></div>
+      <div style="height:6px;background:${LABELRED}"></div>
+      <p style="margin:0;padding:12px 16px 6px;font-size:14.5px;line-height:1.45">${d.text}</p>
+      <div id="k7pad" style="margin:8px 16px;height:170px;border:2px dashed ${INK};border-radius:8px;position:relative;touch-action:none;display:grid;place-items:center;background:rgba(255,255,255,.35)">
+        <div class="k7demo" style="width:34px;height:34px;border-radius:50%;background:${LABELRED};box-shadow:0 0 0 6px rgba(184,58,52,.25);animation:${d.anim};pointer-events:none"></div>
+        <div id="k7bar" style="position:absolute;left:10px;right:10px;bottom:10px;height:8px;border-radius:4px;background:rgba(28,27,25,.15);overflow:hidden"><div id="k7fill" style="height:100%;width:0;background:${LABELRED};transition:width .15s"></div></div>
+        <span style="position:absolute;top:8px;left:0;right:0;text-align:center;font-size:12px;opacity:.7">Entraîne-toi ici</span></div>
+      <div style="padding:4px 16px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span id="k7cnt" style="font-family:${FONT};font-size:14px">0 / ${d.need} ${d.unit}</span>
+        <button id="k7go" style="border:none;border-radius:4px;background:${INK};color:${PAPER};font-family:${FONT};font-size:12px;padding:11px 14px;cursor:pointer;opacity:.35" disabled>C'EST PARTI</button></div></div>`;
+    stage.appendChild(o);
+    const pad = o.querySelector('#k7pad'), fill = o.querySelector('#k7fill'), cnt = o.querySelector('#k7cnt'), go = o.querySelector('#k7go');
+    let n = 0, down = null, holdTimer = null;
+    const bumpCount = () => { n = Math.min(d.need, n + 1); fill.style.width = (n/d.need*100) + '%'; cnt.textContent = `${n} / ${d.need} ${d.unit}`; api.vibe(15);
+      if(n >= d.need){ go.disabled = false; go.style.opacity = '1'; go.style.background = LABELRED; cnt.textContent = 'Bravo !'; api.sfx.coin(); } };
+    pad.onpointerdown = e => { try{ pad.setPointerCapture(e.pointerId); }catch(err){} down = {x: e.clientX, y: e.clientY, t: performance.now(), dir: 0, acc: 0, ly: e.clientY};
+      if(k === 'H'){ const start = performance.now(); holdTimer = setInterval(() => { const p = Math.min(1, (performance.now() - start)/900); fill.style.width = Math.max(n/d.need, (n + p)/d.need)*100 + '%'; if(p >= 1){ clearInterval(holdTimer); holdTimer = null; bumpCount(); I.bell(now(), 880, .1); } }, 50); } };
+    pad.onpointermove = e => { if(!down || k !== 'S') return; const v = e.clientY - down.ly; down.ly = e.clientY; const s = Math.sign(v);
+      if(s && s !== down.dir){ if(down.acc > 14 || down.dir === 0){ bumpCount(); I.wik(clock(), s < 0); } down.dir = s; down.acc = 0; } down.acc += Math.abs(v); };
+    pad.onpointerup = pad.onpointercancel = e => { if(!down) return; const dist = Math.hypot(e.clientX - down.x, e.clientY - down.y), dur = performance.now() - down.t;
+      if(k === 'C' && dist > 40){ bumpCount(); noise(master, clock(), .06, .25, 'highpass', 5000); }
+      if(k === 'J' && dist < 14 && dur < 400){ bumpCount(); I.boing(master, clock(), 220, .14); }
+      if(holdTimer){ clearInterval(holdTimer); holdTimer = null; fill.style.width = (n/d.need*100) + '%'; }
+      down = null; };
+    go.onclick = () => {
+      api.save('tuto.' + k, true); o.remove();
+      t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play';
+      if(useAudio && music) music.gain.setTargetAtTime(.9, actx.currentTime, .05);
+      judges.push({txt: 'À TOI !', x: W/2, y: H*.3, t: 0, big: true});
+    };
+  }
+  const nextTuto = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db > .4 && db < 2.4 && !api.load('tuto.' + o.k, false)) return o.k; } return null; };
+
+  /* ---------- célébrations : mots et illustrations à l'encre en fond, pendant que la partie continue ---------- */
+  const WORDS = [[], ['BIEN JOUÉ', 'ÇA GROOVE', 'QUEL RYTHME'], ['EN FEU !', 'TU TIENS LA TRANSE', 'ÇA CHAUFFE'], ['HYPNOTIQUE', 'IMPARABLE', 'TU VOLES'], ['ROI DU RYTHME', 'LÉGENDAIRE', 'NIRVANA']];
+  let celeb = null;
+  function celebrate(tier, word){ celeb = {tier, word: word || WORDS[tier][Math.floor(Math.random()*WORDS[tier].length)], t: 0, seed: Math.random()*1000}; }
+  function inkBlob(x, y, r, a){ ctx.globalAlpha = a; ctx.fillStyle = INK; ctx.beginPath(); for(let i=0;i<=24;i++){ const an = i/24*6.283, rr = r*(.75 + .25*Math.sin(an*5 + x)); i ? ctx.lineTo(x + Math.cos(an)*rr, y + Math.sin(an)*rr) : ctx.moveTo(x + Math.cos(an)*rr, y + Math.sin(an)*rr); } ctx.fill(); }
+  function drawIllu(rt, ek){
+    const lvl = trance; if(!lvl && !celeb) return;
+    const cx = W/2, cy = H*.2, pop = celeb ? Math.min(1, celeb.t*3) : 1, base = celeb && celeb.t < 2.2 ? .85 : .3;
+    ctx.save();
+    if(lvl >= 1){ ctx.globalAlpha = base*.8; ctx.fillStyle = INK; for(let i=0;i<6;i++){ const a = rt*.8 + i*1.047, R = W*.32*pop*(1 + ek*.06), x = cx + Math.cos(a)*R, y = cy + Math.sin(a)*R*.55; ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(rt*2 + i)*.3); ctx.scale(1.4, 1.4);
+        ctx.beginPath(); ctx.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); ctx.fill(); ctx.fillRect(1.5, -14, 3, 20); ctx.beginPath(); ctx.moveTo(4.5, -14); ctx.quadraticCurveTo(14, -10, 10, 0); ctx.quadraticCurveTo(11, -7, 4.5, -7); ctx.fill(); ctx.restore(); } }
+    if(lvl >= 2){ ctx.globalAlpha = base*.7; for(let i=0;i<5;i++){ const x = W*(.1 + i*.2), h = H*.16*pop*(1 + Math.sin(rt*6 + i)*.15 + ek*.2); ctx.fillStyle = i % 2 ? INK : LABELRED; ctx.beginPath(); ctx.moveTo(x - 26, H*.36); ctx.quadraticCurveTo(x - 30, H*.36 - h*.6, x + Math.sin(rt*4 + i)*10, H*.36 - h); ctx.quadraticCurveTo(x + 30, H*.36 - h*.5, x + 26, H*.36); ctx.closePath(); ctx.fill(); } }
+    if(lvl >= 3){ ctx.globalAlpha = base*.6; ctx.strokeStyle = INK; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath(); for(let a=0;a<6.283*4;a+=.12){ const r = a*W*.017*pop, x = cx + Math.cos(a - rt*2)*r, y = cy + Math.sin(a - rt*2)*r*.8; a ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+    if(lvl >= 4){ ctx.globalAlpha = Math.min(1, base + .2); const s = W*.0022*pop*(1 + ek*.05); ctx.save(); ctx.translate(cx, cy - 6); ctx.scale(s*100, s*100); ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(-1, .5); ctx.lineTo(-1.1, -.6); ctx.lineTo(-.55, -.05); ctx.lineTo(0, -.85); ctx.lineTo(.55, -.05); ctx.lineTo(1.1, -.6); ctx.lineTo(1, .5); ctx.closePath(); ctx.fill(); ctx.fillStyle = LABELRED; for(const x of [-.55, 0, .55]){ ctx.beginPath(); ctx.arc(x, .2, .12, 0, 6.283); ctx.fill(); } ctx.fillStyle = '#e0a800'; ctx.beginPath(); ctx.arc(0, -.85, .1, 0, 6.283); ctx.arc(-1.1, -.6, .08, 0, 6.283); ctx.arc(1.1, -.6, .08, 0, 6.283); ctx.fill(); ctx.restore(); }
+    if(celeb){ const t = celeb.t, a = t < 2.4 ? 1 : Math.max(0, 1 - (t - 2.4)/1.2), sc = t < .18 ? .4 + t/.18*.75 : 1.15 - Math.min(.15, (t - .18)*.5);
+      if(a > 0){ const r = rngFrom('c' + celeb.seed); for(let i=0;i<14;i++) inkBlob(cx + (r() - .5)*W*.8, H*.3 + (r() - .5)*H*.12, 3 + r()*9*pop, a*.8);
+        ctx.globalAlpha = a; ctx.save(); ctx.translate(cx, H*.3); ctx.rotate(-.08); ctx.scale(sc, sc); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const fs = Math.min(42, W*.9/Math.max(6, celeb.word.length)*1.5); ctx.font = `${fs}px ${FONT}`; ctx.lineWidth = 9; ctx.strokeStyle = PAPERBG; ctx.strokeText(celeb.word, 0, 0); ctx.fillStyle = celeb.tier >= 3 ? LABELRED : INK; ctx.fillText(celeb.word, 0, 0); ctx.restore(); } }
+    ctx.restore();
+  }
+  // le public en bas de l'écran : plus tu enchaînes, plus il se lève
+  function drawCrowd(ek){
+    const n = Math.ceil(W/24) + 1, y = H + 4;
+    for(let i=0;i<n;i++){ const x = i*24 + (i % 2)*6, up = trance > 0 && (i*7 % 5) < trance + 1, jump = trance >= 2 ? ek*(6 + (i % 3)*3) : ek*1.5, yy = y - jump - (i % 2)*4;
+      ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(x, yy - 30, 8, 0, 6.283); ctx.fill(); rrect(x - 10, yy - 22, 20, 30, 8); ctx.fill();
+      ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath();
+      if(up){ const w = Math.sin(beatNow*Math.PI + i)*4; ctx.moveTo(x - 8, yy - 18); ctx.lineTo(x - 14 + w, yy - 44); ctx.moveTo(x + 8, yy - 18); ctx.lineTo(x + 14 - w, yy - 44); }
+      else { ctx.moveTo(x - 9, yy - 16); ctx.lineTo(x - 12, yy - 2); ctx.moveTo(x + 9, yy - 16); ctx.lineTo(x + 12, yy - 2); }
+      ctx.stroke(); }
+  }
 
   /* ---------- dessin ---------- */
   function shadow(on, blur, oy){ if(on){ ctx.shadowColor = 'rgba(40,20,0,.28)'; ctx.shadowBlur = blur || 14; ctx.shadowOffsetY = oy == null ? 6 : oy; } else { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; } }
@@ -640,9 +754,11 @@ G.trancheroute = { mount(stage, api){
       for(const g of rings){ ctx.strokeStyle = `rgba(244,240,230,${g.a*.7})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(HXs, Y0, g.r, 0, 6.283); ctx.stroke(); }
       if(trance >= 3 && !api.reduced && ((beatNow % 4) + 4) % 4 < .07){ ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(-20, -20, W + 40, H + 40); }
     }
+    drawIllu(rt, ek);
     // égaliseur qui danse
     const chans = ['kick','bass','snare','chords','lead','hat'], bw = (W - 32)/18;
     for(let i=0;i<18;i++){ const e = energy[chans[i % 6]]*(.6 + .4*Math.sin(i*1.7 + rt*3)), h = 4 + e*36; ctx.fillStyle = i % 6 === 4 ? RED : 'rgba(28,27,25,.55)'; rrect(16 + i*bw + 1, EQY - h, bw - 3, h, 2); ctx.fill(); }
+    drawCrowd(ek);
     // bobines
     const prog = Math.max(0, Math.min(1, beatNow/4/totalBars)), lx = W*.27, rx = W*.73;
     const rL = REELR*(.55 + .45*prog), rR = REELR*(1 - .45*prog), hubR = REELR*.5;
@@ -697,7 +813,11 @@ G.trancheroute = { mount(stage, api){
       ctx.save(); ctx.translate(HXs, hy); ctx.scale(1/sq, sq);
       ctx.fillStyle = 'rgba(40,20,0,.25)'; ctx.beginPath(); ctx.ellipse(0, Y0 - hy - 1, 13*(1 - jp*.5), 3, 0, 0, 6.283); ctx.fill();
       shadow(true, 8, 4); hub(0, 0, 14, rot*2, tr.bg[0]); shadow(false);
-      ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(4, -3, 2.2, 0, 6.283); ctx.arc(-3, -3, 2.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = INK; ctx.strokeStyle = INK; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+      if(hurtT > 0){ for(const ex of [-3, 4]){ ctx.beginPath(); ctx.moveTo(ex - 2, -5); ctx.lineTo(ex + 2, -1); ctx.moveTo(ex + 2, -5); ctx.lineTo(ex - 2, -1); ctx.stroke(); } }
+      else if(trance >= 3){ ctx.fillStyle = LABELRED; for(const ex of [-3, 4]){ ctx.beginPath(); for(let i=0;i<10;i++){ const a = i*Math.PI/5 - Math.PI/2, rr = i % 2 ? 1.2 : 3; ctx.lineTo(ex + Math.cos(a)*rr, -3 + Math.sin(a)*rr); } ctx.fill(); } }
+      else if(trance >= 1){ for(const ex of [-3, 4]){ ctx.beginPath(); ctx.arc(ex, -2, 2.2, Math.PI*1.1, Math.PI*1.9); ctx.stroke(); } ctx.beginPath(); ctx.arc(.5, 2, 3, .2, Math.PI - .2); ctx.stroke(); }
+      else { ctx.beginPath(); ctx.arc(4, -3, 2.2, 0, 6.283); ctx.arc(-3, -3, 2.2, 0, 6.283); ctx.fill(); }
       if(holdState || scratchState){ ctx.strokeStyle = RED; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 19 + ek*4, 0, 6.283); ctx.stroke(); }
       ctx.restore();
     }
@@ -738,51 +858,76 @@ G.trancheroute = { mount(stage, api){
   stopBtn.onclick = () => { if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; } if(useAudio && music) music.gain.setValueAtTime(0, actx.currentTime); if(state === 'play' && notesRun){ api.save('notes', bank() + notesRun); notesRun = 0; } state = 'menu'; showMenu(); };
   /* ---------- menu des cassettes ---------- */
   const menu = document.createElement('div');
-  menu.style.cssText = `position:absolute;inset:0;overflow:auto;background:${PAPERBG};color:${INK};padding:18px 16px 28px;display:flex;flex-direction:column;gap:14px;z-index:4;font-family:"Chakra Petch",sans-serif;touch-action:pan-y;background-size:cover;background-position:center`;
+  menu.style.cssText = `position:absolute;inset:0;overflow:auto;background:${PAPERBG};color:${INK};padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;z-index:4;font-family:"Chakra Petch",sans-serif;touch-action:pan-y;background-size:cover;background-position:center`;
   stage.appendChild(menu);
   const artCache = {};
   const stamp = `border:none;border-radius:4px;background:${INK};color:${PAPER};font-family:${FONT};cursor:pointer;box-shadow:2px 2px 0 ${LABELRED}`;
+  const paperBox = 'background:rgba(236,229,211,.85);border-radius:6px';
+  let cur = Math.min(TRACKS.length - 1, api.load('cur', 0)), dIdx = api.load('diff', 1);
   function showMenu(){
-    api.closeEnd(); state = 'menu'; if(useAudio && music) music.gain.setValueAtTime(.9, actx.currentTime);
-    api.hud(''); const b = bests(), n = bank();
+    api.closeEnd(); state = 'menu'; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); } if(useAudio && music) music.gain.setValueAtTime(.9, actx.currentTime);
+    api.hud(''); const n = bank();
     if(!menu.dataset.bg){ const bg = makeBackdrop(null, Math.round(W), Math.round(H), 'menu'); menu.style.backgroundImage = `url(${bg.toDataURL('image/jpeg', .85)})`; menu.dataset.bg = '1'; }
     menu.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-        <div><div style="font-family:${FONT};font-size:44px;line-height:.9;letter-spacing:-1px">K7</div><div style="font-family:${FONT};font-size:44px;line-height:.9;color:${LABELRED};letter-spacing:-1px">CUT</div>
-          <div style="font-size:13px;margin-top:6px;max-width:22ch">Coupe, saute, maintiens et scratche en rythme.</div></div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <div style="background:${INK};color:${PAPER};font-family:${FONT};font-size:18px;padding:6px 12px;border-radius:4px;transform:rotate(-3deg);box-shadow:3px 3px 0 ${LABELRED}">♪ ${n}</div>
-          <button id="k7mute" style="${stamp};font-size:10px;padding:7px 9px">${api.store.load('muted', false) ? 'SON OFF' : 'SON ON'}</button></div></div>
-      <div id="k7list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px"></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;font-size:12px;line-height:1.25">
-        ${[['GLISSE','couper','M4 20 L20 4'],['TAPE','sauter','M12 18 V6 M7 11 L12 6 L17 11'],['MAINTIENS','note longue','M4 12 H20'],['ALLER-RETOUR','scratch','M4 14 L8 8 L12 14 L16 8 L20 14']].map(([a, c, d]) => `<div style="border:2px solid ${INK};border-radius:4px;padding:6px 2px;background:rgba(236,229,211,.7)"><svg width="28" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="${LABELRED}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><b style="font-family:${FONT};font-size:8px;display:block">${a}</b>${c}</div>`).join('')}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:2px solid ${INK};border-radius:4px;padding:6px 10px;font-size:13px;background:rgba(236,229,211,.7)"><span>Calage du rythme : <b id="k7off">${api.load('offset', 0)} ms</b></span><span style="display:flex;gap:6px"><button id="k7offm" style="${stamp};width:34px;height:28px;font-size:14px">−</button><button id="k7offp" style="${stamp};width:34px;height:28px;font-size:14px">+</button></span></div>
-      <p style="margin:0;font-size:12.5px;line-height:1.4;background:rgba(236,229,211,.7);padding:6px 8px;border-radius:4px">Ramasse les notes ♪ (saute pour celles en l'air) : ton total ouvre les cassettes suivantes. Enchaîne sans rater pour entrer en transe. Coupes « en retard » alors que tu es dans le temps : monte le calage.</p>`;
-    const list = menu.querySelector('#k7list');
-    TRACKS.forEach(t => {
-      const open = unlocked(t), info = b[t.id], afford = !open && n >= t.cost, key = t.id + (open || afford ? '1' : '0');
+        <div style="font-family:${FONT};font-size:34px;line-height:.9;letter-spacing:-1px">K7<br><span style="color:${LABELRED}">CUT</span></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div style="background:${INK};color:${PAPER};font-family:${FONT};font-size:17px;padding:6px 12px;border-radius:4px;transform:rotate(-3deg);box-shadow:3px 3px 0 ${LABELRED}">♪ ${n} talent</div>
+          <div style="${paperBox};padding:3px 8px;font-size:12.5px;font-weight:700">${titleOf(n)}</div></div></div>
+      <div id="k7car" style="position:relative;flex:1;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;touch-action:pan-y;user-select:none">
+        <div style="position:relative;width:100%;display:flex;align-items:center;justify-content:center">
+          <button id="k7prev" aria-label="Cassette précédente" style="${stamp};position:absolute;left:0;z-index:2;width:36px;height:44px;font-size:18px">‹</button>
+          <img id="k7img" alt="" draggable="false" style="width:min(80%,360px);height:auto;filter:drop-shadow(0 10px 12px rgba(40,20,0,.35));transition:transform .25s cubic-bezier(.2,1.3,.4,1),opacity .2s">
+          <button id="k7next" aria-label="Cassette suivante" style="${stamp};position:absolute;right:0;z-index:2;width:36px;height:44px;font-size:18px">›</button></div>
+        <div id="k7dots" style="display:flex;gap:6px"></div>
+        <div id="k7info" style="${paperBox};padding:8px 12px;text-align:center;display:flex;flex-direction:column;gap:2px;width:100%;max-width:360px"></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div id="k7diff" role="radiogroup" aria-label="Difficulté" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>
+        <div id="k7dnote" style="text-align:center;font-size:12.5px;${paperBox};padding:3px 6px"></div></div>
+      <button id="k7play" style="${stamp};font-size:18px;padding:14px;box-shadow:4px 4px 0 ${LABELRED}"></button>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;${paperBox};padding:6px 8px;font-size:12.5px">
+        <button id="k7mute" style="${stamp};font-size:10px;padding:6px 8px">${api.store.load('muted', false) ? 'SON OFF' : 'SON ON'}</button>
+        <span style="display:flex;gap:5px;align-items:center">Calage <b id="k7off">${api.load('offset', 0)} ms</b><button id="k7offm" style="${stamp};width:28px;height:26px;font-size:12px">−</button><button id="k7offp" style="${stamp};width:28px;height:26px;font-size:12px">+</button></span>
+        <button id="k7tuto" style="${stamp};font-size:10px;padding:6px 8px">TUTOS</button>
+        <span style="font-family:${FONT};font-size:10px;opacity:.7">v${VERSION}</span></div>`;
+    const img = menu.querySelector('#k7img'), info = menu.querySelector('#k7info'), dots = menu.querySelector('#k7dots'), play = menu.querySelector('#k7play'), dbox = menu.querySelector('#k7diff');
+    function render(dir){
+      const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost, key = t.id + (open || afford ? '1' : '0');
       if(!artCache[key]) artCache[key] = makeCassette(t, open || afford);
-      const el = document.createElement('button');
-      el.style.cssText = `all:unset;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-width:0;transition:transform .12s;background:rgba(236,229,211,.82);border-radius:6px;padding:4px 2px 8px`;
-      el.onpointerdown = () => el.style.transform = 'scale(.96) rotate(-1deg)'; el.onpointerup = el.onpointerleave = () => el.style.transform = '';
-      el.innerHTML = `<img src="${artCache[key]}" alt="Cassette ${t.name}" style="width:100%;height:auto;display:block;filter:drop-shadow(0 6px 8px rgba(40,20,0,.3))">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:0 4px"><b style="font-family:${FONT};font-size:13px">${t.name}</b><span style="font-size:11.5px;opacity:.75;white-space:nowrap">${t.bpm} BPM</span></div>
-        <div style="padding:0 4px;font-size:12px;line-height:1.3">${t.label.split(' · ')[0]} · ${t.gestures}</div>
-        <div style="padding:0 4px;font-size:12.5px;font-weight:700;color:${open ? INK : LABELRED}">${open ? (info ? '★'.repeat(info.stars) + '☆'.repeat(3 - info.stars) + ' · ' + info.score : 'À jouer') : afford ? 'Touche pour l\'ouvrir' : `Fermée · ${t.cost} ♪`}</div>`;
-      el.onclick = () => {
-        if(!open && !afford) { api.sfx.lose(); el.animate([{transform: 'translateX(-4px)'}, {transform: 'translateX(4px)'}, {transform: 'none'}], {duration: 200}); return; }
-        if(!open && afford){ api.save('unlock.' + t.id, true); api.sfx.coin(); return showMenu(); }
-        startTrack(t);
-      };
-      list.appendChild(el);
-    });
+      img.src = artCache[key]; img.alt = 'Cassette ' + t.name;
+      if(dir){ img.style.transition = 'none'; img.style.transform = `translateX(${dir*60}px) rotate(${dir*4}deg)`; img.style.opacity = '.3'; requestAnimationFrame(() => { img.style.transition = ''; img.style.transform = ''; img.style.opacity = '1'; }); }
+      const bk = bests()[t.id + '.' + DIFFS[dIdx].id];
+      info.innerHTML = `<b style="font-family:${FONT};font-size:20px">FACE ${t.face} · ${t.name.toUpperCase()}</b><span style="font-size:13px">${t.label} · ${t.gestures}</span>
+        <span style="font-size:13px;font-weight:700;color:${open ? INK : LABELRED}">${open ? (bk ? '★'.repeat(bk.stars) + '☆'.repeat(3 - bk.stars) + ' · record ' + bk.score + ' en ' + DIFFS[dIdx].name : 'Jamais jouée en ' + DIFFS[dIdx].name) : afford ? 'Assez de talent : ouvre-la !' : `Fermée · il faut ${t.cost} ♪ de talent`}</span>`;
+      dots.innerHTML = TRACKS.map((x, i) => `<span style="width:${i === cur ? 18 : 8}px;height:8px;border-radius:4px;background:${i === cur ? LABELRED : unlocked(x) ? INK : 'rgba(28,27,25,.25)'};transition:width .2s"></span>`).join('');
+      play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR LA CASSETTE' : `FERMÉE · ${t.cost} ♪`;
+      play.style.opacity = open || afford ? '1' : '.5';
+      dbox.innerHTML = DIFFS.map((d, i) => `<button role="radio" aria-checked="${i === dIdx}" data-i="${i}" style="${stamp};font-size:9.5px;padding:9px 2px;${i === dIdx ? `background:${LABELRED};box-shadow:2px 2px 0 ${INK}` : 'opacity:.75'}">${d.name.toUpperCase()}</button>`).join('');
+      dbox.querySelectorAll('button').forEach(bt => bt.onclick = () => { dIdx = +bt.dataset.i; api.save('diff', dIdx); api.sfx.click(); render(); });
+      menu.querySelector('#k7dnote').textContent = `${DIFFS[dIdx].note} · talent x${DIFFS[dIdx].mult}`;
+    }
+    const go = d => { cur = (cur + d + TRACKS.length) % TRACKS.length; api.save('cur', cur); api.sfx.click(); render(d); };
+    menu.querySelector('#k7prev').onclick = () => go(-1); menu.querySelector('#k7next').onclick = () => go(1);
+    const car = menu.querySelector('#k7car'); let sx = null, sdx = 0;
+    car.onpointerdown = e => { if(e.target.tagName === 'BUTTON') return; sx = e.clientX; sdx = 0; img.style.transition = 'none'; };
+    car.onpointermove = e => { if(sx == null) return; sdx = e.clientX - sx; img.style.transform = `translateX(${sdx}px) rotate(${sdx/30}deg)`; };
+    car.onpointerup = car.onpointercancel = () => { if(sx == null) return; img.style.transition = ''; img.style.transform = ''; const d = sdx; sx = null; if(Math.abs(d) > 45) go(d < 0 ? 1 : -1); };
+    menu.onkeydown = e => { if(e.key === 'ArrowLeft') go(-1); if(e.key === 'ArrowRight') go(1); };
+    play.onclick = () => {
+      const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost;
+      if(!open && !afford){ api.sfx.lose(); img.animate([{transform: 'translateX(-6px)'}, {transform: 'translateX(6px)'}, {transform: 'none'}], {duration: 220}); return; }
+      if(!open){ api.save('unlock.' + t.id, true); api.sfx.coin(); render(); return; }
+      diff = DIFFS[dIdx]; startTrack(t);
+    };
+    render();
     menu.hidden = false; stopBtn.hidden = true;
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); menu.querySelector('#k7off').textContent = v + ' ms'; };
     menu.querySelector('#k7offm').onclick = () => setOff(-10); menu.querySelector('#k7offp').onclick = () => setOff(10);
-    const mb = menu.querySelector('#k7mute'); mb.onclick = () => { api.store.save('muted', !api.store.load('muted', false)); showMenu(); };
+    menu.querySelector('#k7mute').onclick = () => { api.store.save('muted', !api.store.load('muted', false)); showMenu(); };
+    menu.querySelector('#k7tuto').onclick = () => { ['C','J','H','S'].forEach(k => api.save('tuto.' + k, false)); api.sfx.coin(); menu.querySelector('#k7tuto').textContent = 'TUTOS ✓'; };
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 
-  window.__k7 = {now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: i => startTrack(TRACKS[i]), tracks: TRACKS, cv};
+  window.__k7 = {get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: i => startTrack(TRACKS[i]), tracks: TRACKS, cv};
   showMenu();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};
