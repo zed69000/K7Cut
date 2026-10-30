@@ -1,5 +1,22 @@
 # Journal des versions
 
+## 0.14.0 — Accueil, ralenti de bande, roue gourmande, toile vivante
+- **Écran d'accueil** (d'après la maquette) :
+  - le titre TOUCHÉ, avec le É en rouge, dont les lettres giclent sur ta voix ;
+  - les plaques rivetées JOUER (lance directement ta cassette), NIVEAUX (la sélection) et OPTIONS ;
+  - deux cassettes qui dansent sur scène, avec la piste, les bobines et la foule ;
+  - un trophée qui ouvre **Mes œuvres**, la galerie de tes toiles, avec un point rouge quand il y en a une nouvelle.
+- **Perdre le fil.** Après deux ratés d'affilée, la bande ralentit à ×0,78, et la musique descend un peu comme une vraie K7. Chaque geste réussi la relance peu à peu, et au bout de 10 elle repart à vitesse normale (« ÇA REPART ! »). Pendant le ralenti, les points sont divisés par deux et il n'y a pas de « parfait ». Le temps perdu s'affiche à la fin.
+- **La petite roue avale les notes.** Sa bouche s'ouvre quand une note arrive, la note est aspirée, la roue mâche et gonfle. Elle grossit au fil des notes avalées.
+- **La toile raconte ta partie :**
+  - couleur = geste (coupe bleu-canard, tap orange, maintien violet, scratch magenta) ;
+  - forme = timing (rond net = pile, jets à goutte = en avance, coulures = en retard) ;
+  - taille = combo ;
+  - zone de la toile = partie du morceau ;
+  - salissures grises = ratés.
+  
+  L'œuvre finale est rejouée sur une grande feuille de papier ancien.
+
 ## 0.13.0 — Nouveau menu « cassette mascotte »
 - **La cassette devient une mascotte cartoon.** Ses bobines sont des yeux qui suivent le mouvement et clignent. Elle a des joues, un sourire avec la langue, des gants (un poing et un « peace » qui salue) et des baskets qui battent la mesure.
 - Une cassette verrouillée dort : yeux fermés, cadenas, « zz ».
