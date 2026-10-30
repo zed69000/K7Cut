@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.5.0';
+const VERSION = '0.6.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -857,73 +857,146 @@ G.trancheroute = { mount(stage, api){
   stage.appendChild(stopBtn);
   stopBtn.onclick = () => { if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; } if(useAudio && music) music.gain.setValueAtTime(0, actx.currentTime); if(state === 'play' && notesRun){ api.save('notes', bank() + notesRun); notesRun = 0; } state = 'menu'; showMenu(); };
   /* ---------- menu des cassettes ---------- */
-  const menu = document.createElement('div');
-  menu.style.cssText = `position:absolute;inset:0;overflow:auto;background:${PAPERBG};color:${INK};padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;z-index:4;font-family:"Chakra Petch",sans-serif;touch-action:pan-y;background-size:cover;background-position:center`;
-  stage.appendChild(menu);
-  const artCache = {};
-  const stamp = `border:none;border-radius:4px;background:${INK};color:${PAPER};font-family:${FONT};cursor:pointer;box-shadow:2px 2px 0 ${LABELRED}`;
-  const paperBox = 'background:rgba(236,229,211,.85);border-radius:6px';
+  /* ---------- menu cartoon : scène animée, cassettes qui suivent le doigt ---------- */
+  if(!document.getElementById('k7-menu-css')){ const st = document.createElement('style'); st.id = 'k7-menu-css'; st.textContent = `
+    .k7m{position:absolute;inset:0;z-index:4;overflow:hidden;font-family:"Chakra Petch",sans-serif;color:${INK};touch-action:none;user-select:none;-webkit-user-select:none}
+    .k7m canvas{position:absolute;inset:0;width:100%;height:100%}
+    .k7m .ui{position:absolute;left:0;right:0;display:flex;padding:0 16px;pointer-events:none}
+    .k7m .ui > *{pointer-events:auto}
+    .k7btn{border:3px solid ${INK};border-radius:16px;background:${PAPER};color:${INK};font-family:${FONT};cursor:pointer;box-shadow:0 5px 0 ${INK};transition:transform .12s cubic-bezier(.3,1.6,.5,1),box-shadow .12s}
+    .k7btn:active{transform:translateY(4px) scale(.97);box-shadow:0 1px 0 ${INK}}
+    .k7btn:focus-visible{outline:3px solid ${LABELRED};outline-offset:3px}
+    .k7play{background:${LABELRED};color:${PAPER};font-size:22px;padding:14px 34px;border-radius:999px;animation:k7pulse 1.15s ease-in-out infinite}
+    @keyframes k7pulse{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.06) rotate(1deg)}}
+    .k7bubble{position:relative;background:${PAPER};border:3px solid ${INK};border-radius:18px;padding:10px 14px;box-shadow:0 5px 0 ${INK};text-align:center;max-width:340px;margin:0 auto}
+    .k7bubble:before{content:"";position:absolute;top:-14px;left:50%;margin-left:-12px;border:12px solid transparent;border-bottom-color:${INK};border-top:0}
+    .k7bubble:after{content:"";position:absolute;top:-9px;left:50%;margin-left:-9px;border:9px solid transparent;border-bottom-color:${PAPER};border-top:0}
+    .k7pop{animation:k7popin .45s cubic-bezier(.2,1.6,.4,1)}
+    @keyframes k7popin{from{transform:scale(.7) rotate(-3deg);opacity:0}}
+    .k7sheet{position:absolute;inset:0;z-index:6;background:rgba(28,27,25,.45);display:flex;align-items:flex-end;justify-content:center}
+    .k7sheet > div{width:100%;max-width:420px;background:${PAPERBG};border:3px solid ${INK};border-bottom:0;border-radius:22px 22px 0 0;padding:18px 18px 26px;display:flex;flex-direction:column;gap:12px;animation:k7up .35s cubic-bezier(.2,1.3,.4,1)}
+    @keyframes k7up{from{transform:translateY(100%)}}
+    @media (prefers-reduced-motion:reduce){.k7play{animation:none}.k7pop,.k7sheet > div{animation:none}}`; document.head.appendChild(st); }
+  const menu = document.createElement('div'); menu.className = 'k7m'; stage.appendChild(menu);
+  const mcv = document.createElement('canvas'), mdpr = Math.min(window.devicePixelRatio || 1, 2); mcv.width = W*mdpr; mcv.height = H*mdpr; menu.appendChild(mcv);
+  const mx = mcv.getContext('2d'); mx.setTransform(mdpr, 0, 0, mdpr, 0, 0);
+  const artCache = {}, imgCache = {};
   let cur = Math.min(TRACKS.length - 1, api.load('cur', 0)), dIdx = api.load('diff', 1);
+  let mPos = cur, mVel = 0, mTarget = cur, drag = null, squash = 0, mFloat = [], mTime = 0, mOpen = false;
+  for(let i=0;i<14;i++) mFloat.push({x: Math.random()*W, y: Math.random()*H, s: .6 + Math.random()*.9, v: 14 + Math.random()*22, ph: Math.random()*6});
+  const menuBg = makeBackdrop(null, Math.round(W) + 40, Math.round(H) + 40, 'menu');
+  const wrapI = i => ((i % TRACKS.length) + TRACKS.length) % TRACKS.length;
+  function cassImg(t){ const open = unlocked(t) || bank() >= t.cost, key = t.id + (open ? 1 : 0); if(!imgCache[key]){ const im = new Image(); im.src = makeCassette(t, open); imgCache[key] = im; } return imgCache[key]; }
+  const ui = {};
+  menu.insertAdjacentHTML('beforeend', `
+    <div class="ui" style="top:14px;justify-content:flex-end;gap:10px;align-items:flex-start">
+      <div id="k7tal" class="k7btn" style="font-size:16px;padding:7px 12px;transform:rotate(3deg);cursor:default;background:${INK};color:${PAPER};box-shadow:0 5px 0 ${LABELRED}"></div>
+      <button id="k7gear" class="k7btn" aria-label="Réglages" style="width:46px;height:42px;font-size:20px;padding:0">⚙</button></div>
+    <div class="ui" style="bottom:20px;flex-direction:column;gap:14px;align-items:stretch">
+      <div id="k7info" class="k7bubble"></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+        <button id="k7dl" class="k7btn" aria-label="Difficulté plus facile" style="width:42px;height:42px;font-size:20px;padding:0;border-radius:50%">‹</button>
+        <div id="k7diffbox" style="min-width:150px;text-align:center"></div>
+        <button id="k7dr" class="k7btn" aria-label="Difficulté plus dure" style="width:42px;height:42px;font-size:20px;padding:0;border-radius:50%">›</button></div>
+      <div style="display:flex;justify-content:center"><button id="k7play" class="k7btn k7play"></button></div></div>`);
+  ['k7tal','k7gear','k7info','k7dl','k7dr','k7diffbox','k7play'].forEach(id => ui[id] = menu.querySelector('#' + id));
+
+  function refreshUI(pop){
+    const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost, d = DIFFS[dIdx], bk = bests()[t.id + '.' + d.id];
+    ui.k7tal.innerHTML = `♪ ${bank()}<div style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;font-weight:700;opacity:.85">${titleOf(bank())}</div>`;
+    ui.k7info.innerHTML = `<div style="font-family:${FONT};font-size:19px">${t.name.toUpperCase()}</div><div style="font-size:13.5px">${t.label} · ${t.gestures}</div>
+      <div style="font-size:13.5px;font-weight:700;margin-top:3px;color:${open ? INK : LABELRED}">${open ? (bk ? `${'★'.repeat(bk.stars)}${'☆'.repeat(3 - bk.stars)} record ${bk.score}` : 'Jamais jouée à ce niveau') : afford ? 'Tu as assez de talent pour l\'ouvrir !' : `Il te faut ${t.cost} ♪ de talent`}</div>`;
+    if(pop){ ui.k7info.classList.remove('k7pop'); void ui.k7info.offsetWidth; ui.k7info.classList.add('k7pop'); }
+    ui.k7diffbox.innerHTML = `<div style="font-family:${FONT};font-size:16px;color:${dIdx >= 3 ? LABELRED : INK}">${d.name.toUpperCase()}</div><div style="font-size:12.5px;background:rgba(236,229,211,.85);border-radius:8px;padding:1px 6px">${d.note} · talent x${d.mult}</div>`;
+    ui.k7play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR !' : `${t.cost} ♪`;
+    ui.k7play.style.filter = open || afford ? '' : 'grayscale(1)';
+  }
+  ui.k7dl.onclick = () => { dIdx = Math.max(0, dIdx - 1); api.save('diff', dIdx); api.sfx.click(); refreshUI(); squash = .6; };
+  ui.k7dr.onclick = () => { dIdx = Math.min(DIFFS.length - 1, dIdx + 1); api.save('diff', dIdx); api.sfx.click(); refreshUI(); squash = .6; };
+  ui.k7play.onclick = () => {
+    const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost;
+    if(!open && !afford){ api.sfx.lose(); squash = -1; return; }
+    if(!open){ api.save('unlock.' + t.id, true); api.sfx.coin(); squash = 1.2; for(let i=0;i<24;i++) mFloat.push({x: W/2, y: H*.42, s: 1, v: 0, ph: 0, burst: {vx: (Math.random() - .5)*500, vy: -200 - Math.random()*400, life: 1.2}}); refreshUI(true); return; }
+    diff = DIFFS[dIdx]; startTrack(t);
+  };
+  ui.k7gear.onclick = () => {
+    const sh = document.createElement('div'); sh.className = 'k7sheet';
+    sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">RÉGLAGES</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="Fermer">✕</button></div>
+      <button class="k7btn" id="k7mute" style="padding:12px;font-size:13px">${api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'}</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px">Calage du rythme <span style="display:flex;gap:8px;align-items:center"><button class="k7btn" id="k7offm" style="width:40px;height:38px;padding:0">−</button><b id="k7off" style="font-family:${FONT};min-width:62px;text-align:center">${api.load('offset', 0)} ms</b><button class="k7btn" id="k7offp" style="width:40px;height:38px;padding:0">+</button></span></div>
+      <div style="font-size:12.5px;opacity:.8;margin-top:-6px">Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.</div>
+      <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">REVOIR LES TUTOS</button>
+      <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">K7 CUT · version ${VERSION}</div></div>`;
+    menu.appendChild(sh);
+    const close = () => sh.remove();
+    sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
+    sh.querySelector('#k7mute').onclick = e => { api.store.save('muted', !api.store.load('muted', false)); e.target.textContent = api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'; };
+    const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
+    sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
+    sh.querySelector('#k7tuto').onclick = e => { ['C','J','H','S'].forEach(k => api.save('tuto.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
+  };
+
+  // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
+  const SP = () => W*.66;
+  mcv.addEventListener('pointerdown', e => { drag = {x: e.clientX, pos: mPos, last: e.clientX, lt: performance.now(), v: 0}; try{ mcv.setPointerCapture(e.pointerId); }catch(err){} });
+  mcv.addEventListener('pointermove', e => { if(!drag) return; const now2 = performance.now(), dt2 = Math.max(1, now2 - drag.lt); drag.v = drag.v*.6 + ((e.clientX - drag.last)/dt2)*.4; drag.last = e.clientX; drag.lt = now2; mPos = drag.pos - (e.clientX - drag.x)/SP(); });
+  const release = () => { if(!drag) return; const fling = -drag.v*1000/SP()*.28; const moved = Math.abs(mPos - drag.pos); drag = null;
+    let tgt = Math.round(mPos + Math.max(-1.2, Math.min(1.2, fling)));
+    if(moved < .03) return; mTarget = tgt; mVel = 0; };
+  mcv.addEventListener('pointerup', release); mcv.addEventListener('pointercancel', release);
+  menu.addEventListener('keydown', e => { if(e.key === 'ArrowLeft') mTarget = Math.round(mPos) - 1; if(e.key === 'ArrowRight') mTarget = Math.round(mPos) + 1; });
+  mcv.addEventListener('click', e => { const r = mcv.getBoundingClientRect(), x = e.clientX - r.left; if(Math.abs(mPos - mTarget) > .02) return; if(x < W*.22) mTarget = Math.round(mPos) - 1; else if(x > W*.78) mTarget = Math.round(mPos) + 1; });
+
+  function menuFrame(dt){
+    mTime += dt;
+    if(!drag){ const k = 120, c = 17; const f = (mTarget - mPos)*k - mVel*c; mVel += f*dt; mPos += mVel*dt; if(Math.abs(mTarget - mPos) < .0015 && Math.abs(mVel) < .01){ mPos = mTarget; mVel = 0; } }
+    const ni = wrapI(Math.round(mPos)); if(ni !== cur){ cur = ni; api.save('cur', cur); api.sfx.click(); squash = .5; refreshUI(true); }
+    squash *= Math.pow(.02, dt);
+    const g = mx; g.clearRect(0, 0, W, H);
+    g.drawImage(menuBg, -20 + Math.sin(mTime*.3)*8, -20, W + 40, H + 40);
+    const cx = W/2, cy = H*.42, beat = mTime*104/60, bt = beat - Math.floor(beat), kick = Math.max(0, 1 - bt*4);
+    // rayons cartoon qui tournent derrière la cassette
+    g.save(); g.translate(cx, cy); g.rotate(mTime*.25); g.fillStyle = 'rgba(255,255,255,.35)'; for(let i=0;i<12;i++){ g.rotate(6.283/12); if(i % 2){ g.beginPath(); g.moveTo(0, 0); g.lineTo(W, -60); g.lineTo(W, 60); g.closePath(); g.fill(); } } g.restore();
+    g.fillStyle = 'rgba(236,229,211,.9)'; g.beginPath(); g.arc(cx, cy, W*.36 + kick*6, 0, 6.283); g.fill(); g.strokeStyle = INK; g.lineWidth = 3; g.setLineDash([10, 9]); g.lineDashOffset = -mTime*20; g.stroke(); g.setLineDash([]);
+    // notes qui s'envolent
+    for(const n of mFloat){
+      if(n.burst){ n.burst.vy += 900*dt; n.x += n.burst.vx*dt; n.y += n.burst.vy*dt; n.burst.life -= dt; }
+      else { n.y -= n.v*dt; n.x += Math.sin(mTime*1.5 + n.ph)*12*dt; if(n.y < -30){ n.y = H + 20; n.x = Math.random()*W; } }
+      g.save(); g.translate(n.x, n.y); g.rotate(Math.sin(mTime*2 + n.ph)*.3); g.scale(n.s, n.s); g.globalAlpha = n.burst ? Math.max(0, n.burst.life) : .55; g.fillStyle = n.burst ? LABELRED : INK;
+      g.beginPath(); g.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); g.fill(); g.fillRect(1.5, -14, 3, 20); g.beginPath(); g.moveTo(4.5, -14); g.quadraticCurveTo(14, -10, 10, 0); g.quadraticCurveTo(11, -7, 4.5, -7); g.fill(); g.restore();
+    }
+    mFloat = mFloat.filter(n => !n.burst || n.burst.life > 0);
+    // titre qui danse
+    const title = 'K7 CUT'; g.font = `${Math.min(46, W*.12)}px ${FONT}`; g.textBaseline = 'middle'; let tx = 18;
+    for(let i=0;i<title.length;i++){ const ch = title[i], w = g.measureText(ch).width; const jy = Math.sin(mTime*5 - i*.7)*4 - (i % 2 ? kick*4 : 0);
+      g.save(); g.translate(tx + w/2, 40 + jy); g.rotate(Math.sin(mTime*3 + i)*.08); g.lineWidth = 7; g.strokeStyle = PAPER; g.strokeText(ch, -w/2, 0); g.fillStyle = i >= 3 ? LABELRED : INK; g.fillText(ch, -w/2, 0); g.restore(); tx += w; }
+    // les cassettes : voisines sur les côtés, celle du centre en grand, bobines qui tournent
+    const base = Math.floor(mPos);
+    for(const off of [-2, -1, 2, 1, 0].map(o => o + (mPos - base > .5 ? 1 : 0))){
+      const i = base + off, d = i - mPos, ad = Math.abs(d); if(ad > 2.2) continue;
+      const t = TRACKS[wrapI(i)], im = cassImg(t), open = unlocked(t) || bank() >= t.cost;
+      const sc = Math.max(.35, 1 - ad*.32) * Math.min(1, W*.86/320), x = cx + d*SP()*.78, y = cy + ad*ad*16 + Math.sin(mTime*2.2 + i)*6*(1 - Math.min(1, ad));
+      const sq = ad < .5 ? squash : 0;
+      g.save(); g.translate(x, y); g.rotate(d*.16 + Math.sin(mTime*1.7 + i)*.03); g.scale(sc*(1 + sq*.08), sc*(1 - sq*.08)); g.globalAlpha = Math.max(.25, 1 - ad*.45);
+      g.fillStyle = 'rgba(40,20,0,.25)'; g.beginPath(); g.ellipse(0, 112, 130, 14, 0, 0, 6.283); g.fill();
+      if(im.complete) g.drawImage(im, -160, -100, 320, 200);
+      if(open){ for(const rx of [-32, 32]){ g.save(); g.translate(rx, -2); g.rotate(mTime*(ad < .5 ? 4 : 1.2)); g.fillStyle = INK; for(let k=0;k<6;k++){ g.rotate(1.047); g.fillRect(-2.5, -13.5, 5, 5); } g.restore(); } }
+      else { g.fillStyle = INK; g.beginPath(); g.arc(0, 12, 26, Math.PI, 0); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); g.fillStyle = LABELRED; g.strokeStyle = INK; g.lineWidth = 4; g.beginPath(); g.roundRect ? g.roundRect(-36, 10, 72, 54, 10) : g.rect(-36, 10, 72, 54); g.fill(); g.stroke(); g.fillStyle = PAPER; g.beginPath(); g.arc(0, 32, 7, 0, 6.283); g.fill(); g.fillRect(-3, 34, 6, 14); }
+      g.restore();
+    }
+    // flèches cartoon
+    for(const s of [-1, 1]){ const ax = cx + s*W*.44, ay = cy + Math.sin(mTime*4)*4; g.save(); g.translate(ax + s*Math.sin(mTime*4)*3, ay); g.fillStyle = PAPER; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.moveTo(-s*8, -14); g.lineTo(s*10, 0); g.lineTo(-s*8, 14); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    // points de position
+    const dw = 10, tot = TRACKS.length*(dw + 6); for(let i=0;i<TRACKS.length;i++){ const on = i === cur; g.fillStyle = on ? LABELRED : unlocked(TRACKS[i]) ? INK : 'rgba(28,27,25,.3)'; const w = on ? 22 : dw; g.beginPath(); g.roundRect ? g.roundRect(cx - tot/2 + i*(dw + 6) - (on ? 6 : 0), cy + H*.2, w, 10, 5) : g.rect(cx - tot/2 + i*(dw + 6), cy + H*.2, w, 10); g.fill(); }
+  }
+  let mLast = performance.now();
+  (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden) menuFrame(dt); requestAnimationFrame(mLoop); })(mLast);
+
   function showMenu(){
     api.closeEnd(); state = 'menu'; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); } if(useAudio && music) music.gain.setValueAtTime(.9, actx.currentTime);
-    api.hud(''); const n = bank();
-    if(!menu.dataset.bg){ const bg = makeBackdrop(null, Math.round(W), Math.round(H), 'menu'); menu.style.backgroundImage = `url(${bg.toDataURL('image/jpeg', .85)})`; menu.dataset.bg = '1'; }
-    menu.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-        <div style="font-family:${FONT};font-size:34px;line-height:.9;letter-spacing:-1px">K7<br><span style="color:${LABELRED}">CUT</span></div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          <div style="background:${INK};color:${PAPER};font-family:${FONT};font-size:17px;padding:6px 12px;border-radius:4px;transform:rotate(-3deg);box-shadow:3px 3px 0 ${LABELRED}">♪ ${n} talent</div>
-          <div style="${paperBox};padding:3px 8px;font-size:12.5px;font-weight:700">${titleOf(n)}</div></div></div>
-      <div id="k7car" style="position:relative;flex:1;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;touch-action:pan-y;user-select:none">
-        <div style="position:relative;width:100%;display:flex;align-items:center;justify-content:center">
-          <button id="k7prev" aria-label="Cassette précédente" style="${stamp};position:absolute;left:0;z-index:2;width:36px;height:44px;font-size:18px">‹</button>
-          <img id="k7img" alt="" draggable="false" style="width:min(80%,360px);height:auto;filter:drop-shadow(0 10px 12px rgba(40,20,0,.35));transition:transform .25s cubic-bezier(.2,1.3,.4,1),opacity .2s">
-          <button id="k7next" aria-label="Cassette suivante" style="${stamp};position:absolute;right:0;z-index:2;width:36px;height:44px;font-size:18px">›</button></div>
-        <div id="k7dots" style="display:flex;gap:6px"></div>
-        <div id="k7info" style="${paperBox};padding:8px 12px;text-align:center;display:flex;flex-direction:column;gap:2px;width:100%;max-width:360px"></div></div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <div id="k7diff" role="radiogroup" aria-label="Difficulté" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div>
-        <div id="k7dnote" style="text-align:center;font-size:12.5px;${paperBox};padding:3px 6px"></div></div>
-      <button id="k7play" style="${stamp};font-size:18px;padding:14px;box-shadow:4px 4px 0 ${LABELRED}"></button>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between;${paperBox};padding:6px 8px;font-size:12.5px">
-        <button id="k7mute" style="${stamp};font-size:10px;padding:6px 8px">${api.store.load('muted', false) ? 'SON OFF' : 'SON ON'}</button>
-        <span style="display:flex;gap:5px;align-items:center">Calage <b id="k7off">${api.load('offset', 0)} ms</b><button id="k7offm" style="${stamp};width:28px;height:26px;font-size:12px">−</button><button id="k7offp" style="${stamp};width:28px;height:26px;font-size:12px">+</button></span>
-        <button id="k7tuto" style="${stamp};font-size:10px;padding:6px 8px">TUTOS</button>
-        <span style="font-family:${FONT};font-size:10px;opacity:.7">v${VERSION}</span></div>`;
-    const img = menu.querySelector('#k7img'), info = menu.querySelector('#k7info'), dots = menu.querySelector('#k7dots'), play = menu.querySelector('#k7play'), dbox = menu.querySelector('#k7diff');
-    function render(dir){
-      const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost, key = t.id + (open || afford ? '1' : '0');
-      if(!artCache[key]) artCache[key] = makeCassette(t, open || afford);
-      img.src = artCache[key]; img.alt = 'Cassette ' + t.name;
-      if(dir){ img.style.transition = 'none'; img.style.transform = `translateX(${dir*60}px) rotate(${dir*4}deg)`; img.style.opacity = '.3'; requestAnimationFrame(() => { img.style.transition = ''; img.style.transform = ''; img.style.opacity = '1'; }); }
-      const bk = bests()[t.id + '.' + DIFFS[dIdx].id];
-      info.innerHTML = `<b style="font-family:${FONT};font-size:20px">FACE ${t.face} · ${t.name.toUpperCase()}</b><span style="font-size:13px">${t.label} · ${t.gestures}</span>
-        <span style="font-size:13px;font-weight:700;color:${open ? INK : LABELRED}">${open ? (bk ? '★'.repeat(bk.stars) + '☆'.repeat(3 - bk.stars) + ' · record ' + bk.score + ' en ' + DIFFS[dIdx].name : 'Jamais jouée en ' + DIFFS[dIdx].name) : afford ? 'Assez de talent : ouvre-la !' : `Fermée · il faut ${t.cost} ♪ de talent`}</span>`;
-      dots.innerHTML = TRACKS.map((x, i) => `<span style="width:${i === cur ? 18 : 8}px;height:8px;border-radius:4px;background:${i === cur ? LABELRED : unlocked(x) ? INK : 'rgba(28,27,25,.25)'};transition:width .2s"></span>`).join('');
-      play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR LA CASSETTE' : `FERMÉE · ${t.cost} ♪`;
-      play.style.opacity = open || afford ? '1' : '.5';
-      dbox.innerHTML = DIFFS.map((d, i) => `<button role="radio" aria-checked="${i === dIdx}" data-i="${i}" style="${stamp};font-size:9.5px;padding:9px 2px;${i === dIdx ? `background:${LABELRED};box-shadow:2px 2px 0 ${INK}` : 'opacity:.75'}">${d.name.toUpperCase()}</button>`).join('');
-      dbox.querySelectorAll('button').forEach(bt => bt.onclick = () => { dIdx = +bt.dataset.i; api.save('diff', dIdx); api.sfx.click(); render(); });
-      menu.querySelector('#k7dnote').textContent = `${DIFFS[dIdx].note} · talent x${DIFFS[dIdx].mult}`;
-    }
-    const go = d => { cur = (cur + d + TRACKS.length) % TRACKS.length; api.save('cur', cur); api.sfx.click(); render(d); };
-    menu.querySelector('#k7prev').onclick = () => go(-1); menu.querySelector('#k7next').onclick = () => go(1);
-    const car = menu.querySelector('#k7car'); let sx = null, sdx = 0;
-    car.onpointerdown = e => { if(e.target.tagName === 'BUTTON') return; sx = e.clientX; sdx = 0; img.style.transition = 'none'; };
-    car.onpointermove = e => { if(sx == null) return; sdx = e.clientX - sx; img.style.transform = `translateX(${sdx}px) rotate(${sdx/30}deg)`; };
-    car.onpointerup = car.onpointercancel = () => { if(sx == null) return; img.style.transition = ''; img.style.transform = ''; const d = sdx; sx = null; if(Math.abs(d) > 45) go(d < 0 ? 1 : -1); };
-    menu.onkeydown = e => { if(e.key === 'ArrowLeft') go(-1); if(e.key === 'ArrowRight') go(1); };
-    play.onclick = () => {
-      const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost;
-      if(!open && !afford){ api.sfx.lose(); img.animate([{transform: 'translateX(-6px)'}, {transform: 'translateX(6px)'}, {transform: 'none'}], {duration: 220}); return; }
-      if(!open){ api.save('unlock.' + t.id, true); api.sfx.coin(); render(); return; }
-      diff = DIFFS[dIdx]; startTrack(t);
-    };
-    render();
+    api.hud(''); for(const k in imgCache) delete imgCache[k];
+    mPos = mTarget = cur; mVel = 0; refreshUI(true);
     menu.hidden = false; stopBtn.hidden = true;
-    const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); menu.querySelector('#k7off').textContent = v + ' ms'; };
-    menu.querySelector('#k7offm').onclick = () => setOff(-10); menu.querySelector('#k7offp').onclick = () => setOff(10);
-    menu.querySelector('#k7mute').onclick = () => { api.store.save('muted', !api.store.load('muted', false)); showMenu(); };
-    menu.querySelector('#k7tuto').onclick = () => { ['C','J','H','S'].forEach(k => api.save('tuto.' + k, false)); api.sfx.coin(); menu.querySelector('#k7tuto').textContent = 'TUTOS ✓'; };
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 

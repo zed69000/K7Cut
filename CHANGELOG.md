@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.6.0
+- Menu cartoon animé : cassettes voisines visibles, glissé qui suit le doigt avec élan et ressort, bobines qui tournent, titre qui danse, notes qui s'envolent, cadenas sur les faces fermées
+- Difficulté choisie avec deux flèches, bulle d'info, gros bouton JOUER qui pulse
+- Réglages (son, calage, tutos, version) rangés dans un panneau derrière l'engrenage
+
 ## 0.5.0
 - Menu : une seule cassette à l'écran, on glisse pour changer de face
 - 4 difficultés (Apprenti, Musicien, Virtuose, Roi) qui multiplient le talent gagné ; titres de joueur jusqu'à « Roi du scratch et du rythme »
