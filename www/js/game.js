@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.8.0';
+const VERSION = '0.9.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -436,7 +436,7 @@ G.trancheroute = { mount(stage, api){
     const win = .2*diff.win, cand = [];
     for(const o of objs){
       if(o.done) continue; let d;
-      if(o.k === 'C' || o.k === 'J' || (o.k === 'H' && !o.holding)) d = t - o.time;
+      if(o.k === 'H' && !o.holding) d = t - o.time;
       else if(o.k === 'S') d = t < o.time ? t - o.time : t <= o.endTime ? 0 : t - o.endTime;
       else continue;
       if(Math.abs(d) <= win) cand.push({o, d});
@@ -451,32 +451,28 @@ G.trancheroute = { mount(stage, api){
     if(state === 'tuto'){ tutoDown(e); return; }
     if(state !== 'play') return;
     const p = pt(e), t = now(); try{ cv.setPointerCapture(e.pointerId); }catch(err){}
-    const o = pickAt(t);
+    // dans l'ordre : un bloc ou un pic encore à jouer avant la note longue / le scratch passe d'abord
+    let o = pickAt(t); const cj = firstOf(t, q => q.k === 'C' || q.k === 'J'); if(o && cj && cj.time <= o.time + .01) o = null;
     if(o && o.k === 'H' && holdState && holdState.o.endTime - t < .2){ const old = holdState.o; endHold(t, old.startGrade); }
     if(o && o.k === 'H' && !holdState){ o.holding = true; o.startGrade = grade(t - o.time); o.dt = t - o.time; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; api.vibe(10); return; }
     if(o && o.k === 'S'){ scratchState = {o, id: e.pointerId, last: p, dir: 0, acc: 0}; return; }
-    // l'obstacle le plus proche du toucher décide : bloc = coupe, pic = saut, tout de suite
-    if(o && o.k === 'C'){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true, aim: true}); cutObj(o, t, {x: 1, y: .8}); slash = {dx: .78, dy: .62, t: 0}; return; }
-    if(o && o.k === 'J' && !o.bomb){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); jumpObj(o, t); return; }
-    // une bombe : il faut sauter (taper) ; la couper (glisser franc) la fait exploser
-    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false, bomb: o && o.bomb ? o : null});
+    // geste strict, jugé à l'instant du toucher : glisser = couper, taper = sauter
+    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false});
   });
   api.on(cv, 'pointermove', e => {
     if(state === 'tuto'){ tutoMove(e); return; }
     const p = pt(e), t = now();
     if(scratchState && scratchState.id === e.pointerId){ const s = scratchState, dy = p.y - s.last.y, dx = p.x - s.last.x, v = Math.abs(dy) > Math.abs(dx) ? dy : dx; s.last = p;
       const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
-    const g = gestures.get(e.pointerId); if(!g) return;
+    const g = gestures.get(e.pointerId); if(!g || g.done) return;
     const dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
-    if(g.aim && d > 10){ g.aim = false; if(slash) slash = {dx: dx/d, dy: dy/d, t: slash.t}; }
-    if(g.done) return;
-    if(d > (g.bomb ? 26 : 12)){ g.done = true; slash = {dx: dx/d, dy: dy/d, t: 0}; if(g.bomb && !g.bomb.done) explode(g.bomb, g.t); else noise(master, g.t, .05, .05, 'highpass', 3000); }
+    if(d > 18){ g.done = true; doCut(g.t, {x: dx, y: dy}); }
   });
   const up = e => {
     if(state === 'tuto'){ tutoUp(e); return; }
     const t = now(), id = e.pointerId;
     const g = gestures.get(id);
-    if(g && !g.done){ if(g.bomb && !g.bomb.done) jumpObj(g.bomb, g.t); else { const p = pt(e), d = Math.hypot(p.x - g.x, p.y - g.y); if(d < 12){ jumpT = 0; osc(master, 'triangle', 330, g.t, .07, .04, {glide: 520}); } } }
+    if(g && !g.done){ g.done = true; const p = pt(e), dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy); if(d > 18) doCut(g.t, {x: dx, y: dy}); else doJump(g.t); }
     gestures.delete(id);
     if(holdState && holdState.id === id){ const h = holdState.o; endHold(t, t >= h.endTime - .12 ? h.startGrade : (t - h.time)/(h.endTime - h.time) > .6 ? 'ok' : 'miss'); }
     if(scratchState && scratchState.id === id) scratchState = null;
@@ -497,6 +493,22 @@ G.trancheroute = { mount(stage, api){
 
   let slash = null;
   function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2*diff.win).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
+  // parmi les obstacles du bon type : le plus ancien encore jouable, sauf s'il est très en retard et que le suivant tombe pile
+  function firstOf(t, f){
+    const win = .2*diff.win, c = objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) <= win).sort((a, b) => a.time - b.time);
+    if(c[1] && t - c[0].time > .13*diff.win && Math.abs(t - c[1].time) < .06) return c[1];
+    return c[0] || null;
+  }
+  function doCut(t, dir){
+    const l = Math.hypot(dir.x, dir.y) || 1; slash = {dx: dir.x/l, dy: dir.y/l, t: 0};
+    const o = firstOf(t, q => q.k === 'C') || firstOf(t, q => q.bomb);
+    if(window.__k7log) window.__k7log.push({cut: t, got: o && (o.k + o.beat), near: objs.filter(q => Math.abs(q.time - t) < .35).map(q => q.k + (q.bomb ? 'b' : '') + q.beat + (q.done ? '✓' : '') + ':' + Math.round((t - q.time)*1000))});
+    if(o && o.bomb) explode(o, t); else if(o) cutObj(o, t, dir); else noise(master, t, .05, .05, 'highpass', 3000);
+  }
+  function doJump(t){
+    const o = firstOf(t, q => q.k === 'J');
+    if(o) jumpObj(o, t); else { jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); }
+  }
   function cutObj(o, t, dir){ o.dt = t - o.time; resolve(o, grade(o.dt), t, dir); }
   function jumpObj(o, t){ jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); o.dt = t - o.time; resolve(o, grade(o.dt), t); }
   function explode(o, t){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); }
@@ -943,11 +955,12 @@ G.trancheroute = { mount(stage, api){
     return c;
   }
   const GRAF = '"Sedgwick Ave Display", "Permanent Marker", ' + FONT, MARKER = '"Permanent Marker", "Chakra Petch", sans-serif';
-  function graffiti(g, txt, x, y, size, t, k){
+  function graffiti(g, txt, x, y, size, t, k, pop){
     g.save(); g.font = `${size}px ${GRAF}`; g.textBaseline = 'alphabetic'; let cx = x; const ws = [...txt].map(ch => g.measureText(ch).width + size*.02);
     [...txt].forEach((ch, i) => {
-      const w = ws[i], jy = Math.sin(t*4 - i*.8)*3 - (i % 2 ? k*3 : 0), rot = Math.sin(t*2.4 + i*1.3)*.07 - .06;
-      g.save(); g.translate(cx + w/2, y + jy); g.rotate(rot);
+      const w = ws[i], jy = Math.sin(t*4 - i*.8)*3 - (i % 2 ? k*3 : 0), rot = Math.sin(t*2.4 + i*1.3)*.07 - .06, ps = pop ? pop(i) : 1;
+      if(ps <= 0){ cx += w; return; }
+      g.save(); g.translate(cx + w/2, y + jy - (ps - 1)*size*.4); g.rotate(rot + (ps - 1)*.3); g.scale(ps, ps);
       for(let e=7;e>0;e--){ g.fillStyle = INK; g.fillText(ch, -w/2 + e, e); }
       g.lineJoin = 'round'; g.lineWidth = size*.16; g.strokeStyle = INK; g.strokeText(ch, -w/2, 0);
       const gr = g.createLinearGradient(0, -size*.8, 0, 0); const pair = i < 2 ? ['#ff3d7f', '#ffd23f'] : ['#29c4ff', '#7cf05a']; gr.addColorStop(0, pair[0]); gr.addColorStop(1, pair[1]); g.fillStyle = gr; g.fillText(ch, -w/2, 0);
@@ -1028,6 +1041,7 @@ G.trancheroute = { mount(stage, api){
       <button class="k7btn" id="k7voice" style="padding:12px;font-size:13px">${api.load('voice', true) ? 'MÉLODIE : TA VOIX' : 'MÉLODIE : SYNTHÉ'}</button>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px">Calage du rythme <span style="display:flex;gap:8px;align-items:center"><button class="k7btn" id="k7offm" style="width:40px;height:38px;padding:0">−</button><b id="k7off" style="font-family:${FONT};min-width:62px;text-align:center">${api.load('offset', 0)} ms</b><button class="k7btn" id="k7offp" style="width:40px;height:38px;padding:0">+</button></span></div>
       <div style="font-size:12.5px;opacity:.8;margin-top:-6px">Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.</div>
+      <button class="k7btn" id="k7intro" style="padding:12px;font-size:13px">REJOUER L'INTRO</button>
       <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">REVOIR LES TUTOS</button>
       <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">K7 CUT · version ${VERSION}</div></div>`;
     menu.appendChild(sh);
@@ -1037,6 +1051,7 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7mute').onclick = e => { api.store.save('muted', !api.store.load('muted', false)); e.target.textContent = api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'; };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
+    sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     sh.querySelector('#k7tuto').onclick = e => { ['C','J','H','S'].forEach(k => api.save('tuto.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
   };
 
@@ -1051,6 +1066,51 @@ G.trancheroute = { mount(stage, api){
   menu.addEventListener('keydown', e => { if(e.key === 'ArrowLeft') mTarget = Math.round(mPos) - 1; if(e.key === 'ArrowRight') mTarget = Math.round(mPos) + 1; });
   mcv.addEventListener('click', e => { const r = mcv.getBoundingClientRect(), x = e.clientX - r.left; if(Math.abs(mPos - mTarget) > .02) return; if(x < W*.22) mTarget = Math.round(mPos) - 1; else if(x > W*.78) mTarget = Math.round(mPos) + 1; });
 
+  /* ---------- intro du menu : ta voix chante K-7-C-U-T, les lettres giclent une à une ---------- */
+  let intro = {stage: 'wait', t: 0}; // à chaque lancement
+  const IBPM = 104, ISTEP = 60/IBPM/2, ILET = [0, 1, 3, 4, 5]; // syllabe i -> lettre (l'espace saute)
+  function introGo(){
+    if(!intro || intro.stage !== 'wait') return;
+    intro.stage = 'load'; intro.t = 0;
+    try{ muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; if(actx && actx.state === 'suspended') actx.resume(); loadVoice(); }catch(e){}
+  }
+  function introPlay(){
+    intro.stage = 'play'; intro.t = 0;
+    if(!useAudio) return;
+    events = []; t0 = 0; const s0 = actx.currentTime + .08, f = [196, 220, 247, 294, 330, 392, 392];
+    for(let i=0;i<7;i++){ const at = s0 + i*ISTEP*(i === 6 ? 1.5 : 1);
+      if(i % 2 === 0){ osc(master, 'sine', 160, at, .3, .8, {glide: 42, gt: .1}); noise(master, at, .012, .2, 'highpass', 2500); }
+      if(!sing(master, at, f[i], i, i === 6 ? .9 : .75, {long: i === 6, rev: .3, dly: i === 6 ? .3 : 0})) osc(master, 'triangle', f[i]*2, at, .18, .2);
+    }
+    try{ I.crash(s0 + 6*ISTEP*1.5); I.clap(s0 + 6*ISTEP*1.5, .4); }catch(e){}
+  }
+  function introPop(i){
+    if(!intro) return 1;
+    if(intro.stage !== 'play') return 0;
+    const si = ILET.indexOf(i); if(si < 0) return intro.t > ILET.length*ISTEP ? 1 : 0;
+    const dt2 = intro.t - .08 - si*ISTEP, last = intro.t - .08 - 6*ISTEP*1.5;
+    if(dt2 < 0) return 0;
+    const b = 1 + Math.exp(-dt2*9)*Math.sin(dt2*30)*.45 + (dt2 < .06 ? .6 - dt2*10 : 0);
+    return last > 0 ? b + Math.exp(-last*6)*.35 : b;
+  }
+  mcv.addEventListener('pointerdown', introGo, true); menu.addEventListener('pointerdown', introGo, true);
+  function introFrame(g, dt){
+    if(!intro) return;
+    intro.t += dt;
+    if(intro.stage === 'load' && (voiceBuf || !useAudio || intro.t > 1.5)) introPlay();
+    if(intro.stage === 'play'){
+      const pt2 = intro.t - .08 - ILET.length*ISTEP;
+      for(let i=0;i<ILET.length;i++){ const d2 = intro.t - .08 - i*ISTEP; if(d2 > 0 && d2 < dt + .001){ mFloat.push(...Array.from({length: 6}, () => ({x: 30 + ILET[i]*W*.11, y: 50, v: 0, s: .8 + Math.random()*.6, ph: Math.random()*6, burst: {vx: (Math.random() - .5)*380, vy: -200 - Math.random()*250, life: 1}}))); squash = .4; } }
+      if(intro.t > 2.6) intro = null;
+      return;
+    }
+    // invitation à toucher
+    const a = .6 + Math.sin(mTime*6)*.4;
+    g.save(); g.translate(18, 52); g.rotate(-.05); g.scale(1 + Math.sin(mTime*6)*.05, 1 + Math.sin(mTime*6)*.05);
+    g.textAlign = 'left'; g.textBaseline = 'middle'; g.lineJoin = 'round'; g.strokeStyle = INK; g.globalAlpha = a;
+    g.font = `${Math.min(34, W*.085)}px ${FONT}`; g.lineWidth = 9; g.strokeText('TOUCHE !', 0, 0); g.fillStyle = SPRAY[1]; g.fillText('TOUCHE !', 0, 0);
+    g.font = `${Math.min(17, W*.044)}px ${MARKER}`; g.lineWidth = 6; g.strokeText('pour lancer la cassette', 4, 30); g.fillStyle = PAPER; g.fillText('pour lancer la cassette', 4, 30); g.restore();
+  }
   function menuFrame(dt){
     mTime += dt;
     if(!drag){ const k = 120, c = 17; const f = (mTarget - mPos)*k - mVel*c; mVel += f*dt; mPos += mVel*dt; if(Math.abs(mTarget - mPos) < .0015 && Math.abs(mVel) < .01){ mPos = mTarget; mVel = 0; } }
@@ -1071,7 +1131,7 @@ G.trancheroute = { mount(stage, api){
     }
     mFloat = mFloat.filter(n => !n.burst || n.burst.life > 0);
     // titre en graffiti qui dégouline
-    graffiti(g, 'K7 CUT', 14, 70, Math.min(60, W*.16), mTime, kick);
+    graffiti(g, 'K7 CUT', 14, 70, Math.min(60, W*.16), mTime, kick, intro ? introPop : null); introFrame(g, dt);
     // les cassettes : voisines sur les côtés, celle du centre en grand, bobines qui tournent
     const base = Math.floor(mPos);
     for(const off of [-2, -1, 2, 1, 0].map(o => o + (mPos - base > .5 ? 1 : 0))){
@@ -1104,7 +1164,7 @@ G.trancheroute = { mount(stage, api){
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 
-  window.__k7 = {get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
   showMenu();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};

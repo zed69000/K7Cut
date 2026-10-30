@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 0.9.0 — Gestes stricts + intro chantée
+- **Taper = sauter, glisser = couper, point.** Un tap ne coupe plus jamais un bloc, un glissé ne fait plus jamais sauter. Le geste est jugé à l'instant où le doigt touche l'écran, sur le premier obstacle du bon type.
+- Glisser près d'une bombe coupe le bloc en priorité au lieu de faire exploser la bombe.
+- Un bloc ou un pic encore à jouer passe avant la note longue ou le scratch qui le suit (avant, la note longue « volait » le toucher).
+- **Intro du menu chantée avec ta voix** : on touche l'écran, les 5 lettres K-7-C-U-T giclent une à une sur les syllabes, avec beat et crash. À chaque lancement, et rejouable depuis les réglages.
+- Bot : nouveaux contrôles COUPE_SUR_TAP et SAUT_SUR_GLISSE. 0 sur les 8 cassettes (modes juste, faux, au hasard).
+
 ## 0.8.0
 - Ta voix dans le jeu : les 7 syllabes chantées du mémo deviennent un instrument. Chaque coupe réussie chante la note de la mélodie, transposée automatiquement ; les appels « écoute », le compte à rebours et les paliers de transe (en chœur) chantent aussi
 - Réglage « Mélodie : ta voix / synthé » dans l'engrenage
