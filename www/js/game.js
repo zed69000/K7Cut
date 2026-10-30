@@ -88,7 +88,10 @@ G.trancheroute = { mount(stage, api){
       music = actx.createGain(); music.gain.value = .9; music.connect(pump);
     }catch(e){ actx = null; }
   }
-  const now = () => useAudio ? actx.currentTime - t0 : performance.now()/1000 - t0;
+  let lat = 0;
+  const clock = () => useAudio ? actx.currentTime - t0 : performance.now()/1000 - t0;
+  // ce que le joueur entend arrive après la latence de sortie : on juge et on dessine sur ce temps-là
+  const now = () => clock() - lat;
   let noiseBuf = null;
   function env(gn, T, v, a, d, sus){ gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(v, T + a); if(sus){ gn.gain.setValueAtTime(v, T + a + sus); } gn.gain.exponentialRampToValueAtTime(.0001, T + a + (sus || 0) + d); }
   function osc(bus, type, f, at, dur, vol, o2){
@@ -245,6 +248,7 @@ G.trancheroute = { mount(stage, api){
     hideMenu(); api.closeEnd(); api.hud(`FACE ${t.face} · ${t.name.toUpperCase()}`);
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
+    lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
     state = 'play';
   }
@@ -273,7 +277,7 @@ G.trancheroute = { mount(stage, api){
       api.vibe(g === 'perfect' ? 16 : 8);
       if(combo % 25 === 0) judges.push({txt: combo + ' COMBO', x: W/2, y: H*.2, t: 0, big: true});
     }
-    judges.push({txt: LABEL[g], g, x: o.k === 'H' || o.k === 'S' ? HXs + 30 : x, y: Y0 - 74, t: 0});
+    judges.push({txt: LABEL[g], g, x: o.k === 'H' || o.k === 'S' ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? 'en retard' : 'en avance') : null});
   }
 
   /* ---------- gestes ---------- */
@@ -293,10 +297,12 @@ G.trancheroute = { mount(stage, api){
     if(scratchState){ const s = scratchState, dy = p.y - s.last.y, dx = p.x - s.last.x, v = Math.abs(dy) > Math.abs(dx) ? dy : dx; s.last = p;
       const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
     if(!gesture || gesture.done) return; const dx = p.x - gesture.x, dy = p.y - gesture.y;
-    if(Math.hypot(dx, dy) > 16){ gesture.done = true; cut(gesture.t, {x: dx, y: dy}); slash = {dx: dx/Math.hypot(dx, dy), dy: dy/Math.hypot(dx, dy), t: 0}; }
+    if(Math.hypot(dx, dy) > 12){ gesture.done = true; cut(gesture.t, {x: dx, y: dy}); slash = {dx: dx/Math.hypot(dx, dy), dy: dy/Math.hypot(dx, dy), t: 0}; }
   });
-  const up = () => {
+  const up = e => {
     const t = now();
+    if(gesture && !gesture.done && e && e.type === 'pointerup'){ const p = pt(e), dx = p.x - gesture.x, dy = p.y - gesture.y, d = Math.hypot(dx, dy);
+      if(d > 8){ gesture.done = true; cut(gesture.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; } }
     if(holdState){ const h = holdState.o; endHold(t, t >= h.endTime - .12 ? h.startGrade : (t - h.time)/(h.endTime - h.time) > .6 ? 'ok' : 'miss'); }
     scratchState = null;
     if(gesture && !gesture.done) jump(gesture.t); gesture = null;
@@ -315,16 +321,16 @@ G.trancheroute = { mount(stage, api){
   function endHold(t, g){ const h = holdState.o; if(holdState.voice) holdState.voice.stop(); holdState = null; h.holding = false; h.released = t; resolve(h, g, t); }
 
   let slash = null;
-  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .18).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
+  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
   function cut(t, dir){
-    const o = nearest(t, o => o.k === 'C' || o.k === 'J');
+    const o = nearest(t, o => o.k === 'C' || o.bomb);
     if(o && o.bomb){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); return; }
-    if(o && o.k === 'C') resolve(o, grade(t - o.time), t, dir);
+    if(o && o.k === 'C'){ o.dt = t - o.time; resolve(o, grade(o.dt), t, dir); }
     else noise(master, t, .05, .05, 'highpass', 3000);
   }
   function jump(t){
     jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520});
-    const o = nearest(t, o => o.k === 'J'); if(o) resolve(o, grade(t - o.time), t);
+    const o = nearest(t, o => o.k === 'J'); if(o){ o.dt = t - o.time; resolve(o, grade(o.dt), t); }
   }
   function split(o, dir){
     const l = Math.hypot(dir.x, dir.y) || 1, d = {x: dir.x/l, y: dir.y/l}, n = {x: -d.y, y: d.x}, x = xOf(o.beat);
@@ -369,7 +375,7 @@ G.trancheroute = { mount(stage, api){
     if(state === 'play'){
       const t = now();
       beatNow = t/bpb;
-      while(nextStep/4*bpb < t + .15 && nextStep < totalBars*16){ scheduleStep(nextStep); nextStep++; }
+      while(nextStep/4*bpb < clock() + .15 && nextStep < totalBars*16){ scheduleStep(nextStep); nextStep++; }
       while(spawned*4 < beatNow + 10 && spawned < totalBars){ spawnBar(spawned); spawned++; }
       const air = jumpT < .42 && jumpT > .04;
       for(const o of objs){
@@ -377,7 +383,7 @@ G.trancheroute = { mount(stage, api){
         if(o.k === 'N' && t >= o.time) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && Math.abs(t - o.time) < .12 && air) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && t > o.time + .12){ o.done = true; o.result = 'gone'; }
-        else if((o.k === 'C' || o.k === 'J') && t > o.time + .18) resolve(o, 'miss', t);
+        else if((o.k === 'C' || o.k === 'J') && t > o.time + .2 && !(gesture && !gesture.done && Math.abs(gesture.t - o.time) < .2 && t < o.time + .6)) resolve(o, 'miss', t);
         else if(o.k === 'H'){ if(!o.holding && t > o.time + .18) resolve(o, 'miss', t); else if(o.holding){ if(t > o.endTime + .04) endHold(t, o.startGrade); else if(Math.random() < .5) confetti(HXs, Y0 - 12, [RED, PAPER], 1, .3); } }
         else if(o.k === 'S' && t > o.endTime + .1){ const r = o.strokes/o.need; resolve(o, r >= 1.5 ? 'perfect' : r >= 1 ? 'good' : r > 0 ? 'ok' : 'miss', t); if(scratchState && scratchState.o === o) scratchState = null; }
       }
@@ -544,8 +550,9 @@ G.trancheroute = { mount(stage, api){
     menu.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-family:${FONT};font-size:34px;line-height:1">K7 <span style="color:${RED}">CUT</span></div><div style="display:flex;gap:10px;align-items:center"><span style="font-family:${FONT};font-size:14px">♪ ${n}</span><button id="k7mute" style="border:none;border-radius:6px;background:${INK};color:${PAPER};font-family:${FONT};font-size:10px;padding:7px 9px;cursor:pointer">${api.store.load('muted', false) ? 'SON OFF' : 'SON ON'}</button></div></div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:12.5px;line-height:1.3">
         ${[['GLISSE','couper'],['TAPE','sauter'],['MAINTIENS','note longue'],['VA-ET-VIENT','scratch']].map(([a, c]) => `<div style="background:rgba(28,27,25,.08);border-radius:6px;padding:6px 4px;text-align:center"><b style="font-family:${FONT};font-size:9px;display:block;color:${RED}">${a}</b>${c}</div>`).join('')}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(28,27,25,.08);border-radius:6px;padding:6px 10px;font-size:13px"><span>Calage du rythme : <b id="k7off">${api.load('offset', 0)} ms</b></span><span style="display:flex;gap:6px"><button id="k7offm" style="border:none;border-radius:6px;background:${INK};color:${PAPER};width:34px;height:28px;font-size:16px;cursor:pointer">−</button><button id="k7offp" style="border:none;border-radius:6px;background:${INK};color:${PAPER};width:34px;height:28px;font-size:16px;cursor:pointer">+</button></span></div>
       <div id="k7list" style="display:flex;flex-direction:column;gap:12px"></div>
-      <p style="margin:0;font-size:13px;opacity:.75">Ramasse les notes ♪ sur la bande (saute pour celles dans les airs) : ton total débloque les cassettes suivantes. Les cassettes rouges + donnent une vie.</p>`;
+      <p style="margin:0;font-size:13px;opacity:.75">Ramasse les notes ♪ sur la bande (saute pour celles dans les airs) : ton total débloque les cassettes suivantes. Si tes coupes tombent « en retard » alors que tu es dans le temps, monte le calage ; si elles tombent « en avance », baisse-le. Les cassettes rouges + donnent une vie.</p>`;
     const list = menu.querySelector('#k7list');
     TRACKS.forEach(t => {
       const open = unlocked(t), info = b[t.id], afford = !open && n >= t.cost;
@@ -567,6 +574,8 @@ G.trancheroute = { mount(stage, api){
       list.appendChild(el);
     });
     menu.hidden = false; stopBtn.hidden = true;
+    const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); menu.querySelector('#k7off').textContent = v + ' ms'; };
+    menu.querySelector('#k7offm').onclick = () => setOff(-10); menu.querySelector('#k7offp').onclick = () => setOff(10);
     const mb = menu.querySelector('#k7mute'); mb.onclick = () => { api.store.save('muted', !api.store.load('muted', false)); showMenu(); };
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
