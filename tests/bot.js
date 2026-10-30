@@ -1,4 +1,4 @@
-["C","CV","CH","J","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); });
+["C","CV","CH","J","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); localStorage.setItem("k7cut.tuto3." + k, "true"); });
 window.__bot = function(sigma, mode){
   const k = window.__k7, cv = k.cv; const r = cv.getBoundingClientRect(); const cx = r.left + r.width*.6, cy = r.top + r.height*.3;
   const seen = new Set(), plan = []; let pid = 10;

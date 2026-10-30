@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.19.0 — Ronds-cœurs en rythme, sens de glisse strict, tutos sur les vraies formes
+- **Les ronds-cœurs partent au toucher.** Le tap était validé quand le doigt se levait, donc le son arrivait environ 0,1 s en retard : on avait l'impression de ne pas être en rythme. Le coup part maintenant dès que le doigt touche l'écran.
+- **Le son du rond-cœur est celui du morceau** : la caisse claire ou le clap exact du style (rimshot en dub, clap filtré en French touch, caisse saturée en métal…), plus de son ajouté.
+- **Plus de sons hors style.** Suppression du coup de batterie générique à chaque réussite, de la basse « chaleur », des clics aigus sur les coupes, du « blip » d'un tap dans le vide et du « blop » des notes ramassées : chaque geste ne joue que l'instrument du genre.
+- **Le sens de glisse compte.** Glisser dans le mauvais sens sur un bloc debout ou couché est un raté (avant : « OK »).
+- **Tutos sur les vraies formes.** Quand une forme jamais vue arrive sur la bande, à deux temps de la ligne rouge, le jeu se fige : tout s'assombrit sauf cette forme et la ligne rouge, le geste est dessiné dessus (flèche, doigt, remplissage du ruban), une étiquette dit quoi faire. On essaie, « OUI ! SUR LA LIGNE ROUGE », et ça repart.
+- **Les aides « GLISSE ↑ / GLISSE → / TAPE » s'effacent quand tu as compris** : elles pâlissent à chaque réussite de ce geste, disparaissent après 8, et reviennent si tu le rates. Pour tous les niveaux.
+
 ## 0.18.0 — Son plus pêchu, ronds-cœurs batteurs, phrases rythmiques, tutos repensés, toiles uniques
 - **Apprenti par défaut** pour une première partie (le choix déjà enregistré d'un joueur est gardé).
 - **Musique plus pêchue.** Le compresseur laisse passer les attaques, une saturation douce colle le tout, grosse caisse avec plus de corps et un clic, caisse claire plus épaisse, sous-basse sous les basses, toute la musique pompe sur la grosse caisse. Le premier couplet n'est plus étouffé (le filtre part de 2,6 kHz au lieu de 900 Hz et s'ouvre en 4 mesures).
