@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.7.0';
+const VERSION = '0.7.1';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -429,7 +429,11 @@ G.trancheroute = { mount(stage, api){
     if(o && o.k === 'H' && holdState && holdState.o.endTime - t < .2){ const old = holdState.o; endHold(t, old.startGrade); }
     if(o && o.k === 'H' && !holdState){ o.holding = true; o.startGrade = grade(t - o.time); o.dt = t - o.time; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; api.vibe(10); return; }
     if(o && o.k === 'S'){ scratchState = {o, id: e.pointerId, last: p, dir: 0, acc: 0}; return; }
-    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false});
+    const near = objs.filter(q => !q.done && (q.k === 'C' || q.k === 'J') && Math.abs(t - q.time) < .2*diff.win);
+    const kinds = new Set(near.map(q => q.bomb ? 'B' : q.k));
+    if(near.length && kinds.size === 1 && kinds.has('C')){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); cut(t, {x: 1, y: .8}); slash = {dx: .78, dy: .62, t: 0}; return; }
+    if(near.length && kinds.size === 1 && kinds.has('J')){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); jump(t); return; }
+    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false, mixed: near.length > 0});
   });
   api.on(cv, 'pointermove', e => {
     if(state === 'tuto'){ tutoMove(e); return; }
@@ -438,14 +442,14 @@ G.trancheroute = { mount(stage, api){
       const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
     const g = gestures.get(e.pointerId); if(!g || g.done) return;
     const dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
-    if(d > 12){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; }
+    if(d > (g.mixed ? 22 : 12)){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; }
   });
   const up = e => {
     if(state === 'tuto'){ tutoUp(e); return; }
     const t = now(), id = e.pointerId;
     const g = gestures.get(id);
     if(g && !g.done && e.type === 'pointerup'){ const p = pt(e), dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
-      if(d > 8){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; } }
+      if(d > (g.mixed ? 22 : 8)){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; } }
     if(g && !g.done) jump(g.t);
     gestures.delete(id);
     if(holdState && holdState.id === id){ const h = holdState.o; endHold(t, t >= h.endTime - .12 ? h.startGrade : (t - h.time)/(h.endTime - h.time) > .6 ? 'ok' : 'miss'); }
@@ -1079,7 +1083,7 @@ G.trancheroute = { mount(stage, api){
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 
-  window.__k7 = {get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: i => startTrack(TRACKS[i]), tracks: TRACKS, cv};
+  window.__k7 = {get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
   showMenu();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};

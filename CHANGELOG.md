@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.7.1
+- Obstacles rapprochés : c'est l'obstacle dans le rond qui décide de l'action. Seulement des blocs autour : tout geste coupe, dès le toucher. Seulement des sauts : tout geste fait sauter, même si le doigt bouge un peu. Bloc et saut mélangés : il faut un glissé franc pour couper
+
 ## 0.7.0
 - Tutos en jeu : arrêt sur image quand l'obstacle arrive, projecteur, doigt animé qui montre le geste, on le fait sur le vrai écran et la partie repart
 - Menu street art : mur en béton, affiches collées, coulures de bombe, tags, titre graffiti qui dégouline, cassettes en stickers, difficulté sur du scotch
