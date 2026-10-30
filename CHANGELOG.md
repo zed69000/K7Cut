@@ -1,5 +1,29 @@
 # Journal des versions
 
+## 0.17.0 — Paliers de difficulté, son calé, personnage élastique, page de récompense
+- **Progression en paliers.** Chaque morceau monte d'une marche puis souffle sur un palier : intro → couplet facile → couplet → pause → refrain → refrain plus dense → final. Chaque niveau a un plafond :
+
+  | Niveau | Palier max | Écart minimal entre deux gestes |
+  |---|---|---|
+  | Apprenti | 1 | 0,55 s |
+  | Musicien | 2 | 0,34 s |
+  | Virtuose | 3 | 0,24 s |
+  | Roi | 3 | 0,19 s |
+
+  En Apprenti, il y a moins de notes tenues et de scratchs, on ne change de geste qu'avec le temps de réfléchir, et les fenêtres sont plus larges. Résultat : 35 à 61 gestes par minute au lieu de 50 à 108.
+- **Tes coupes jouent la mélodie que le morceau te laisse.** La mélodie de fond se tait là où il y a un bloc. Ta note sort devant, avec une attaque nette, et la musique se pousse un instant pour la laisser passer.
+- **Chaque geste réussi est salué par un petit coup de batterie bien calé**, différent selon le style (clap, rimshot ou caisse claire), avec une basse ronde sur l'accord en cours. Toutes les 8 parfaits, un scintillement de cymbale.
+- **Tout est calé sur la grille du morceau :** la voix de combo démarre sur la croche, l'accord de transe sur le temps suivant, et le « blop » d'une note avalée sur le temps de la note. La musique est un peu plus basse pour laisser la place aux récompenses.
+- **Le personnage ne saute plus.** Il s'étire dans le sens du glissé, ou gonfle et éclate avec des traits BD quand on tape : c'est lui qui donne le tempo. Les notes dorées sont avalées sans sauter.
+- **Nouvelle page de récompense** (d'après la maquette) :
+  - en haut, le titre, le nom de l'œuvre, le % qui défile et la toile en polaroïd ;
+  - un bandeau « N DISQUES GAGNÉS » où les disques tombent un par un sur les temps, avec éclats, confettis et une note chantée ;
+  - le score qui défile, le combo, le talent, la bande ralentie ou intacte ;
+  - le nouveau titre, la nouvelle cassette et le record ;
+  - les boutons REJOUER, GARDER MON ŒUVRE, CASSETTES et FACE SUIVANTE.
+
+  Le tout est animé sur un petit air de fin tonique au tempo de la face (kick, clap, basse, accords), avec la foule qui saute.
+
 ## 0.16.0 — Un habillage par style de musique, retour direct aux cassettes
 - **Chaque style a son univers en jeu** (d'après les maquettes) :
   - **Métal** : papier crème, pinceaux noir et rouge, éclairs, tête de mort, enceintes, chevrons rouges, bobines rouges, foule liserée de rouge.
