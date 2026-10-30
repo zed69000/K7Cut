@@ -49,7 +49,14 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.17.0';
+/* rythmes d'une mesure (8 croches) : C = coupe (la mélodie, souvent sur les temps), J = rond-cœur (la caisse claire, sur 2 et 4), n = note à ramasser */
+const RHY = [
+  ['C...J...', 'C...C...', 'C.....J.', 'C...n.J.', 'C.n.C...', 'C...J.n.'],
+  ['C.J.C.J.', 'C.J...J.', 'C...C.J.', 'C.C.J...', 'C.J.C.n.', 'C..CJ...', 'C.J.CC..'],
+  ['C.JCC.J.', 'C.J.CCJ.', 'CC.JC.J.', 'C.JC.CJ.', 'C..CJ.C.', 'C.J..CJC', 'CCJ.C.J.'],
+  ['CCJCCCJC', 'C.JCCJCJ', 'CCJ.CCJC', 'C.JCC.JC', 'CCJCC.JJ', 'C.JCCJ.C']
+];
+const VERSION = '0.18.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Pour apprendre, tout en douceur', mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -67,7 +74,7 @@ G.trancheroute = { mount(stage, api){
   const REELY = Math.round(H*.83), REELR = Math.min(W*.19, H*.11), EQY = Math.round(H*.665);
   let PPB = 100;
   let actx = null, master = null, music = null, pump = null, t0 = 0, useAudio = false;
-  let diff = DIFFS[1], tr = null, sections, totalBars, bpb, objs, bits, judges, state = 'menu', score, combo, maxCombo, hearts, stats, beatNow, nextStep, jumpT, hurtT, energy, events, bump, flashR, gesture, motif, notesRun, holdState, scratchState, rot, finished, trance = 0, rings = [], hookMask = [1,0,0,1,0,1,0,0];
+  let diff = DIFFS[0], tr = null, sections, totalBars, bpb, objs, bits, judges, state = 'menu', score, combo, maxCombo, hearts, stats, beatNow, nextStep, jumpT, hurtT, energy, events, bump, flashR, gesture, motif, notesRun, holdState, scratchState, rot, finished, trance = 0, rings = [], hookMask = [1,0,0,1,0,1,0,0];
 
   /* ---------- sauvegarde ---------- */
   const bank = () => api.load('notes', 0);
@@ -80,19 +87,29 @@ G.trancheroute = { mount(stage, api){
   const unlocked = t => t.cost === 0 || api.load('unlock.' + t.id, false);
 
   /* ---------- audio : bus musique (filtre, pompe) + réverb + écho, compresseur et limiteur ---------- */
-  let tone = null, shelf = null, revIn = null, dlyIn = null, dly = null, curves = {};
+  let tone = null, shelf = null, revIn = null, dlyIn = null, dly = null, curves = {}, vduck = null, vox = null, voiceFrom = 0, voiceUntil = 0;
   function impulse(sec, decay){ const n = Math.floor(actx.sampleRate*sec), b = actx.createBuffer(2, n, actx.sampleRate); for(let c=0;c<2;c++){ const d = b.getChannelData(c); for(let i=0;i<n;i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/n, decay); } return b; }
   function audioInit(){
     if(muted || actx) return;
     try{
       actx = new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
-      const comp = actx.createDynamicsCompressor(); comp.threshold.value = -18; comp.knee.value = 8; comp.ratio.value = 4; comp.attack.value = .004; comp.release.value = .15;
-      const lim = actx.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .06;
-      master = actx.createGain(); master.gain.value = .8; master.connect(comp).connect(lim).connect(actx.destination);
+      // compresseur à attaque lente (les attaques de batterie passent devant), saturation douce qui colle le tout, puis limiteur
+      const comp = actx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 6; comp.ratio.value = 3; comp.attack.value = .015; comp.release.value = .12;
+      const glue = actx.createWaveShaper(); glue.curve = curve(1.6); glue.oversample = '2x';
+      const lim = actx.createDynamicsCompressor(); lim.threshold.value = -1.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .05;
+      master = actx.createGain(); master.gain.value = .7; master.connect(comp).connect(glue).connect(lim).connect(actx.destination);
       pump = actx.createGain(); pump.connect(master);
       shelf = actx.createBiquadFilter(); shelf.type = 'highshelf'; shelf.frequency.value = 5000; shelf.gain.value = 0; shelf.connect(pump);
       tone = actx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 20000; tone.Q.value = .8; tone.connect(shelf);
-      music = actx.createGain(); music.gain.value = .8; music.connect(tone);
+      // la musique se pousse quand la voix chante (gain séparé, pour ne pas se battre avec le reste)
+      vduck = actx.createGain(); vduck.connect(tone);
+      const low = actx.createBiquadFilter(); low.type = 'lowshelf'; low.frequency.value = 110; low.gain.value = 3.5; low.connect(vduck);
+      music = actx.createGain(); music.gain.value = .8; music.connect(low);
+      // bus de la voix : on coupe le grave qui bave, on avance la présence, on tient le volume
+      const vhp = actx.createBiquadFilter(), vpk = actx.createBiquadFilter(), vcomp = actx.createDynamicsCompressor();
+      vhp.type = 'highpass'; vhp.frequency.value = 230; vpk.type = 'peaking'; vpk.frequency.value = 2800; vpk.Q.value = 1; vpk.gain.value = 4;
+      vcomp.threshold.value = -24; vcomp.ratio.value = 5; vcomp.attack.value = .004; vcomp.release.value = .1;
+      vox = actx.createGain(); vox.gain.value = .8; vox.connect(vhp).connect(vpk).connect(vcomp).connect(master);
       const rev = actx.createConvolver(); rev.buffer = impulse(2.4, 3); const revOut = actx.createGain(); revOut.gain.value = .32; revIn = actx.createGain(); revIn.connect(rev).connect(revOut).connect(master);
       setTimeout(loadVoice, 0);
       dly = actx.createDelay(2); const fb = actx.createGain(), dlf = actx.createBiquadFilter(), dlyOut = actx.createGain(); fb.gain.value = .42; dlf.type = 'lowpass'; dlf.frequency.value = 2400; dlyOut.gain.value = .38;
@@ -111,7 +128,8 @@ G.trancheroute = { mount(stage, api){
   function sing(bus, at, f, idx, vol, o2){
     if(!useAudio || !voiceBuf) return false; o2 = o2 || {};
     const sg = VSEG[((idx % 7) + 7) % 7], T = RT(at), src = actx.createBufferSource(), gn = actx.createGain();
-    let pr = f*tapeK()/sg[2]; while(pr > 2.1) pr /= 2; while(pr < .55) pr *= 2;
+    // on reste près de la hauteur naturelle de la voix (au-delà d'une quinte, elle sonne en canard ou en ogre)
+    let pr = f*tapeK()/sg[2]; while(pr > 1.42) pr /= 2; while(pr < .71) pr *= 2;
     const dur = (o2.long ? sg[1] - sg[0] : Math.min(sg[1] - sg[0], .26))/pr;
     src.buffer = voiceBuf; src.playbackRate.value = pr*(o2.det || 1);
     gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(vol, T + .012); gn.gain.setValueAtTime(vol, T + Math.max(.02, dur - .05)); gn.gain.linearRampToValueAtTime(0, T + dur);
@@ -157,31 +175,35 @@ G.trancheroute = { mount(stage, api){
   const qNext = (t, div) => { const st = bpb*div; return Math.ceil((t - .004)/st)*st; };
   // chaque geste réussi est salué par un petit coup de batterie bien calé, de la couleur du style, et une basse chaude sur l'accord
   function rewardBeat(o, g, t){
-    if(!useAudio) return; const at = o.time >= t - .002 ? o.time : qNext(t, .25), v = g === 'perfect' ? 1 : g === 'good' ? .75 : .5, st2 = tr.style;
+    if(!useAudio || o.k === 'J') return; const at = o.time >= t - .002 ? o.time : qNext(t, .25), v = g === 'perfect' ? 1 : g === 'good' ? .75 : .5, st2 = tr.style;
     if(st2 === 'disco' || st2 === 'french' || st2 === 'synthwave'){ for(let q=0;q<2;q++) noise(master, at + q*.011, .07, .09*v, 'bandpass', 1400, null, false, {q: .9, rev: .22, pan: q ? .25 : -.25}); }
     else if(st2 === 'hiphop' || st2 === 'reggae'){ osc(master, 'triangle', 1650, at, .035, .07*v, {rev: .2, dly: st2 === 'reggae' ? .3 : 0}); noise(master, at, .025, .06*v, 'bandpass', 3200, null, false, {q: 2}); }
     else { noise(master, at, .1, .1*v, 'bandpass', 2100, 1500, false, {q: .8, rev: .12}); osc(master, 'triangle', 190, at, .07, .09*v, {glide: 130}); }
     const root = freq(chordOf(Math.floor(o.beat/4)), 1); osc(master, 'sine', root, at, .2, .14*v, {glide: root*.97, gt: .2}); // la chaleur : une basse ronde
     if(g === 'perfect' && combo % 8 === 0) noise(master, at, .5, .05, 'highpass', 7000, null, false, {rev: .35}); // un scintillement de cymbale toutes les 8
   }
-  function comboVoice(when, o){
-    when = qNext(when, .5); // la voix démarre toujours sur la croche
+  function comboVoice(when){
     if(!voiceOn() || combo % 10) return;
-    const lvl = combo/10, fx = VFX[tr.style] || VFX.disco, root = chordOf(Math.floor(o.beat/4)) + 7;
-    const arp = [0, 2, 4, 7, 9, 11, 14], n = Math.min(1 + Math.floor((lvl - 1)/1), 5), step = bpb/2*(tr.bpm > 135 ? 1 : 1);
-    const vol = Math.min(1, .5 + lvl*.05)*fx.vol;
-    for(let i=0;i<n;i++){
-      const deg = root + arp[i], f = freq(deg, 4)*(lvl >= 10 && i === n - 1 ? 2 : 1), at = when + i*step, last = i === n - 1, syl = (lvl + i*2) % 7;
-      const base = {long: last, rev: fx.rev, dly: last ? fx.dly : fx.dly*.4, drive: fx.drive, hp: fx.hp, lp: fx.lp};
-      sing(master, at, f, syl, vol*(last ? 1 : .75), base);
-      if(fx.dbl) sing(master, at, f*Math.pow(2, fx.dbl/12), syl, vol*.35, {...base, pan: .3});
-      if(fx.chorus){ sing(master, at, f, syl, vol*.4, {...base, det: 1.008, pan: -.6}); sing(master, at, f, syl, vol*.4, {...base, det: .992, pan: .6}); }
+    // la voix entre sur un temps fort (1 ou 3) : elle répond à la musique au lieu de tomber n'importe où
+    when = qNext(when + bpb*.25, 2);
+    const lvl = combo/10, fx = VFX[tr.style] || VFX.disco, step = bpb*(tr.bpm < 90 ? .5 : 1);
+    const LINES = [[4], [2, 4], [0, 2, 4], [0, 2, 4, 7], [4, 2, 0, 2, 4]], line = LINES[Math.min(lvl, LINES.length) - 1];
+    const vol = Math.min(.9, .55 + lvl*.04)*fx.vol, end = when + (line.length - 1)*step + bpb*1.2;
+    for(let i=0;i<line.length;i++){
+      const at = when + i*step, root = chordOf(Math.floor(at/bpb/4)) + 7, deg = root + line[i], f = freq(deg, 4), last = i === line.length - 1, syl = (lvl + i*2) % 7;
+      const base = {long: last, rev: fx.rev, dly: last ? fx.dly : fx.dly*.3, drive: fx.drive, hp: fx.hp, lp: fx.lp};
+      sing(vox, at, f, syl, vol*(last ? 1 : .8), base);
+      // les doublures arrivent avec le combo : une voix seule d'abord, un chœur ensuite
+      if(lvl >= 2 && fx.dbl) sing(vox, at, f*Math.pow(2, fx.dbl/12), syl, vol*.28, {...base, pan: .3});
+      if(lvl >= 2 && fx.chorus){ sing(vox, at, f, syl, vol*.3, {...base, det: 1.006, pan: -.6}); sing(vox, at, f, syl, vol*.3, {...base, det: .994, pan: .6}); }
       if(fx.robot) I.talk(at, f, last ? .35 : .14);
-      if(fx.stut && last && lvl >= 2){ sing(master, at + step/2, f, syl, vol*.5, {...base, long: false}); }
-      // à partir de 30 : chœur à la tierce ; à partir de 50 : quinte en plus
-      if(lvl >= 3 && last) sing(master, at + .015, freq(deg + 2, 4), syl + 1, vol*.45, {...base, pan: -.4});
-      if(lvl >= 5 && last) sing(master, at + .03, freq(deg + 4, 4), syl + 2, vol*.4, {...base, pan: .45});
+      if(fx.stut && last && lvl >= 2){ sing(vox, at + bpb/2, f, syl, vol*.45, {...base, long: false}); }
+      if(lvl >= 3 && last) sing(vox, at + .015, freq(deg + 2, 4), syl + 1, vol*.35, {...base, pan: -.4});
+      if(lvl >= 5 && last) sing(vox, at + .03, freq(deg + 4, 4), syl + 2, vol*.3, {...base, pan: .45});
     }
+    // la mélodie de fond se tait et la musique se pousse le temps de la phrase
+    voiceFrom = when; voiceUntil = end;
+    if(useAudio && vduck){ const T0 = RT(when) - .02, T1 = RT(end); vduck.gain.cancelScheduledValues(T0); vduck.gain.setTargetAtTime(.62, T0, .015); vduck.gain.setTargetAtTime(1, T1, .12); }
     judges.push({txt: '♪ x' + combo, x: W/2, y: H*.3, t: 0, big: lvl >= 3});
   }
   function curve(k){ if(curves[k]) return curves[k]; const n = 1024, c = new Float32Array(n); for(let i=0;i<n;i++){ const x = i/(n - 1)*2 - 1; c[i] = Math.tanh(k*x)/Math.tanh(k); } return curves[k] = c; }
@@ -228,18 +250,19 @@ G.trancheroute = { mount(stage, api){
   }
   const freq = (deg, oct) => { const sc = tr.scale, d = ((deg % 7) + 7) % 7, o = Math.floor(deg/7); return tr.root*Math.pow(2, (sc[d] + 12*o)/12)*(oct || 1); };
   function hit(ch, at){ events.push({ch, at}); }
-  function duck(at, depth){ if(!useAudio || !['disco','synthwave','french'].includes(tr.style)) return; const T = RT(at); pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || .35, T); pump.gain.linearRampToValueAtTime(1, T + 60/tr.bpm*.6); }
+  // la pompe : tout le morceau respire sur la grosse caisse (fort en électro, léger ailleurs)
+  function duck(at, depth){ if(!useAudio) return; const el = ['disco','synthwave','french'].includes(tr.style), T = RT(at); pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || (el ? .35 : .72), T); pump.gain.linearRampToValueAtTime(1, T + 60/tr.bpm*(el ? .6 : .35)); }
 
   /* instruments */
   const I = {
     kick(at, v, kind){
       v = v || 1;
-      if(kind === 'tight'){ osc(music, 'sine', 210, at, .16, .9*v, {glide: 50, gt: .06}); noise(music, at, .02, .35*v, 'highpass', 3000); }
+      if(kind === 'tight'){ osc(music, 'sine', 220, at, .18, 1.05*v, {glide: 50, gt: .05}); osc(music, 'square', 2200, at, .006, .1*v); noise(music, at, .02, .4*v, 'highpass', 3000); }
       else if(kind === 'dub'){ osc(music, 'sine', 120, at, .45, 1*v, {glide: 38, gt: .2}); }
-      else { osc(music, 'sine', 160, at, .3, .95*v, {glide: 42, gt: .1}); osc(music, 'triangle', 90, at, .18, .3*v, {glide: 40}); noise(music, at, .012, .22*v, 'highpass', 2500); }
+      else { osc(music, 'sine', 170, at, .34, 1.1*v, {glide: 44, gt: .09}); osc(music, 'triangle', 95, at, .2, .35*v, {glide: 40}); osc(music, 'square', 1800, at, .008, .12*v); noise(music, at, .014, .3*v, 'highpass', 2500); }
       duck(at); hit('kick', at);
     },
-    snare(at, v, o2){ v = v || 1; o2 = o2 || {}; noise(music, at, .2, .42*v, 'bandpass', 2200, 1600, false, {q: .8, rev: o2.rev ?? .12, dly: o2.dly || 0}); osc(music, 'triangle', 200, at, .1, .3*v, {glide: 140}); hit('snare', at); },
+    snare(at, v, o2){ v = v || 1; o2 = o2 || {}; noise(music, at, .2, .5*v, 'bandpass', 2200, 1600, false, {q: .8, rev: o2.rev ?? .12, dly: o2.dly || 0}); noise(music, at, .09, .25*v, 'highpass', 5000); osc(music, 'triangle', 210, at, .11, .45*v, {glide: 150}); hit('snare', at); },
     rim(at, v){ noise(music, at, .04, .3*(v || 1), 'bandpass', 2600, null, false, {q: 6, dly: .45, rev: .2}); osc(music, 'triangle', 820, at, .03, .15, {dly: .3}); hit('snare', at); },
     clap(at, rev){ for(let i=0;i<3;i++) noise(music, at + i*.012, .1, .28, 'bandpass', 1300, null, false, {rev: rev || .18, pan: (i - 1)*.3}); hit('snare', at); },
     hat(at, v, open, pan){ noise(music, at, open ? .2 : .04, v, 'highpass', open ? 7500 : 9000, null, false, {pan: pan || 0}); hit('hat', at); },
@@ -252,7 +275,7 @@ G.trancheroute = { mount(stage, api){
       else if(kind === 'reese'){ osc(music, 'sawtooth', f, at, dur, .16, {detune: -14, lp: [800, 300, 2]}); osc(music, 'sawtooth', f, at, dur, .16, {detune: 14, lp: [800, 300, 2]}); osc(music, 'sine', f/2, at, dur, .3); }
       else if(kind === 'grit'){ osc(music, 'sawtooth', f, at, dur, .2, {drive: 6, lp: [1400, 500, 1.5]}); osc(music, 'sine', f/2, at, dur, .25); }
       else if(kind === 'funk'){ osc(music, 'square', f, at, dur, .2, {lp: [2200, 300, 7]}); osc(music, 'sine', f, at, dur, .2); }
-      else osc(music, 'sawtooth', f, at, dur, .24, {lp: [kind === 'acid' ? 1800 : 1000, 150, kind === 'acid' ? 10 : 5]});
+      else { osc(music, 'sawtooth', f, at, dur, .24, {lp: [kind === 'acid' ? 1800 : 1000, 150, kind === 'acid' ? 10 : 5]}); osc(music, 'sine', f < 70 ? f : f/2, at, dur*.9, .22); }
       hit('bass', at);
     },
     chord(at, degs, dur, kind, extra){
@@ -281,6 +304,19 @@ G.trancheroute = { mount(stage, api){
     pluck(bus, at, f, v, o2){ osc(bus, 'square', f, at, .16, v, {lp: [4200, 900, 4], ...(o2 || {})}); osc(bus, 'triangle', f*2, at, .1, v*.4, o2); hit('lead', at); },
     bell(at, f, v){ osc(music, 'sine', f, at, .4, v, {rev: .3}); osc(music, 'sine', f*2.76, at, .14, v*.3); hit('lead', at); },
     boing(bus, at, f, v){ osc(bus, 'triangle', f, at, .18, v, {glide: f*2, gt: .12}); },
+    // le rond-cœur : c'est TOI qui joues la caisse claire du morceau (le morceau la laisse vide là où tu tapes)
+    tap(bus, at, v, f){
+      v = v || 1; const st = tr ? tr.style : 'disco';
+      if(st === 'disco' || st === 'french'){ for(let i=0;i<3;i++) noise(bus, at + i*.011, .12, .32*v, 'bandpass', 1250, null, false, {q: .9, rev: .22, pan: (i - 1)*.3}); osc(bus, 'triangle', 220, at, .09, .35*v, {glide: 150}); noise(bus, at, .25, .06*v, 'highpass', 7500, null, false, {pan: .3}); }
+      else if(st === 'synthwave'){ noise(bus, at, .32, .5*v, 'bandpass', 1900, 1200, false, {q: .7, rev: .55}); osc(bus, 'triangle', 190, at, .14, .45*v, {glide: 130}); }
+      else if(st === 'hiphop'){ noise(bus, at, .16, .55*v, 'lowpass', 5200, 2400, false, {rev: .15}); osc(bus, 'triangle', 185, at, .1, .45*v, {glide: 140}); noise(bus, at, .03, .2*v, 'bandpass', 3800, null, false, {q: 3}); }
+      else if(st === 'reggae'){ noise(bus, at, .05, .45*v, 'bandpass', 2600, null, false, {q: 5, dly: .5, rev: .25}); osc(bus, 'triangle', 820, at, .035, .2*v, {dly: .35}); }
+      else if(st === 'dnb'){ noise(bus, at, .14, .55*v, 'bandpass', 2400, 1700, false, {q: .9, rev: .2}); osc(bus, 'triangle', 240, at, .08, .45*v, {glide: 170}); }
+      else { noise(bus, at, .2, .55*v, 'bandpass', 2000, 1500, false, {q: .8, rev: .2}); osc(bus, 'triangle', 200, at, .11, .5*v, {glide: 140}); noise(bus, at, .5, .1*v, 'highpass', 4500, null, false, {rev: .3}); }
+      // un tom accordé sur l'accord : tes coups de caisse font aussi une petite mélodie
+      if(f) osc(bus, 'sine', f, at, .16, .22*v, {glide: f*.7, gt: .12});
+      hit('snare', at);
+    },
     // scratch : un petit « tchic » accordé sur l'accord en cours, au lieu du bruit
     wik(at, up){ const c = tr ? chordOf(Math.floor(at/bpb/4)) : 0, f = tr ? freq(c + (up ? 4 : 2), 3) : (up ? 523 : 440);
       osc(master, 'triangle', f, at, .09, .07, {glide: f*(up ? 1.06 : .94), gt: .06, lp: [2200, 900, 1]}); osc(master, 'sine', f/2, at, .06, .05); noise(master, at, .025, .025, 'bandpass', up ? 3800 : 2800, null, false, {q: 1.2}); },
@@ -301,7 +337,7 @@ G.trancheroute = { mount(stage, api){
   function chordOf(bar){ return tr.prog[((bar - 1) % tr.prog.length + tr.prog.length) % tr.prog.length]; }
   function scheduleStep(s){
     const beat = s/4, bar = Math.floor(beat/4), p = s % 16, sw = (p % 2 ? tr.swing*bpb/4 : 0), at = beat*bpb + sw;
-    if(bar === 0){ if(p % 4 === 0){ if(!(voiceOn() && sing(master, at, freq([0, 2, 4, 7][p/4], 4), [0, 2, 4, 6][p/4], .8, {long: p === 12}))) osc(master, 'square', p === 0 ? 1568 : 1046, at, .06, .12); hit('kick', at); } if(p === 0) I.riser(at, 4*bpb); return; }
+    if(bar === 0){ if(p % 4 === 0){ if(!(voiceOn() && sing(vox, at, freq([0, 2, 4, 7][p/4], 4), [0, 2, 4, 6][p/4], .8, {long: p === 12}))) osc(master, 'square', p === 0 ? 1568 : 1046, at, .06, .12); hit('kick', at); } if(p === 0) I.riser(at, 4*bpb); return; }
     const sec = sectionOf(bar); if(!sec) return;
     const L = new Set(sec.layers), st = tr.style, deg = chordOf(bar), chord = [deg, deg + 2, deg + 4], T = sec.tier === 'rest' ? 0 : sec.tier;
     const lastBar = bar === sec.start + sec.bars - 1, next = sectionOf(bar + 1), r = freq(deg, 1);
@@ -310,14 +346,14 @@ G.trancheroute = { mount(stage, api){
     if(lastBar && next && p >= 12 && L.has('snare')) I.snare(at, .4 + (p - 12)*.15);
     const brk = lastBar && next && next.tier !== 'rest' && next.tier >= 2 && sec.tier !== next.tier && p >= 8;
     if(p === 0 && bar === sec.start && useAudio && trance === 0){ const T0 = RT(at), T1 = RT(at + sec.bars*4*bpb); tone.frequency.cancelScheduledValues(T0);
-      if(sec.tier === 0 || sec.tier === 'rest'){ tone.frequency.setValueAtTime(sec.tier === 'rest' ? 700 : 900, T0); tone.frequency.exponentialRampToValueAtTime(sec.tier === 'rest' ? 2500 : 9000, T1); }
+      if(sec.tier === 0 || sec.tier === 'rest'){ tone.frequency.setValueAtTime(sec.tier === 'rest' ? 1100 : 2600, T0); tone.frequency.exponentialRampToValueAtTime(sec.tier === 'rest' ? 3500 : 16000, T0 + Math.min(T1 - T0, 4*4*bpb)); }
       else tone.frequency.setTargetAtTime(20000, T0, .05); }
     if(brk && p === 8 && useAudio){ tone.frequency.setValueAtTime(20000, RT(at)); tone.frequency.exponentialRampToValueAtTime(600, RT(at + 2*bpb)); }
     if(p === 0 && !['punk', 'metal'].includes(st) && sec.tier !== 0) I.chord(at, [deg, deg + 2, deg + 4, deg + 6], 4*bpb*.95, 'pad');
     if(sec.tier === 'rest' && p % 2 === 0) I.pluck(music, at, freq(deg + [0, 4, 7, 9, 11, 9, 7, 4][(p/2) % 8], 8), .02, {dly: .45, pan: (p % 4 ? .5 : -.5)});
     const K0 = L.has('kick'), B0 = L.has('bass');
-    const myBar = p % 2 === 0 ? buildBar(bar) : null, mine = myBar && myBar[p >> 1] && myBar[p >> 1].k === 'C';
-    const K = K0 && !brk, S = L.has('snare'), Hh = L.has('hat'), B = B0 && !brk, Ch = L.has('chords'), A = L.has('arp'), P = L.has('perc'), Ld = L.has('lead') && !mine, Gt = L.has('gtr');
+    const myBar = p % 2 === 0 ? buildBar(bar) : null, mine = myBar && myBar[p >> 1] && myBar[p >> 1].k === 'C', mineJ = myBar && myBar[p >> 1] && myBar[p >> 1].k === 'J';
+    const K = K0 && !brk, S = L.has('snare') && !mineJ, Hh = L.has('hat'), B = B0 && !brk, Ch = L.has('chords'), A = L.has('arp'), P = L.has('perc'), Ld = L.has('lead') && !mine && !(at >= voiceFrom && at < voiceUntil), Gt = L.has('gtr');
     const mel = motif[(bar % 4)*8 + (p >> 1)], hk = p % 2 === 0 && hookMask[p >> 1] === 1;
     if(st === 'disco'){
       if(K && p % 4 === 0) I.kick(at);
@@ -408,7 +444,7 @@ G.trancheroute = { mount(stage, api){
       const nb = buildBar(bar + 1); const e = nb && nb[p/2];
       if(e){ const f = freq(e.deg, 4);
         if(e.k === 'C') lead(at, f, .09);
-        if(e.k === 'J') I.boing(master, at, freq(deg, 2), .14);
+        if(e.k === 'J') I.tap(music, at, .55, freq(deg, 2));
         if(e.k === 'H') osc(master, 'triangle', f, at, .08, .06, {sus: e.len*bpb/2, lp: [1400, 1000, 1]});
         if(e.k === 'S'){ for(let i=0;i<e.len;i++) I.wik(at + i*bpb/2, i % 2 === 0); }
       }
@@ -421,35 +457,44 @@ G.trancheroute = { mount(stage, api){
   function buildBar(bar){
     if(barCache[bar] !== undefined) return barCache[bar];
     const sec = sectionOf(bar); if(!sec || isListen(bar)) return barCache[bar] = null;
-    const rng = rngFrom(tr.id + ':' + diff.id + ':' + bar), acts = sec.acts, slots = new Array(8).fill(null);
+    const rng = rngFrom(tr.id + ':' + diff.id + ':' + bar), acts = sec.acts, slots = new Array(8).fill(null); let shp = null;
     const mdeg = i => motif[(bar % 4)*8 + i];
     if(sec.tier === 'rest'){
       if(acts.includes('C') && rng() < .7) slots[0] = {k: 'C'};
       for(let i=1;i<8;i++) if(rng() < .55) slots[i] = {k: rng() < .2 ? 'A' : 'N'};
       if(bar === sec.start + 1 && rng() < .9) slots[6] = {k: 'A'};
     } else {
-      const tier = Math.min(sec.tier, diff.cap ?? 3), fast = tr.bpm >= 140 ? .4 : tr.bpm >= 125 ? .75 : 1;
-      let pos = tier === 0 ? [0, 4] : tier === 1 ? [0, 2, 4, 6].filter((_, i) => i === 0 || rng() < .75) : tier === 2 ? [0, 2, 4, 6].concat([1, 3, 5, 7].filter(() => rng() < .3*fast)) : [0, 1, 2, 3, 4, 5, 6, 7].filter(i => i % 2 === 0 || rng() < .55*fast);
-      let blocked = new Set();
-      // gestes longs d'abord
-      if(acts.includes('H') && rng() < (sec.call ? 1 : diff.easy ? .22 : .45)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 3 + Math.floor(rng()*3)); slots[s0] = {k: 'H', len: Math.min(len, 7 - s0)}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
-      else if(acts.includes('S') && rng() < (sec.call ? 1 : diff.easy ? .2 : .4)){ const s0 = [0, 2, 4][Math.floor(rng()*3)], len = Math.min(8 - s0, 2 + Math.floor(rng()*3)); slots[s0] = {k: 'S', len: Math.min(len, 7 - s0)}; for(let i=s0;i<s0 + len + 1;i++) blocked.add(i); }
-      if(diff.dens < 1) pos = pos.filter(i => i === 0 || i === 4 || rng() < diff.dens);
-      if(diff.dens > 1 && tier >= 1) for(const i of [1, 3, 5, 7]) if(!pos.includes(i) && rng() < (diff.dens - 1)*.5*(tr.bpm >= 140 ? .4 : 1)) pos.push(i);
-      for(const i of pos){ if(blocked.has(i) || slots[i]) continue;
-        let k = 'C'; if(acts.includes('J') && rng() < .32 && !(slots[i - 1] && slots[i - 1].k === 'J')) k = 'J';
-        if(!acts.includes('C') && !acts.includes('J')) continue; if(!acts.includes('C')) k = 'J';
-        slots[i] = {k}; }
-      for(let i=0;i<8;i++) if(!slots[i] && !blocked.has(i) && rng() < .14) slots[i] = {k: tier >= 1 && rng() < .35 ? 'A' : 'N'};
+      const tier0 = Math.min(sec.tier, diff.cap ?? 3), fast = tr.bpm >= 140 ? .4 : tr.bpm >= 125 ? .75 : 1;
+      // une phrase = 4 mesures A A A' B, tirées une fois pour toutes : on découvre le motif, on le rejoue, il varie, puis il relance
+      const k4 = (bar - sec.start) % 4, pr = rngFrom(tr.id + ':' + diff.id + ':' + sec.idx + ':' + Math.floor((bar - sec.start)/4)), pick = list => list[Math.floor(pr()*list.length)];
+      const tier = tier0 >= 2 && pr() > fast ? tier0 - 1 : tier0;
+      const A = pick(RHY[tier]), B = pick(RHY[Math.min(tier + 1, diff.cap ?? 3)]), mut = 4 + Math.floor(pr()*4);
+      shp = Array.from({length: 8}, () => pr() < .5 ? 'wide' : 'tall');
+      const keep = Array.from({length: 8}, (_, i) => i === 0 || i === 4 || pr() < diff.dens), extra = Array.from({length: 8}, () => pr() < (diff.dens - 1)*.5*(tr.bpm >= 140 ? .4 : 1));
+      const longK = acts.includes('H') && (!acts.includes('S') || pr() < .5) ? 'H' : acts.includes('S') ? 'S' : null, longOn = longK && pr() < (sec.call ? 1 : diff.easy ? .3 : .55);
+      const longS = [0, 2, 4][Math.floor(pr()*3)], longL = longK === 'H' ? 3 + Math.floor(pr()*3) : 2 + Math.floor(pr()*3);
+      const pat = (k4 === 3 && !sec.call ? B : A).split('');
+      if(k4 === 2){ const c = pat[mut]; pat[mut] = c === 'C' ? 'J' : c === 'J' ? 'C' : mut % 2 ? 'n' : 'C'; }
+      const blocked = new Set();
+      // le geste long fait la relance (mesure B), ou toute la section quand on vient de l'apprendre
+      if(longOn && (k4 === 3 || sec.call)){ const len = Math.min(longL, 7 - longS); slots[longS] = {k: longK, len}; for(let i=longS;i<longS + len + 1;i++) blocked.add(i); }
+      pat.forEach((c, i) => {
+        if(blocked.has(i) || slots[i]) return;
+        if(c === 'n'){ slots[i] = {k: 'N'}; return; }
+        if(c === '.'){ if(extra[i] && tier >= 1 && i % 2) c = 'C'; else { if(rng() < .1) slots[i] = {k: tier >= 1 && rng() < .35 ? 'A' : 'N'}; return; } }
+        if(!keep[i]){ if(rng() < .3) slots[i] = {k: 'N'}; return; }
+        let k = c; if(k === 'J' && !acts.includes('J')) k = 'C'; if(k === 'C' && !acts.includes('C')) k = acts.includes('J') ? 'J' : null;
+        if(k) slots[i] = {k};
+      });
     }
     // écart minimal entre deux gestes (selon le niveau) ; en Apprenti, on ne change de geste qu'avec du temps pour réfléchir
     if(sec.tier !== 'rest'){ const prevB = bar > 1 ? buildBar(bar - 1) : null; let lastT = -9, lastK = null;
       if(prevB) for(let i=7;i>=0;i--){ const q = prevB[i]; if(q && 'CJHS'.includes(q.k)){ lastT = (i - 8)*bpb/2 + (q.len || 0)*bpb/2; lastK = q.k; break; } }
       for(let i=0;i<8;i++){ const q = slots[i]; if(!q || !'CJHS'.includes(q.k)) continue; const tq = i*bpb/2;
         if((q.k === 'C' || q.k === 'J') && tq - lastT < diff.gap){ slots[i] = rng() < .5 ? {k: 'N'} : null; continue; }
-        if(diff.easy && (q.k === 'C' || q.k === 'J') && lastK && (lastK === 'C' || lastK === 'J') && lastK !== q.k && tq - lastT < 1.1) q.k = lastK;
+        if(diff.easy && (q.k === 'C' || q.k === 'J') && lastK && (lastK === 'C' || lastK === 'J') && lastK !== q.k && tq - lastT < .7) q.k = lastK;
         lastT = tq + (q.len || 0)*bpb/2; lastK = q.k; } }
-    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'C') s.shape = i < 7 && !(slots[i - 1] && slots[i - 1].shape === 'wide') && rng() < .5 ? 'wide' : 'tall'; } });
+    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'C') s.shape = i < 7 && !(slots[i - 1] && slots[i - 1].shape === 'wide') && (shp ? shp[i] === 'wide' : rng() < .5) ? 'wide' : 'tall'; } });
     return barCache[bar] = slots;
   }
   function spawnBar(bar){
@@ -471,12 +516,13 @@ G.trancheroute = { mount(stage, api){
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
-    trance = 0; rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
+    trance = 0; voiceFrom = voiceUntil = 0; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
     lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     resetRate(); t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
+    cueRuns = api.load('runs', 0); tutoBar = -9;
     state = 'play';
   }
-  let spawned = 1;
+  let spawned = 1, cueRuns = 0;
 
   const grade = d => { const a = Math.abs(d)/diff.win; return a < .055 ? 'perfect' : a < .11 ? 'good' : 'ok'; };
   const LABEL = {perfect: 'PARFAIT', good: 'BIEN', ok: 'OK', miss: 'RATÉ'};
@@ -484,7 +530,7 @@ G.trancheroute = { mount(stage, api){
   const TIERS = [0, 10, 25, 50, 100], TNAME = ['', 'EN RYTHME', 'TRANSE', 'HYPNOSE', 'NIRVANA'], TMULT = [1, 1.5, 2, 3, 4];
   function setTrance(n, t){
     if(n === trance) return; const up = n > trance; trance = n;
-    if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)), fx = VFX[tr.style] || {}; [0, 2, 4].forEach((k2, i) => sing(master, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), 6, .45*(fx.vol || 1), {long: true, pan: (i - 1)*.5, rev: .45, drive: fx.drive, hp: fx.hp, lp: fx.lp})); } celebrate(n); judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
+    if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)), fx = VFX[tr.style] || {}; [0, 2, 4].forEach((k2, i) => sing(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), 6, .45*(fx.vol || 1), {long: true, pan: (i - 1)*.5, rev: .45, drive: fx.drive, hp: fx.hp, lp: fx.lp})); } celebrate(n); judges.push({txt: TNAME[n], sub: 'points x' + TMULT[n], x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
       if(useAudio){ const T = actx.currentTime; tone.frequency.setTargetAtTime(20000, T, .05); shelf.gain.setTargetAtTime(n*1.5, T, .4); } }
   }
   function tapeStop(t){
@@ -511,12 +557,12 @@ G.trancheroute = { mount(stage, api){
     } else {
       missRun = 0;
       if(slowed){ recHits++; rateTgt = SLOW + (1 - SLOW)*Math.min(1, recHits/REC); if(recHits >= REC){ slowed = false; rateTgt = 1; judges.push({txt: 'ÇA REPART !', x: W/2, y: H*.2, t: 0, big: true}); I.crash(Math.max(t, o.time)); } }
-      combo++; maxCombo = Math.max(maxCombo, combo); if(o.k !== 'H' && o.k !== 'S') comboVoice(Math.max(t, o.time), o); else comboVoice(t, {beat: beatNow}); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(TIERS.filter(x => combo >= x).length - 1, t);
+      combo++; maxCombo = Math.max(maxCombo, combo); comboVoice(o.k !== 'H' && o.k !== 'S' ? Math.max(t, o.time) : t); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(TIERS.filter(x => combo >= x).length - 1, t);
       const base = g === 'perfect' ? 100 : g === 'good' ? 60 : 25; score += Math.round(base*(1 + Math.min(combo, 50)/10)*TMULT[trance]*(slowed ? .5 : 1));
       const when = Math.max(t, o.time);
       // le joueur joue la mélodie
       if(o.k === 'C'){ lead(when, freq(o.deg, 4), g === 'perfect' ? .17 : .13, true);  noise(master, t, .05, .2, 'highpass', 5000); split(o, dir); }
-      if(o.k === 'J') I.boing(master, when, freq(chordOf(Math.floor(o.beat/4)), 2), .14);
+      if(o.k === 'J') I.tap(master, when, g === 'perfect' ? 1 : .8, freq(chordOf(Math.floor(o.beat/4)) + [0, 2, 4][Math.round(o.beat*2) % 3], 2));
       confetti(x, y - 10, g === 'perfect' ? [RED, PAPER, INK] : [PAPER, INK], g === 'perfect' ? 16 : 8, 1);
       if(g === 'perfect') bump = Math.max(bump, .5);
       api.vibe(g === 'perfect' ? 16 : 8);
@@ -614,7 +660,7 @@ G.trancheroute = { mount(stage, api){
   const wantDir = o => o.shape === 'tall' ? {x: 0, y: -1} : o.shape === 'wide' ? {x: 1, y: 0} : null;
   function rightWay(o, dir){ const w = wantDir(o); if(!w) return true; const l = Math.hypot(dir.x, dir.y) || 1; return (dir.x*w.x + dir.y*w.y)/l > .5; }
   function cutObj(o, t, dir){ o.dt = t - o.time; let g = grade(o.dt); if(g !== 'miss' && !rightWay(o, dir)){ g = 'ok'; o.wrongWay = true; } resolve(o, g, t, dir); }
-  function jumpObj(o, t){ jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); o.dt = t - o.time; resolve(o, grade(o.dt), t); }
+  function jumpObj(o, t){ jumpT = 0; o.dt = t - o.time; resolve(o, grade(o.dt), t); }
   function explode(o, t){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); }
   function split(o, dir){
     const l = Math.hypot(dir.x, dir.y) || 1, d = {x: dir.x/l, y: dir.y/l}, n = {x: -d.y, y: d.x}, x = xOf(o.beat);
@@ -634,7 +680,30 @@ G.trancheroute = { mount(stage, api){
   function frescoInit(){
     FH = Math.max(120, Y0 - 66); fresco = document.createElement('canvas'); fresco.width = Math.round(W*1.5); fresco.height = Math.round(FH*1.5); fg = fresco.getContext('2d'); fg.scale(1.5, 1.5);
     frR = rngFrom(tr.id + ':' + Date.now()); pen = {x: W*.06, y: (Y0 - 66 + 76)/2}; paintN = 0;
+    compo = COMPOS[Math.floor(frR()*COMPOS.length)]; pal = PALS[Math.floor(frR()*PALS.length)]; GCOL = pal.g; compoPh = frR()*6.283; compoW = 1 + Math.floor(frR()*3);
   }
+  /* compositions : où tombe chaque coup de pinceau au fil du morceau (prog 0 → 1) */
+  let compo = null, pal = null, compoPh = 0, compoW = 1;
+  const jit = k => (frR() + frR() - 1)*k;
+  const COMPOS = [
+    {name: 'Nuée', at: (prog, si) => { const an = ANCH[si % ANCH.length]; return [an[0] + jit(.3), an[1] + jit(.3)]; }},
+    {name: 'Spirale', at: prog => { const a = prog*5*Math.PI + compoPh, r = .06 + .42*prog; return [.5 + Math.cos(a)*r + jit(.04), .5 + Math.sin(a)*r*.95 + jit(.04)]; }},
+    {name: 'Vague', at: prog => [.04 + prog*.92 + jit(.03), .5 + .3*Math.sin(prog*6.283*compoW + compoPh) + jit(.07)]},
+    {name: 'Cœur', at: prog => { const t = prog*6.283 + jit(.08), x = 16*Math.pow(Math.sin(t), 3), y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t); return [.5 + x/38 + jit(.025), .47 - y/34 + jit(.025)]; }},
+    {name: 'Explosion', at: (prog, si) => { const a = si*2.4 + compoPh + jit(.5), r = .05 + Math.pow(frR(), .7)*.46; return [.5 + Math.cos(a)*r, .5 + Math.sin(a)*r]; }},
+    {name: 'Pluie', at: (prog, si) => [(si + .5)/sections.length + jit(.05), frR()]},
+    {name: 'Diagonale', at: prog => { const k = compoW % 2 ? prog : 1 - prog; return [prog + jit(.08), k + jit(.12)]; }},
+    {name: 'Constellation', at: (prog, si) => { const r2 = rngFrom(tr.id + 'cst' + Math.floor(prog*14) + compoPh); return [.08 + r2()*.84 + jit(.03), .08 + r2()*.84 + jit(.03)]; }}
+  ];
+  /* palettes : couleur de chaque geste + papier de la toile finale */
+  const PALS = [
+    {name: 'Classique', paper: '#efe7d6', ink: '#1c2340', g: {C: ['#2a8ca3', '#1f5f7a'], J: ['#f08a24', '#f2b31a'], H: ['#7b2d8e'], S: ['#c4306b', '#d9472b']}},
+    {name: 'Néon', paper: '#1d1b22', ink: '#f4f0e6', g: {C: ['#29e0ff', '#3d7bff'], J: ['#ff3d9a', '#ffd23f'], H: ['#b06bff'], S: ['#7cf05a', '#ff8a2a']}},
+    {name: 'Kraft', paper: '#e3cfa6', ink: '#1c1b19', g: {C: ['#1c1b19', '#3a3a3a'], J: ['#d7263d', '#a51c2e'], H: ['#f4f0e6'], S: ['#2a8ca3', '#1c1b19']}},
+    {name: 'Tropique', paper: '#f6efe0', ink: '#14463a', g: {C: ['#2e8b3e', '#14463a'], J: ['#ff6a3d', '#f2c21b'], H: ['#ff3d7f'], S: ['#29c4ff', '#7b3fbf']}},
+    {name: 'Bleu nuit', paper: '#dfe6ea', ink: '#0f1d3a', g: {C: ['#0f3d91', '#2f6fd6'], J: ['#ffd23f', '#f08a24'], H: ['#0f1d3a'], S: ['#e8344f', '#b06bff']}},
+    {name: 'Pop', paper: '#fff6e0', ink: '#1c1b19', g: {C: ['#ff3d7f', '#b06bff'], J: ['#29c4ff', '#7cf05a'], H: ['#ffd23f'], S: ['#ff8a2a', '#1c1b19']}}
+  ];
   function palette(){ const i0 = TRACKS.indexOf(tr), n = 2 + Math.min(trance, 4); return Array.from({length: n}, (_, i) => SPRAY[(i0 + i) % SPRAY.length]); }
   // la fresque se peint de gauche à droite au fil du morceau : à la fin, le mur raconte toute la face
   const FTOP = 76;
@@ -660,7 +729,7 @@ G.trancheroute = { mount(stage, api){
      forme = timing (pile = tache ronde nette, en avance = jets à goutte, en retard = coulures) ;
      taille = combo ; place = la partie du morceau ; gris = les ratés */
   const PK = {teal: '#2a8ca3', petrol: '#1f5f7a', orange: '#f08a24', amber: '#f2b31a', purple: '#7b2d8e', magenta: '#c4306b', red: '#d9472b', navy: '#1c2340'};
-  const GCOL = {C: [PK.teal, PK.petrol], J: [PK.orange, PK.amber], H: [PK.purple], S: [PK.magenta, PK.red]};
+  let GCOL = {C: [PK.teal, PK.petrol], J: [PK.orange, PK.amber], H: [PK.purple], S: [PK.magenta, PK.red]};
   const ANCH = [[.06, .25], [.94, .18], [.1, .78], [.92, .74], [.5, .06], [.3, .5], [.72, .45], [.5, .94], [.04, .52], [.96, .5]];
   let paintEv = [];
   function streakB(g, x, y, a, len, w, col, ball){ const ex = x + Math.cos(a)*len, ey = y + Math.sin(a)*len, nx = -Math.sin(a)*w/2, ny = Math.cos(a)*w/2; g.fillStyle = col; g.beginPath(); g.moveTo(x + nx, y + ny); g.lineTo(ex + nx*.25, ey + ny*.25); g.lineTo(ex - nx*.25, ey - ny*.25); g.lineTo(x - nx, y - ny); g.closePath(); g.fill(); if(ball){ g.beginPath(); g.arc(ex, ey, w*.9, 0, 6.283); g.fill(); } }
@@ -685,14 +754,14 @@ G.trancheroute = { mount(stage, api){
     // scratch : un zigzag au pinceau
     if(ev.zig){ g.strokeStyle = ev.col; g.lineWidth = 2.5*sc; g.lineJoin = 'round'; g.beginPath(); for(let i=0;i<7;i++) g.lineTo(x - R*1.4 + i*R*.45, y - R*1.2 + (i % 2 ? -R*.5 : R*.3)); g.stroke(); }
     // gros palier de combo : une giclée marine qui traverse
-    if(ev.big){ for(let i=0;i<8;i++){ const a = toC + (r() - .5)*2; streakB(g, x, y, a, R*(1.5 + r()*2.5), (1 + r()*1.6)*sc, PK.navy, true); } }
+    if(ev.big){ for(let i=0;i<8;i++){ const a = toC + (r() - .5)*2; streakB(g, x, y, a, R*(1.5 + r()*2.5), (1 + r()*1.6)*sc, ev.bigc || PK.navy, true); } }
     g.restore();
   }
   function paint(o, g, dir){
     if(!fg) return; paintN++;
     const bar = Math.floor(beatNow/4), sec = sectionOf(bar), si = Math.max(0, sections.indexOf(sec));
-    const an = ANCH[si % ANCH.length], gs = () => (frR() + frR() + frR() - 1.5)*.22;
-    const ev = {seed: 'pt' + paintN + tr.id, nx: Math.max(-.05, Math.min(1.05, an[0] + gs())), ny: Math.max(-.05, Math.min(1.05, an[1] + gs()))};
+    const prog = Math.max(0, Math.min(1, beatNow/(totalBars*4))), at = (compo || COMPOS[0]).at(prog, si);
+    const ev = {seed: 'pt' + paintN + tr.id, nx: Math.max(-.05, Math.min(1.05, at[0])), ny: Math.max(-.05, Math.min(1.05, at[1])), bigc: pal ? pal.ink : PK.navy};
     if(g === 'miss'){ ev.miss = true; ev.R = 7; }
     else {
       const pool = trance >= 2 && frR() < .4 ? Object.values(GCOL).flat() : GCOL[o.k] || GCOL.C;
@@ -703,16 +772,27 @@ G.trancheroute = { mount(stage, api){
     }
     paintEv.push(ev); renderEv(fg, W, FTOP, FH - FTOP, ev);
   }
-  function paintNote(o){ if(!fg) return; paintN++; const ev = {seed: 'n' + paintN, nx: frR(), ny: frR(), R: o.k === 'A' ? 4 : 2.5, col: o.k === 'A' ? PK.amber : PK.orange, e: 0}; paintEv.push(ev); renderEv(fg, W, FTOP, FH - FTOP, ev); }
+  function paintNote(o){ if(!fg) return; paintN++; const at = (compo || COMPOS[0]).at(Math.max(0, Math.min(1, beatNow/(totalBars*4))), Math.max(0, sections.indexOf(sectionOf(Math.floor(beatNow/4))))), J = GCOL.J; const ev = {seed: 'n' + paintN, nx: at[0] + jit(.08), ny: at[1] + jit(.08), R: o.k === 'A' ? 4 : 2.5, col: J[o.k === 'A' ? J.length - 1 : 0], e: 0}; paintEv.push(ev); renderEv(fg, W, FTOP, FH - FTOP, ev); }
   // l'œuvre finale : on rejoue tous les coups de pinceau sur une grande toile en papier ancien
+  // le titre de l'œuvre : la composition, l'humeur de la partie, un numéro de série
+  let artTitle = '';
+  function nameArt(){ const moods = ['brute', 'qui groove', 'en transe', 'hypnotique', 'nirvana'], m = moods[TIERS.filter(x => x && maxCombo >= x).length], n = api.load('runs', 0);
+    return `${(compo || COMPOS[0]).name} ${m} n°${n}`; }
   function artwork(acc){
+    artTitle = nameArt();
     const Wc = 360, Hc = 340, c = document.createElement('canvas'), sc = 2; c.width = Wc*sc; c.height = Hc*sc; const g = c.getContext('2d'); g.scale(sc, sc);
-    g.fillStyle = '#efe7d6'; g.fillRect(0, 0, Wc, Hc); const rr = rngFrom('papier');
+    g.fillStyle = pal ? pal.paper : '#efe7d6'; g.fillRect(0, 0, Wc, Hc); const rr = rngFrom('papier');
     for(let i=0;i<14;i++){ const x = rr()*Wc, y = rr()*Hc, R = 40 + rr()*120, gr = g.createRadialGradient(x, y, 0, x, y, R); gr.addColorStop(0, `rgba(${rr() < .5 ? '170,150,110' : '255,255,245'},.12)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, Wc, Hc); }
     for(let i=0;i<Wc*Hc/14;i++){ g.fillStyle = `rgba(110,90,60,${rr()*.06})`; g.fillRect(rr()*Wc, rr()*Hc, 1, 1); }
     for(const ev of paintEv) renderEv(g, Wc, 0, Hc, ev);
-    g.save(); g.translate(Wc - 12, Hc - 12); g.rotate(-.05); g.textAlign = 'right'; g.font = `16px ${MARKER}`; g.fillStyle = PK.navy; g.fillText(`${tr.name} · ${acc} %`, 0, 0); g.restore();
+    g.save(); g.translate(Wc - 12, Hc - 12); g.rotate(-.05); g.textAlign = 'right'; g.font = `16px ${MARKER}`; g.fillStyle = pal ? pal.ink : PK.navy; g.fillText(`« ${artTitle} »`, 0, -18); g.font = `12px ${MARKER}`; g.fillText(`${tr.name} · ${acc} %`, 0, 0); g.restore();
     return c.toDataURL('image/jpeg', .86);
+  }
+  function artsOf(id){ try{ const a = JSON.parse(localStorage.getItem('k7cut.arts.' + id) || '[]'); if(a.length) return a; const old = localStorage.getItem('k7cut.art.' + id); return old ? [{img: old, title: '', acc: 0}] : []; }catch(e){ return []; } }
+  function saveArt(img, acc){
+    let list = [{img, title: artTitle, acc}, ...artsOf(tr.id)].slice(0, 3);
+    // si le stockage est plein, on garde moins de toiles plutôt que rien
+    while(list.length){ try{ localStorage.removeItem('k7cut.art.' + tr.id); localStorage.setItem('k7cut.arts.' + tr.id, JSON.stringify(list)); api.save('artNew', true); return; }catch(e){ list = list.slice(0, list.length - 1); } }
   }
   function rhythmPct(){ const tot = stats.perfect + stats.good + stats.ok + stats.miss; return tot ? Math.round((stats.perfect + stats.good*.8 + stats.ok*.4)/tot*100) : null; }
   /* ---------- page de récompense : animée sur un petit air de fin, calé sur le tempo de la face ---------- */
@@ -727,7 +807,8 @@ G.trancheroute = { mount(stage, api){
     .k7rw h2{margin:0;font-family:${GRAF};font-weight:400;font-size:clamp(30px,10vw,48px);line-height:.95;color:#ffd23f;-webkit-text-stroke:3px ${INK};paint-order:stroke fill;text-shadow:4px 5px 0 ${INK};transform:rotate(-4deg);transform-origin:left}
     .k7rw .band{display:inline-block;margin-top:10px;background:${INK};color:#fff;font-family:${MARKER};font-size:clamp(16px,4.6vw,21px);padding:5px 14px;transform:rotate(-3deg);clip-path:polygon(0 12%,3% 0,97% 6%,100% 40%,98% 100%,2% 92%)}
     .k7rw .pct{display:inline-block;margin-top:8px;background:#f6e7a8;font-weight:800;font-size:clamp(15px,4.4vw,19px);padding:4px 12px;transform:rotate(-2deg);box-shadow:2px 3px 0 rgba(0,0,0,.15)}
-    .k7rw .art{width:44%;max-width:200px;flex:none;background:#fff;padding:7px 7px 18px;box-shadow:0 6px 0 rgba(28,27,25,.8);transform:rotate(4deg);position:relative;border:2px solid ${INK}}
+    .k7rw .art{width:88%;max-width:360px;margin:4px auto 0;background:#fff;padding:10px 10px 46px;box-shadow:0 8px 0 rgba(28,27,25,.8);transform:rotate(-2deg);position:relative;border:3px solid ${INK}}
+    .k7rw .art .cap{position:absolute;left:12px;right:12px;bottom:6px;display:flex;flex-direction:column;align-items:flex-start;font-family:${MARKER};line-height:1.15}.k7rw .art .cap b{font-weight:400;font-size:clamp(15px,4.6vw,20px)}.k7rw .art .cap span{font-size:12px;opacity:.7}
     .k7rw .art img{display:block;width:100%}.k7rw .art::before{content:"";position:absolute;top:-10px;left:30%;width:40%;height:18px;background:rgba(215,38,61,.75);transform:rotate(-4deg)}
     .k7rw .panel{position:relative;background:#ffd23f;border:4px solid ${INK};padding:44px 14px 16px;transform:rotate(-1deg);box-shadow:0 6px 0 ${INK}}
     .k7rw .ribbon{position:absolute;left:8%;right:8%;top:-16px;background:#e8344f;color:#fff;font-family:${GRAF};font-size:clamp(24px,7.4vw,34px);text-align:center;padding:4px 6px;border:4px solid ${INK};-webkit-text-stroke:1.5px ${INK};paint-order:stroke fill;text-shadow:3px 3px 0 ${INK};transform:rotate(-2deg);white-space:nowrap}
@@ -763,8 +844,8 @@ G.trancheroute = { mount(stage, api){
     }
     I.crash(at0); I.crash(at0 + 28*B);
     // un disque = une note chantée (ou jouée), sur les temps 4, 5 et 6 ; puis un final à l'unisson
-    for(let i=0;i<3;i++){ const at = at0 + (4 + i)*B; if(i < stars){ if(!(voiceOn() && sing(master, at, freq(d0 + [7, 9, 11][i], 4), [2, 4, 6][i], .8, {long: true, rev: .35}))) I.bell(at, freq(d0 + [7, 9, 11][i], 4), .14); I.crash(at); } else osc(master, 'triangle', 160, at, .12, .08, {glide: 110}); }
-    if(stars === 3 && voiceOn()) [0, 2, 4].forEach((k2, i) => sing(master, at0 + 8*B + i*.03, freq(d0 + 7 + k2, 4), 6, .5, {long: true, pan: (i - 1)*.5, rev: .5}));
+    for(let i=0;i<3;i++){ const at = at0 + (4 + i)*B; if(i < stars){ if(!(voiceOn() && sing(vox, at, freq(d0 + [7, 9, 11][i], 4), [2, 4, 6][i], .8, {long: true, rev: .35}))) I.bell(at, freq(d0 + [7, 9, 11][i], 4), .14); I.crash(at); } else osc(master, 'triangle', 160, at, .12, .08, {glide: 110}); }
+    if(stars === 3 && voiceOn()) [0, 2, 4].forEach((k2, i) => sing(vox, at0 + 8*B + i*.03, freq(d0 + 7 + k2, 4), 6, .5, {long: true, pan: (i - 1)*.5, rev: .5}));
     for(let i=0;i<16;i++) I.hat(at0 + 2*B + i*B/8, .03 + i*.002, false, (i % 2 ? .3 : -.3)); // le compteur qui défile
   }
   function showReward(R){
@@ -784,8 +865,8 @@ G.trancheroute = { mount(stage, api){
     if(second.length === 1) second.push(`<div class="cell"><div class="ic">◉</div><div><div class="lb">DISQUES</div><div class="vl">${discs()}</div></div></div>`);
     el.innerHTML = `<canvas></canvas><div class="in">
       ${P(0, `<h2>${TT}</h2>`)}
-      <div class="top"><div class="ttl">${P(1, `<div class="band">${tr.name} ${R.mood}</div>`)}${P(2, `<div class="pct"><span data-count="${R.acc}">0</span> % de super rythme</div>`)}</div>
-        ${R.img ? P(2, `<div class="art"><img src="${R.img}" alt="Ta toile"><div style="position:absolute;right:8px;bottom:2px;font-family:${MARKER};font-size:10px;white-space:nowrap">${tr.name} · ${R.acc} %</div></div>`, 'artw') : ''}</div>
+      ${R.img ? P(1, `<div class="art"><img src="${R.img}" alt="Ta toile"><div class="cap"><b>« ${R.artTitle} »</b><span>${tr.name} · ${R.acc} %</span></div></div>`, 'artw') : ''}
+      <div class="top"><div class="ttl">${P(2, `<div class="band">${tr.name} ${R.mood}</div>`)}${P(2, `<div class="pct"><span data-count="${R.acc}">0</span> % de super rythme</div>`)}</div></div>
       ${P(3, `<div class="panel"><div class="ribbon">${ribbon}</div><div class="discs">${[0, 1, 2].map(i => `<div class="disc pop ${i < R.stars ? 'on' : ''}" style="--n:${4 + i}">${i < R.stars ? '<div class="burst"></div>' : ''}${discSvg(i < R.stars, '#ffd23f')}</div>`).join('')}</div>
         <div class="next">${R.stars < 3 ? `PROCHAIN DISQUE À ${diff.disc[R.stars]} %` : 'LES 3 DISQUES, BRAVO !'}</div></div>`)}
       ${P(7, `<div class="card"><div class="cell"><div class="ic">🏆</div><div><div class="lb">SCORE</div><div class="vl" data-count="${score}">0</div><div class="sm">points</div></div></div><div class="cell"><div class="ic" style="background:#29c4ff">✸</div><div><div class="lb">COMBO MAX</div><div class="vl">${maxCombo}</div></div></div>
@@ -793,7 +874,7 @@ G.trancheroute = { mount(stage, api){
       ${P(8, `<div class="card">${second.slice(0, 2).join('')}</div>`)}
       ${P(9, `<div class="btns"><button class="again">REJOUER ▶</button>${R.img ? `<button class="keep">GARDER MON ŒUVRE 💾</button>` : `<button class="keep">CASSETTES</button>`}</div>`)}
       ${P(10, `<div class="links"><button class="tomenu">◀ CASSETTES</button>${R.nextT && unlocked(R.nextT) ? `<button class="next2">FACE ${R.nextT.face} : ${R.nextT.name.toUpperCase()} ▶</button>` : ''}</div>`)}
-      <div style="font-size:12px;opacity:.7;text-align:center">Ta toile : rond net = pile · jets = en avance · coulures = en retard · gris = raté</div></div>`;
+      <div style="font-size:12px;opacity:.7;text-align:center">Chaque partie peint une toile unique. Rond net = pile · jets = en avance · coulures = en retard · gris = raté</div></div>`;
     stage.appendChild(el);
     const close = () => { alive = false; el.remove(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
     el.querySelector('.again').onclick = () => { close(); startTrack(tr); };
@@ -821,6 +902,7 @@ G.trancheroute = { mount(stage, api){
   }
   function finishRun(won){
     if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; }
+    api.save('runs', api.load('runs', 0) + 1);
     const acc = rhythmPct() || 0, stars = diff.disc.filter(x => acc >= x).length, discsBefore = discs();
     const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + stars*5*diff.mult);
     api.save('notes', bank() + gained);
@@ -842,13 +924,13 @@ G.trancheroute = { mount(stage, api){
     actions.push({label: 'Choisir une cassette', fn: showMenu});
     const TT = ['PAS ENCORE CALÉ', 'ÇA GROOVE', 'SUPER RYTHME', 'RYTHME PARFAIT'];
     const mood = ['brut', 'qui groove', 'en transe', 'hypnotique', 'nirvana'][TIERS.filter(x => x && maxCombo >= x).length];
-    let img = null; try{ img = artwork(acc); try{ localStorage.setItem('k7cut.art.' + tr.id, img); api.save('artNew', true); }catch(e){} }catch(e){}
+    let img = null; try{ img = artwork(acc); saveArt(img, acc); }catch(e){}
     if(img) actions.splice(actions.length - 1, 0, {label: 'Garder mon œuvre', keep: true, fn: async () => { const name = `k7cut-${tr.id}-${acc}.jpg`;
       // dans Claude : la sauvegarde passe par la fenêtre de confirmation ; ailleurs (GitHub Pages, appli) : téléchargement classique
       if(window.claude && window.claude.use){ try{ const dl = await window.claude.use('downloads'); if(dl){ const blob = await (await fetch(img)).blob(); await dl.save({filename: name, data: blob}); return; } }catch(e){ return; } }
       const a = document.createElement('a'); a.href = img; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }});
     const keep = img ? actions.find(a => a.keep).fn : null;
-    api.after(700, () => showReward({acc, stars, img, mood, gained, rec, nextT, opened, titleNew: titleAfter !== titleBefore ? titleAfter : null, keep}));
+    api.after(700, () => showReward({acc, stars, img, artTitle, mood, gained, rec, nextT, opened, titleNew: titleAfter !== titleBefore ? titleAfter : null, keep}));
   }
   function fail(){ if(state !== 'play') return; state = 'over'; if(useAudio){ music.gain.setTargetAtTime(0, actx.currentTime, .2); osc(master, 'sawtooth', 220, now(), 1.2, .2, {glide: 40}); api.after(1500, () => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }); } finishRun(false); }
   function win(){ if(state !== 'play') return; state = 'over'; I.crash(now()); judges.push({txt: 'FIN DE FACE', x: W/2, y: H*.25, t: 0, big: true}); finishRun(true); }
@@ -1014,48 +1096,60 @@ G.trancheroute = { mount(stage, api){
   /* ---------- tutos en jeu : arrêt sur image, doigt animé, on fait le geste sur le vrai écran ---------- */
   // chaque forme a son geste : la forme EST la consigne
   const TUTO = {
-    CV: {verb: 'GLISSE VERS LE HAUT', shape: 'FORME DEBOUT', hint: 'du bas vers le haut, n\'importe où sur l\'écran', need: 1},
-    CH: {verb: 'GLISSE À DROITE', shape: 'FORME COUCHÉE', hint: 'de gauche à droite, n\'importe où sur l\'écran', need: 1},
-    J: {verb: 'TAPE UNE FOIS', shape: 'FORME RONDE', hint: 'un simple tap, sans glisser', need: 1},
-    H: {verb: 'POSE ET TIENS', shape: 'RUBAN', hint: 'garde le doigt posé jusqu\'au bout du ruban', need: 1},
-    S: {verb: 'GRATTE', shape: 'ZIGZAG', hint: 'allers-retours rapides de haut en bas', need: 4}
+    CV: {verb: 'GLISSE VERS LE HAUT', shape: 'BLOC DEBOUT', hint: 'du bas vers le haut, n\'importe où sur l\'écran', need: 1, cue: 'GLISSE ↑'},
+    CH: {verb: 'GLISSE À DROITE', shape: 'BLOC COUCHÉ', hint: 'de gauche à droite, n\'importe où sur l\'écran', need: 1, cue: 'GLISSE →'},
+    J: {verb: 'TAPE UNE FOIS', shape: 'ROND-CŒUR', hint: 'un tap sec, sans glisser : c\'est toi la caisse claire', need: 1, cue: 'TAPE'},
+    H: {verb: 'POSE ET TIENS', shape: 'RUBAN', hint: 'pose le doigt et garde-le jusqu\'au bout du ruban', need: 1, cue: 'TIENS'},
+    S: {verb: 'GRATTE', shape: 'ZIGZAG', hint: 'allers-retours rapides de haut en bas', need: 4, cue: 'GRATTE'}
   };
   const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : 'CV') : o.k;
-  let tutoWrong = 0;
+  let tutoWrong = 0, tutoOk = 0, tutoBar = -9, tutoHeld = 0;
   let tutoOpen = false, pauseRaw = 0, tutoObj = null, tutoT = 0, tutoCount = 0, tutoTouch = null, holdHint = 0;
   const rawNow = () => useAudio ? actx.currentTime : performance.now()/1000;
+  // le tuto s'ouvre au début d'une mesure, avant que la nouvelle forme n'arrive : on apprend à l'arrêt, on essaie, puis on la joue en musique
   function startTuto(o){
-    tutoOpen = true; tutoObj = o; tutoT = 0; tutoCount = 0; tutoTouch = null; state = 'tuto'; pauseRaw = rawNow();
+    tutoOpen = true; tutoObj = o; tutoT = 0; tutoCount = 0; tutoTouch = null; tutoOk = 0; tutoWrong = 0; tutoHeld = 0; state = 'tuto'; pauseRaw = rawNow();
     if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(.12, actx.currentTime, .05); }
     gestures.clear(); api.vibe(30);
   }
+  function tutoSuccess(dir){
+    if(tutoOk) return; tutoOk = 1.6; tutoTouch = null; api.vibe([15, 30, 15]); const at = clock(), o = tutoObj;
+    if(o.k === 'C'){ lead(at, freq(o.deg || 4, 4), .15, true); if(dir){ const l = Math.hypot(dir.x, dir.y) || 1; slash = {dx: dir.x/l, dy: dir.y/l, t: 0}; } }
+    if(o.k === 'J'){ I.tap(master, at, 1, freq(chordOf(Math.max(1, Math.floor(beatNow/4))), 2)); jumpT = 0; }
+    if(o.k === 'H' || o.k === 'S') I.bell(at, freq(7, 4), .1);
+    confetti(W/2, H*.3, [RED, PAPER, '#ffd23f'], 26, 1.1);
+  }
   function resumeTuto(){
-    api.save('tuto.' + tk(tutoObj), true);
-    t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play';
+    api.save('tuto2.' + tk(tutoObj), true);
+    t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play'; tutoBar = -9; // on revérifie la mesure : un autre geste nouveau peut suivre
     if(useAudio && music) music.gain.setTargetAtTime(.8, actx.currentTime, .04);
   }
+  function tutoWrongMsg(){ tutoWrong = 1; api.vibe(40); osc(master, 'triangle', 180, clock(), .12, .06); }
   function tutoDown(e){
-    const p = pt(e), o = tutoObj; try{ cv.setPointerCapture(e.pointerId); }catch(err){}
+    if(tutoOk) return;
+    const p = pt(e); try{ cv.setPointerCapture(e.pointerId); }catch(err){}
     tutoTouch = {id: e.pointerId, x: p.x, y: p.y, ly: p.y, dir: 0, acc: 0};
-    if(o.k === 'H'){ resumeTuto(); const t = now(); o.holding = true; o.startGrade = 'perfect'; o.dt = 0; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; holdHint = 1; tutoTouch = null; }
   }
   function tutoMove(e){
     if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj;
-    if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 22){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null;
-      if(!rightWay(o, dir)){ tutoWrong = 1; api.vibe(40); osc(master, 'triangle', 180, clock(), .12, .06); return; }
-      resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); slash = {dx: dir.x/Math.hypot(dir.x, dir.y), dy: dir.y/Math.hypot(dir.x, dir.y), t: 0}; }
-    if(o.k === 'S'){ const v = p.y - tutoTouch.ly; tutoTouch.ly = p.y; const s = Math.sign(v);
-      if(s && s !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; I.wik(clock(), s < 0); api.vibe(10); confetti(HXs + 10, Y0 - 10, [PAPER, INK], 4, .5);
-          if(tutoCount >= TUTO.S.need){ const id = tutoTouch.id; tutoTouch = null; resumeTuto(); o.strokes = tutoCount; scratchState = {o, id, last: p, dir: s, acc: 0}; } }
-        if(tutoTouch){ tutoTouch.dir = s; tutoTouch.acc = 0; } }
-      if(tutoTouch) tutoTouch.acc += Math.abs(v); }
+    if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 22){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null; if(rightWay(o, dir)) tutoSuccess(dir); else tutoWrongMsg(); return; }
+    if(o.k === 'S'){ const v = p.y - tutoTouch.ly; tutoTouch.ly = p.y; const sg = Math.sign(v);
+      if(sg && sg !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; I.wik(clock(), sg < 0); api.vibe(10); confetti(W/2, H*.3, [PAPER, INK], 4, .5); if(tutoCount >= TUTO.S.need){ tutoSuccess(); return; } }
+        tutoTouch.dir = sg; tutoTouch.acc = 0; }
+      tutoTouch.acc += Math.abs(v); }
   }
   function tutoUp(e){
     if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj, st = tutoTouch, d = Math.hypot(p.x - st.x, p.y - st.y); tutoTouch = null;
-    if(o.k === 'J'){ if(d < 18){ resumeTuto(); jumpT = 0; o.dt = 0; resolve(o, 'perfect', now()); } else { tutoWrong = 1; api.vibe(40); } }
-    if(o.k === 'C' && d > 10){ const dir = {x: p.x - st.x, y: p.y - st.y}; if(rightWay(o, dir)){ resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); } else { tutoWrong = 1; api.vibe(40); } }
+    if(o.k === 'J'){ if(d < 18) tutoSuccess(); else tutoWrongMsg(); }
+    if(o.k === 'C'){ if(d > 10){ const dir = {x: p.x - st.x, y: p.y - st.y}; if(rightWay(o, dir)) tutoSuccess(dir); else tutoWrongMsg(); } else tutoWrongMsg(); }
+    if(o.k === 'H' && !tutoOk){ tutoHeld = 0; tutoWrongMsg(); }
   }
-  const nextTutoObj = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db <= .02 && db > -.15 && !api.load('tuto.' + tk(o), false)) return o; } return null; };
+  // au début de chaque mesure : y a-t-il un geste jamais vu dans les deux mesures qui viennent ?
+  const nextTutoObj = () => {
+    const b = Math.floor(beatNow/4); if(b === tutoBar || beatNow - b*4 > .5) return null; tutoBar = b;
+    for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db > .5 && db <= 8.5 && !api.load('tuto2.' + tk(o), false)) return o; }
+    return null;
+  };
   // un doigt cartoon
   function finger(x, y, press, a){
     ctx.save(); ctx.translate(x, y); ctx.rotate(a || -.35); ctx.scale(1 - press*.08, 1 - press*.08);
@@ -1067,37 +1161,59 @@ G.trancheroute = { mount(stage, api){
     if(press > .5){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 3; ctx.globalAlpha = press - .5; ctx.beginPath(); ctx.arc(x, y, 14 + (1 - press)*30, 0, 6.283); ctx.stroke(); ctx.globalAlpha = 1; }
   }
   function drawTuto(rt){
-    const o = tutoObj; if(!o) return; tutoT += 1/60;
-    const ox = xOf(o.beat), oy = objY(o), d = TUTO[tk(o)]; tutoWrong = Math.max(0, tutoWrong - 1/60/1.2);
-    // projecteur : tout s'assombrit sauf l'obstacle et la tête de lecture
-    ctx.save(); ctx.fillStyle = 'rgba(28,27,25,.6)'; ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283, true); ctx.fill('evenodd'); ctx.restore();
-    ctx.strokeStyle = PAPER; ctx.lineWidth = 3; ctx.setLineDash([8, 7]); ctx.lineDashOffset = -rt*30; ctx.beginPath(); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
-    // le doigt fait le geste
-    const cx = W*.62, cy = H*.34; let fx = cx, fy = cy, pr = 0, trail = null;
-    let sx = cx, sy = cy;
-    if(o.k === 'C'){ const k = (tutoT % 1.3)/1.3, m = Math.min(1, Math.max(0, (k - .1)/.5)), e = 1 - Math.pow(1 - m, 3), v = o.shape !== 'wide';
-      sx = v ? cx : cx - 80; sy = v ? cy + 70 : cy; fx = v ? cx : sx + e*160; fy = v ? sy - e*140 : cy; pr = k > .08 && k < .65 ? 1 : 0; trail = e;
-      // grosse flèche fantôme qui montre le sens
-      ctx.save(); ctx.globalAlpha = .35 + .25*Math.sin(rt*6); ctx.strokeStyle = SPRAY[1]; ctx.fillStyle = SPRAY[1]; ctx.lineWidth = 10; ctx.lineCap = 'round';
-      const ex = v ? cx : cx + 95, ey = v ? cy - 85 : cy; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.translate(ex, ey); ctx.rotate(v ? -Math.PI/2 : 0); ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(-8, -18); ctx.lineTo(-8, 18); ctx.closePath(); ctx.fill(); ctx.restore(); }
-    if(o.k === 'J'){ const k = (tutoT % .9)/.9; pr = k > .3 && k < .55 ? 1 : 0; fy = cy - (pr ? 0 : 10); }
-    if(o.k === 'H'){ const k = (tutoT % 1.6)/1.6; pr = k > .15 && k < .85 ? 1 : 0; fy = cy - (pr ? 0 : 12);
-      if(pr){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(cx, cy, 26, -Math.PI/2, -Math.PI/2 + (k - .15)/.7*6.283); ctx.stroke(); } }
-    if(o.k === 'S'){ fy = cy + Math.sin(tutoT*18)*40; pr = 1; }
-    if(trail != null && pr){ ctx.strokeStyle = 'rgba(244,240,230,.9)'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(fx, fy); ctx.stroke(); }
-    finger(fx, fy, pr);
-    // la consigne, style pochoir
-    ctx.save(); ctx.translate(W/2, Math.max(H*.17, 130)); ctx.rotate(-.04); ctx.scale(1 + Math.sin(rt*8)*.03, 1 + Math.sin(rt*8)*.03);
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `${Math.min(34, W*.085)}px ${FONT}`;
-    // chaque ligne est ajustée à la largeur du téléphone (marges comprises)
+    const o = tutoObj; if(!o) return; const dt = 1/60; tutoT += dt;
+    const d = TUTO[tk(o)]; tutoWrong = Math.max(0, tutoWrong - dt/1.2);
+    if(o.k === 'H' && tutoTouch && !tutoOk){ tutoHeld += dt; if(tutoHeld >= .8) tutoSuccess(); }
+    if(tutoOk){ tutoOk -= dt; if(tutoOk <= 0){ tutoOk = 0; resumeTuto(); return; } }
     const fit = (txt, base, font) => { ctx.font = `${base}px ${font}`; const w = ctx.measureText(txt).width, mw = W - 44; return w > mw ? base*mw/w : base; };
-    ctx.font = `${fit(d.shape + ' =', 17, FONT)}px ${FONT}`; ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(d.shape + ' =', 0, -30); ctx.fillStyle = SPRAY[1]; ctx.fillText(d.shape + ' =', 0, -30);
-    ctx.font = `${fit(d.verb, 30, FONT)}px ${FONT}`;
-    ctx.lineWidth = 10; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 3, 4); ctx.fillStyle = LABELRED; ctx.fillText(d.verb, 3, 4); ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 0, 0); ctx.fillStyle = PAPER; ctx.fillText(d.verb, 0, 0);
-    ctx.font = `700 ${fit(d.hint, 15, '"Chakra Petch", sans-serif')}px "Chakra Petch", sans-serif`; ctx.fillStyle = PAPER; ctx.fillText(d.hint, 0, 34);
-    if(tutoWrong > 0){ ctx.globalAlpha = Math.min(1, tutoWrong*2); const msg = o.k === 'J' ? 'SANS GLISSER !' : 'PAS DANS CE SENS !'; ctx.font = `${fit(msg, 20, FONT)}px ${FONT}`; ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(msg, 0, 64); ctx.fillStyle = LABELRED; ctx.fillText(msg, 0, 64); ctx.globalAlpha = 1; }
-    else if(o.k === 'S') { ctx.font = `16px ${FONT}`; ctx.fillText(`${tutoCount} / ${d.need}`, 0, 62); }
+    const label = (txt, y, size, fill, font) => { font = font || FONT; const fs = fit(txt, size, font); ctx.font = `${fs}px ${font}`; ctx.lineWidth = Math.max(4, fs*.28); ctx.strokeStyle = INK; ctx.strokeText(txt, W/2, y); ctx.fillStyle = fill; ctx.fillText(txt, W/2, y); };
+    const DX = W/2, DY = Math.max(H*.27, 150), okP = tutoOk ? 1 - tutoOk/1.6 : 0;
+    // rideau sombre, avec une fenêtre sur la démo ; après la réussite, une fenêtre sur la tête de lecture
+    ctx.save(); ctx.fillStyle = 'rgba(28,27,25,.74)'; ctx.beginPath(); ctx.rect(0, 0, W, H); if(!tutoOk) ctx.arc(DX, DY, 70 + Math.sin(rt*6)*3, 0, 6.283, true);
+    if(tutoOk) ctx.rect(HXs - 34, Y0 - 70, 68, TT + 96); ctx.fill('evenodd'); ctx.restore();
+    if(!tutoOk){ ctx.strokeStyle = PAPER; ctx.lineWidth = 3; ctx.setLineDash([8, 7]); ctx.lineDashOffset = -rt*30; ctx.beginPath(); ctx.arc(DX, DY, 70 + Math.sin(rt*6)*3, 0, 6.283); ctx.stroke(); ctx.setLineDash([]); }
+    // la forme en grand
+    if(!tutoOk){ ctx.save(); ctx.translate(DX, DY); ctx.scale(2, 2);
+    if(o.k === 'H'){ ctx.lineCap = 'round'; ctx.strokeStyle = RED; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(-22, 0); ctx.lineTo(22, 0); ctx.stroke(); ctx.fillStyle = PAPER; ctx.beginPath(); ctx.arc(-22, 0, 9, 0, 6.283); ctx.fill(); ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(-22, 0, 4, 0, 6.283); ctx.fill(); }
+    else if(o.k === 'S'){ ctx.strokeStyle = PAPER; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.beginPath(); for(let i=0;i<7;i++) ctx.lineTo(-24 + i*8, i % 2 ? -7 : 7); ctx.stroke(); }
+    else drawObj({k: o.k, shape: o.shape, beat: beatNow + 9, born: 1}, 0, 0, 0);
+    ctx.restore(); }
+    // le doigt fait le geste, à côté de la forme
+    const cx = DX + 46, cy = DY - 6; let fx = cx, fy = cy, pr = 0;
+    if(!tutoOk){
+      if(o.k === 'C'){ const k = (tutoT % 1.3)/1.3, m = Math.min(1, Math.max(0, (k - .1)/.5)), e = 1 - Math.pow(1 - m, 3), v = o.shape !== 'wide';
+        const sx = v ? cx : cx - 90, sy = v ? cy + 40 : cy; fx = v ? cx : sx + e*120; fy = v ? sy - e*110 : cy; pr = k > .08 && k < .65 ? 1 : 0;
+        ctx.save(); ctx.globalAlpha = .45 + .25*Math.sin(rt*6); ctx.strokeStyle = SPRAY[1]; ctx.fillStyle = SPRAY[1]; ctx.lineWidth = 10; ctx.lineCap = 'round';
+        const ex = v ? cx : cx + 40, ey = v ? cy - 80 : cy; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke(); ctx.translate(ex, ey); ctx.rotate(v ? -Math.PI/2 : 0); ctx.beginPath(); ctx.moveTo(20, 0); ctx.lineTo(-8, -18); ctx.lineTo(-8, 18); ctx.closePath(); ctx.fill(); ctx.restore();
+        if(pr){ ctx.strokeStyle = 'rgba(244,240,230,.9)'; ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(fx, fy); ctx.stroke(); } }
+      if(o.k === 'J'){ const k = (tutoT % .9)/.9; pr = k > .3 && k < .55 ? 1 : 0; fy = cy - (pr ? 0 : 12); }
+      if(o.k === 'H'){ const k = (tutoT % 1.6)/1.6; pr = k > .15 && k < .85 ? 1 : 0; fy = cy - (pr ? 0 : 12); const fill = tutoTouch ? Math.min(1, tutoHeld/.8) : pr ? (k - .15)/.7 : 0;
+        if(fill > 0){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(DX, DY, 78, -Math.PI/2, -Math.PI/2 + fill*6.283); ctx.stroke(); } }
+      if(o.k === 'S'){ fy = cy + Math.sin(tutoT*18)*34; pr = 1; }
+      finger(fx, fy, pr);
+    }
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const ty = Math.max(H*.1, 76);
+    label('NOUVEAU : ' + d.shape, ty, 17, SPRAY[1]);
+    if(!tutoOk){
+      label(d.verb, ty + 36, 30, PAPER);
+      ctx.font = `700 ${fit(d.hint, 15, '"Chakra Petch", sans-serif')}px "Chakra Petch", sans-serif`; ctx.fillStyle = PAPER; ctx.fillText(d.hint, W/2, DY + 86);
+      if(tutoWrong > 0){ ctx.globalAlpha = Math.min(1, tutoWrong*2); label(o.k === 'J' ? 'SANS GLISSER !' : o.k === 'H' ? 'TIENS PLUS LONGTEMPS !' : o.k === 'C' ? 'DANS LE SENS DE LA FLÈCHE !' : 'ENCORE !', DY + 108, 20, LABELRED); ctx.globalAlpha = 1; }
+      else label(o.k === 'S' ? `ESSAIE ICI : ${tutoCount} / ${d.need}` : 'ESSAIE ICI, MAINTENANT', DY + 108, 16, '#ffd23f');
+    } else {
+      ctx.save(); const sc = 1 + Math.max(0, .3 - okP)*1.5; ctx.translate(W/2, ty + 38); ctx.scale(sc, sc); ctx.translate(-W/2, -(ty + 38)); label('BRAVO !', ty + 38, 34, '#ffd23f'); ctx.restore();
+      label('EN MUSIQUE, MAINTENANT :', DY - 20, 16, PAPER);
+      label('FAIS-LE QUAND ELLE TOUCHE', DY + 6, 18, '#ffd23f'); label('LA LIGNE ROUGE ↓', DY + 32, 18, '#ffd23f');
+      // flèche vers la tête de lecture
+      const ay = Y0 - 86 + Math.sin(rt*10)*5; ctx.fillStyle = LABELRED; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(HXs - 12, ay - 16); ctx.lineTo(HXs + 12, ay - 16); ctx.lineTo(HXs + 12, ay); ctx.lineTo(HXs + 22, ay); ctx.lineTo(HXs, ay + 18); ctx.lineTo(HXs - 22, ay); ctx.lineTo(HXs - 12, ay); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
     ctx.restore();
+  }
+  // en Apprenti, chaque forme qui arrive porte son geste écrit au-dessus (les premières parties)
+  function drawCue(o, x, y){
+    const d = TUTO[tk(o)]; if(!d || !d.cue) return; const bd = o.beat - beatNow; if(bd > 3 || bd < -.1) return;
+    ctx.save(); ctx.globalAlpha = Math.min(1, (3 - bd)*1.5); ctx.textAlign = 'center'; ctx.font = `11px ${FONT}`; const w = ctx.measureText(d.cue).width + 12, top = o.k === 'C' && o.shape === 'tall' ? 50 : 36;
+    ctx.fillStyle = INK; rrect(x - w/2, y - top - 16, w, 18, 5); ctx.fill(); ctx.fillStyle = bd < .35 ? '#ffd23f' : PAPER; ctx.textBaseline = 'middle'; ctx.fillText(d.cue, x, y - top - 7); ctx.restore();
   }
 
   /* ---------- célébrations : mots et illustrations à l'encre en fond, pendant que la partie continue ---------- */
@@ -1267,6 +1383,7 @@ G.trancheroute = { mount(stage, api){
       if((o.k === 'C' || o.k === 'J') && bd < 1.6 && bd > -.15){ const r = (o.shape === 'tall' || o.shape === 'wide' ? 36 : 22) + Math.max(0, bd)*70, a = Math.min(1, (1.6 - bd)*1.2);
         ctx.strokeStyle = o.bomb ? `rgba(215,38,61,${a})` : o.k === 'J' ? `rgba(28,27,25,${a})` : `rgba(244,240,230,${a})`; ctx.lineWidth = 3 + (bd < .25 ? 2 : 0); ctx.setLineDash([10, 6]); ctx.lineDashOffset = -beatNow*20; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.stroke(); ctx.setLineDash([]); }
       drawObj(o, x, y, dance);
+      if(diff.easy && (o.k === 'C' || o.k === 'J') && cueRuns < 3) drawCue(o, x, y);
       if((o.k === 'C' || o.k === 'J') && bd < .7 && bd > -.1){ const a2 = 1 - bd/.7; ctx.strokeStyle = `rgba(28,27,25,${a2})`; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; const top = o.shape === 'tall' ? 32 : 18; for(let q=0;q<3;q++){ const an = -1.1 + q*.45; ctx.beginPath(); ctx.moveTo(x + Math.cos(an)*(top + 4), y + Math.sin(an)*(top + 4)); ctx.lineTo(x + Math.cos(an)*(top + 11 + a2*4), y + Math.sin(an)*(top + 11 + a2*4)); ctx.stroke(); } }
     }
     // héros
@@ -1546,7 +1663,7 @@ G.trancheroute = { mount(stage, api){
   const mcv = document.createElement('canvas'), mdpr = Math.min(window.devicePixelRatio || 1, 2); mcv.width = W*mdpr; mcv.height = H*mdpr; menu.appendChild(mcv);
   const mx = mcv.getContext('2d'); mx.setTransform(mdpr, 0, 0, mdpr, 0, 0);
   const artCache = {}, imgCache = {};
-  let cur = Math.min(TRACKS.length - 1, api.load('cur', 0)), dIdx = api.load('diff', 1);
+  let cur = Math.min(TRACKS.length - 1, api.load('cur', 0)), dIdx = api.load('diff', 0);
   let mPos = cur, mVel = 0, mTarget = cur, drag = null, squash = 0, mFloat = [], mTime = 0, mOpen = false;
   for(let i=0;i<14;i++) mFloat.push({x: Math.random()*W, y: Math.random()*H, s: .6 + Math.random()*.9, v: 14 + Math.random()*22, ph: Math.random()*6});
   const menuBg = makeWall(Math.round(W) + 40, Math.round(H) + 40);
@@ -1610,7 +1727,7 @@ G.trancheroute = { mount(stage, api){
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
-    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','J','H','S'].forEach(k => api.save('tuto.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','J','H','S'].forEach(k => api.save('tuto2.' + k, false)); e.target.textContent = 'TUTOS RÉACTIVÉS ✓'; api.sfx.coin(); };
   };
 
   // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
@@ -1638,7 +1755,7 @@ G.trancheroute = { mount(stage, api){
     events = []; t0 = 0; resetRate(); const s0 = actx.currentTime + .08, f = [196, 220, 247, 294, 330, 392, 392];
     for(let i=0;i<7;i++){ const at = s0 + i*ISTEP*(i === 6 ? 1.5 : 1);
       if(i % 2 === 0){ osc(master, 'sine', 160, at, .3, .8, {glide: 42, gt: .1}); noise(master, at, .012, .2, 'highpass', 2500); }
-      if(!sing(master, at, f[i], i, i === 6 ? .9 : .75, {long: i === 6, rev: .3, dly: i === 6 ? .3 : 0})) osc(master, 'triangle', f[i]*2, at, .18, .2);
+      if(!sing(vox, at, f[i], i, i === 6 ? .9 : .75, {long: i === 6, rev: .3, dly: i === 6 ? .3 : 0})) osc(master, 'triangle', f[i]*2, at, .18, .2);
     }
     try{ I.crash(s0 + 6*ISTEP*1.5); I.clap(s0 + 6*ISTEP*1.5, .4); }catch(e){}
   }
@@ -1717,7 +1834,7 @@ G.trancheroute = { mount(stage, api){
     .k7gal figure{margin:0;background:#fff;border:3px solid ${INK};border-radius:10px;overflow:hidden;cursor:pointer}
     .k7gal img{display:block;width:100%;aspect-ratio:9/10;object-fit:cover}
     .k7gal .empty{display:grid;place-items:center;aspect-ratio:9/10;background:repeating-linear-gradient(45deg,#ece5d3 0 10px,#e2dac6 10px 20px);font-family:${MARKER};font-size:14px;text-align:center;padding:8px}
-    .k7gal figcaption{padding:5px 8px;font-family:${MARKER};font-size:14px;display:flex;justify-content:space-between}`; document.head.appendChild(st); }
+    .k7gal figcaption{padding:5px 8px;font-family:${MARKER};font-size:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}`; document.head.appendChild(st); }
   const home = document.createElement('div'); home.className = 'k7home'; menu.appendChild(home);
   const hcv = document.createElement('canvas'); hcv.width = W*mdpr; hcv.height = H*mdpr; home.appendChild(hcv); const hx = hcv.getContext('2d'); hx.setTransform(mdpr, 0, 0, mdpr, 0, 0);
   const TROPHY = `<svg width="26" height="26" viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="${INK}"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="${INK}" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="${INK}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></svg>`;
@@ -1747,10 +1864,11 @@ G.trancheroute = { mount(stage, api){
   home.querySelector('#k7trophy').onclick = () => {
     api.sfx.click(); api.save('artNew', false); refreshHome(); { const bd = menu.querySelector('#k7bdot'); if(bd) bd.hidden = true; }
     const sh = document.createElement('div'); sh.className = 'k7sheet'; const b = bests();
-    const cells = TRACKS.map(t => { let art = null; try{ art = localStorage.getItem('k7cut.art.' + t.id); }catch(e){} const n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0));
-      return `<figure data-id="${t.id}">${art ? `<img src="${art}" alt="Toile ${t.name}">` : `<div class="empty">${unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée'}</div>`}<figcaption><span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span></figcaption></figure>`; }).join('');
+    const cells = TRACKS.map(t => { const arts = artsOf(t.id), n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0)), cap = `<span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span>`;
+      if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée'}</div><figcaption>${cap}</figcaption></figure>`;
+      return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="Toile ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
     sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">MES ŒUVRES</b><button class="k7btn" id="k7gx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="Fermer">✕</button></div>
-      <div style="font-size:13px;opacity:.8;margin-top:-4px">Ta dernière toile sur chaque cassette. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.</div><div class="k7gal">${cells}</div></div>`;
+      <div style="font-size:13px;opacity:.8;margin-top:-4px">Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.</div><div class="k7gal">${cells}</div></div>`;
     menu.appendChild(sh); const close = () => sh.remove(); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
     sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;
       if(window.claude && window.claude.use){ try{ const dl = await window.claude.use('downloads'); if(dl){ await dl.save({filename: name, data: await (await fetch(im.src)).blob()}); return; } }catch(e){ return; } }

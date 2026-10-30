@@ -1,5 +1,14 @@
 # Journal des versions
 
+## 0.18.0 — Son plus pêchu, ronds-cœurs batteurs, phrases rythmiques, tutos repensés, toiles uniques
+- **Apprenti par défaut** pour une première partie (le choix déjà enregistré d'un joueur est gardé).
+- **Musique plus pêchue.** Le compresseur laisse passer les attaques, une saturation douce colle le tout, grosse caisse avec plus de corps et un clic, caisse claire plus épaisse, sous-basse sous les basses, toute la musique pompe sur la grosse caisse. Le premier couplet n'est plus étouffé (le filtre part de 2,6 kHz au lieu de 900 Hz et s'ouvre en 4 mesures).
+- **La voix se mêle mieux.** Elle a son propre bus (grave coupé, présence, compression), elle entre sur un temps fort (1 ou 3), la musique se pousse et la mélodie de fond se tait pendant qu'elle chante, sa hauteur reste à moins d'une quinte de la voix naturelle, et les doublures n'arrivent qu'à partir de 20 de combo.
+- **Les ronds-cœurs font la caisse claire.** Taper un rond-cœur joue le clap ou la caisse claire du style (plus un tom accordé), et le morceau laisse ce coup vide : si tu rates, il manque au groove. Dans les rythmes, ils tombent surtout sur les temps 2 et 4.
+- **Motifs en phrases.** Chaque section est faite de phrases de 4 mesures A A A' B tirées d'une bibliothèque de rythmes (`RHY`) : on découvre un motif, on le rejoue, il varie, puis une mesure de relance (qui porte les notes tenues et scratchs). Les appels/réponses répètent le même motif.
+- **Tutos repensés.** Ils s'ouvrent au début de la mesure qui précède la nouvelle forme (plus jamais au moment de la jouer) : la forme en grand, le doigt qui montre, on essaie sur place, puis « BRAVO ! Fais-le quand elle touche la ligne rouge » avec une flèche sur la tête de lecture. En Apprenti, pendant les 3 premières parties, le geste est écrit au-dessus de chaque forme qui arrive. Les tutos sont réaffichés une fois pour tout le monde.
+- **Chaque toile est unique.** Une composition (nuée, spirale, vague, cœur, explosion, pluie, diagonale, constellation) et une palette (dont papier kraft et papier nuit) sont tirées à chaque partie, et la toile reçoit un titre (« Spirale hypnotique n°12 »). Elle est en grand en haut de la page de récompense, et la galerie garde les 3 dernières toiles de chaque cassette.
+
 ## 0.17.0 — Paliers de difficulté, son calé, personnage élastique, page de récompense
 - **Progression en paliers.** Chaque morceau monte d'une marche puis souffle sur un palier : intro → couplet facile → couplet → pause → refrain → refrain plus dense → final. Chaque niveau a un plafond :
 
