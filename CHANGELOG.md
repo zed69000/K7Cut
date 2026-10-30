@@ -1,5 +1,19 @@
 # Journal des versions
 
+## 0.16.0 — Un habillage par style de musique, retour direct aux cassettes
+- **Chaque style a son univers en jeu** (d'après les maquettes) :
+  - **Métal** : papier crème, pinceaux noir et rouge, éclairs, tête de mort, enceintes, chevrons rouges, bobines rouges, foule liserée de rouge.
+  - **Punk** : rose fluo et vert acide, bouts de scotch, croix au feutre.
+  - **Disco** : dégradé bleu-violet-rose, boule à facettes qui tourne et scintille sur le temps, rayons cyan et rose, foule néon, score en noir et blanc.
+  - **Reggae** : papier jaune, soleil, palmiers, enceintes, guirlande d'ampoules qui clignote sur le temps, chevrons rouge-jaune-vert, vinyles rasta, score dans une tache jaune.
+  - **Hip-hop** : mur de briques, couronne dorée, tag violet.
+  - **Synthwave** : nuit violette étoilée, soleil couchant, grille, cyan et rose.
+  - **French touch** : nuit, rayons dorés, pyramide de lumière.
+  - **Drum'n'bass** : vert profond et traits vert acide.
+  
+  Les couleurs des chevrons, des bobines, de l'égaliseur, de la foule et du score suivent le style. Les textes restent lisibles sur les fonds sombres.
+- **Plus de page d'accueil** : le jeu s'ouvre directement sur les cassettes. Le « TOUCHE ! » lance l'intro chantée, puis le titre K7 CUT s'affiche sur sa propre ligne. Le trophée de la galerie « Mes œuvres » est en haut à gauche.
+
 ## 0.15.0 — En jeu façon BD explosive
 - **Nouveau fond** (d'après la maquette) : papier crème, grandes bandes de pinceau noires et rouges en diagonale, trames de points, giclées, étoiles, éclairs, traits de vitesse et confettis. Chaque cassette garde sa couleur d'accent.
 - **Score et pourcentage dans des taches jaunes qui coulent**, avec de gros chiffres et des disques cerclés. Le bouton du haut devient un carré noir bordé de blanc.
