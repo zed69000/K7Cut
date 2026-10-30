@@ -8,6 +8,10 @@ window.__bot = function(sigma, mode){
   function tick(){
     if(k.state === 'play'){ 
       const t = k.now();
+      { const hw = o => o.k === 'C' ? (o.shape === 'wide' ? 27 : 12) : o.k === 'J' ? 16 : o.k === 'A' ? 10 : o.k === 'N' ? 7 : 0;
+        const vis = k.objs.filter(o => !o.done && hw(o) && o.beat - t/k.bpb < 6 && !o.__ov).sort((a, b) => a.beat - b.beat);
+        for(let i=1;i<vis.length;i++){ const a = vis[i - 1], b = vis[i], gap = (b.beat - a.beat)*k.ppb, need = hw(a) + hw(b);
+          const big = (a.k === 'C' || a.k === 'J') && (b.k === 'C' || b.k === 'J'); if(gap < need && big){ b.__ov = 1; window.__rep.flags.push('CHEVAUCHE ' + a.k + (a.shape || '') + '/' + b.k + (b.shape || '') + ' ' + Math.round(gap) + '<' + need); } } }
       for(const o of k.objs){ if(seen.has(o) || o.done || !['C','J','H','S'].includes(o.k)) continue;
         if(o.time - t < .4){ seen.add(o); plan.push({o, at: o.time + gauss()*sigma, stage: 0, id: pid++}); } }
       for(const a of plan){ if(a.fin) continue; const o = a.o;

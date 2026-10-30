@@ -1,5 +1,21 @@
 # Journal des versions
 
+## 0.12.0 — La fresque, une voix de combo, plus de chevauchements
+- **Ta fresque street art.** Chaque geste réussi peint le mur au-dessus de la piste, de gauche à droite au fil du morceau :
+  - une coupe = un trait de bombe dans le sens du geste ;
+  - un tap = une tache de peinture ;
+  - un maintien = un rouleau qui coule ;
+  - un scratch = un tag ;
+  - une note ramassée = une étoile.
+  
+  Plus le combo monte, plus les traits sont gros. Chaque palier de transe ajoute des couleurs, et un pochoir (étoile, couronne, cœur, éclair) tombe tous les 25 combos. Un raté laisse juste une coulure grise. À la fin, l'œuvre s'affiche avec son nom (« Robot nirvana »…), on peut la télécharger, et la dernière de chaque cassette est gardée.
+- **La voix récompense le combo.** Elle chante tous les 10 de combo, et la phrase grandit : 1 note à 10, 2 à 20, 3 à 30 avec un chœur à la tierce, jusqu'à 5 notes avec la quinte, puis l'octave à 100. Les syllabes changent à chaque palier.
+- **La voix prend la couleur du style** : écho dub en reggae, filtre téléphone et bégaiement en hip-hop, robot en French touch, chorus spatial en synthwave, saturation et octave grave en punk et métal.
+- **Un vrai instrument par style pour la mélodie de tes coupes** : cloche en hip-hop, mélodica en reggae, supersaw en synthwave, talkbox en French touch, guitare en punk et métal, pluck en disco et DnB.
+- **Fini les chevauchements.** Les formes sont plus compactes, il y a au moins 54 px entre deux croches, et jamais deux blocs couchés côte à côte. Le bot n'a trouvé aucun chevauchement sur les 8 cassettes en niveau Roi.
+- **La bombe est retirée.**
+- **Optimisation.** Ombres dures sans flou, nettement moins coûteuses sur mobile. Le geste est jugé à l'heure exacte du toucher, pas à l'image suivante, donc une image qui traîne ne te met plus « en retard ». La fresque coûte moins de 1 ms par coup de pinceau.
+
 ## 0.10.0 — La forme dit le geste, plus de vies
 - **Chaque forme a son geste.** Bloc debout = glisser de bas en haut. Bloc couché = glisser de gauche à droite. Les chevrons rouges montrent le sens. Rond = un tap. Ruban = tenir. Zigzag = gratter.
 - Le mauvais sens coupe quand même, mais compte au mieux « OK », avec « coupe vers le haut ↑ » ou « coupe vers la droite → » affiché.

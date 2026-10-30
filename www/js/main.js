@@ -25,13 +25,14 @@ const api = {
   shake(px){ if(reduced) return; const k = []; for(let i=0;i<6;i++){ const f = (px || 8)*(1 - i/6); k.push({transform: `translate(${(Math.random()*2 - 1)*f}px,${(Math.random()*2 - 1)*f}px)`}); } k.push({transform: 'translate(0,0)'}); stage.animate(k, {duration: 280, easing: 'ease-out'}); },
   banner(){},
   closeEnd(){ stage.querySelectorAll('.end').forEach(e => e.remove()); },
-  end({title, text, win, actions}){
+  end({title, text, win, actions, img, caption}){
     api.closeEnd();
     const o = document.createElement('div'); o.className = 'end ' + (win ? 'win' : 'lose');
     o.innerHTML = '<div class="end-card"><div class="end-label"><p class="end-title"></p></div><div class="end-stripe"></div><p class="end-text"></p><div class="end-actions"></div></div>';
     o.querySelector('.end-title').textContent = title; o.querySelector('.end-text').textContent = text;
+    if(img){ const fig = document.createElement('figure'); fig.className = 'end-art'; const im = new Image(); im.src = img; im.alt = caption || 'Ton œuvre'; fig.appendChild(im); if(caption){ const fc = document.createElement('figcaption'); fc.textContent = caption; fig.appendChild(fc); } o.querySelector('.end-stripe').after(fig); }
     const box = o.querySelector('.end-actions');
-    (actions || []).forEach((a, i) => { const b = document.createElement('button'); b.className = 'btn' + (i ? ' ghost' : ''); b.textContent = a.label; b.onclick = () => { sfx.click(); o.remove(); a.fn && a.fn(); }; box.appendChild(b); });
+    (actions || []).forEach((a, i) => { const b = document.createElement('button'); b.className = 'btn' + (i ? ' ghost' : ''); b.textContent = a.label; b.onclick = () => { sfx.click(); if(!a.keep) o.remove(); a.fn && a.fn(); }; box.appendChild(b); });
     stage.appendChild(o);
   }
 };
