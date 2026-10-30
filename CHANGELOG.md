@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.7.2
+- Plus aucune devinette sur le geste : l'obstacle visé décide (bloc = coupe, pic = saut), seule la bombe exige un tap
+- Les obstacles sont joués dans l'ordre, comme une partition : un geste un peu en retard ne vole plus l'obstacle suivant
+- Bot de test ajouté (tests/) : 8 cassettes jouées en entier, bons et mauvais gestes, 0 coupe transformée en saut
+
 ## 0.7.1
 - Obstacles rapprochés : c'est l'obstacle dans le rond qui décide de l'action. Seulement des blocs autour : tout geste coupe, dès le toucher. Seulement des sauts : tout geste fait sauter, même si le doigt bouge un peu. Bloc et saut mélangés : il faut un glissé franc pour couper
 

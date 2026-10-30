@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.7.1';
+const VERSION = '0.7.2';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -410,16 +410,22 @@ G.trancheroute = { mount(stage, api){
 
   /* ---------- gestes : un geste par doigt, la cible est l'obstacle le plus proche dans le temps ---------- */
   const gestures = new Map();
+  // dans l'ordre, comme une partition : le plus ancien obstacle encore jouable reçoit le geste,
+  // sauf s'il est déjà très en retard alors que le suivant tombe pile
   function pickAt(t){
-    let best = null, bd = .2*diff.win;
+    const win = .2*diff.win, cand = [];
     for(const o of objs){
       if(o.done) continue; let d;
-      if(o.k === 'C' || o.k === 'J' || (o.k === 'H' && !o.holding)) d = Math.abs(t - o.time);
-      else if(o.k === 'S') d = t < o.time ? o.time - t : t <= o.endTime ? 0 : t - o.endTime;
+      if(o.k === 'C' || o.k === 'J' || (o.k === 'H' && !o.holding)) d = t - o.time;
+      else if(o.k === 'S') d = t < o.time ? t - o.time : t <= o.endTime ? 0 : t - o.endTime;
       else continue;
-      if(d < bd){ bd = d; best = o; }
+      if(Math.abs(d) <= win) cand.push({o, d});
     }
-    return best;
+    if(!cand.length) return null;
+    cand.sort((x, y) => x.o.time - y.o.time);
+    const first = cand[0], next = cand[1];
+    if(next && first.d > .13*diff.win && Math.abs(next.d) < .06) return next.o;
+    return first.o;
   }
   api.on(cv, 'pointerdown', e => {
     if(state === 'tuto'){ tutoDown(e); return; }
@@ -429,28 +435,28 @@ G.trancheroute = { mount(stage, api){
     if(o && o.k === 'H' && holdState && holdState.o.endTime - t < .2){ const old = holdState.o; endHold(t, old.startGrade); }
     if(o && o.k === 'H' && !holdState){ o.holding = true; o.startGrade = grade(t - o.time); o.dt = t - o.time; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; api.vibe(10); return; }
     if(o && o.k === 'S'){ scratchState = {o, id: e.pointerId, last: p, dir: 0, acc: 0}; return; }
-    const near = objs.filter(q => !q.done && (q.k === 'C' || q.k === 'J') && Math.abs(t - q.time) < .2*diff.win);
-    const kinds = new Set(near.map(q => q.bomb ? 'B' : q.k));
-    if(near.length && kinds.size === 1 && kinds.has('C')){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); cut(t, {x: 1, y: .8}); slash = {dx: .78, dy: .62, t: 0}; return; }
-    if(near.length && kinds.size === 1 && kinds.has('J')){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); jump(t); return; }
-    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false, mixed: near.length > 0});
+    // l'obstacle le plus proche du toucher décide : bloc = coupe, pic = saut, tout de suite
+    if(o && o.k === 'C'){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true, aim: true}); cutObj(o, t, {x: 1, y: .8}); slash = {dx: .78, dy: .62, t: 0}; return; }
+    if(o && o.k === 'J' && !o.bomb){ gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: true}); jumpObj(o, t); return; }
+    // une bombe : il faut sauter (taper) ; la couper (glisser franc) la fait exploser
+    gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false, bomb: o && o.bomb ? o : null});
   });
   api.on(cv, 'pointermove', e => {
     if(state === 'tuto'){ tutoMove(e); return; }
     const p = pt(e), t = now();
     if(scratchState && scratchState.id === e.pointerId){ const s = scratchState, dy = p.y - s.last.y, dx = p.x - s.last.x, v = Math.abs(dy) > Math.abs(dx) ? dy : dx; s.last = p;
       const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
-    const g = gestures.get(e.pointerId); if(!g || g.done) return;
+    const g = gestures.get(e.pointerId); if(!g) return;
     const dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
-    if(d > (g.mixed ? 22 : 12)){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; }
+    if(g.aim && d > 10){ g.aim = false; if(slash) slash = {dx: dx/d, dy: dy/d, t: slash.t}; }
+    if(g.done) return;
+    if(d > (g.bomb ? 26 : 12)){ g.done = true; slash = {dx: dx/d, dy: dy/d, t: 0}; if(g.bomb && !g.bomb.done) explode(g.bomb, g.t); else noise(master, g.t, .05, .05, 'highpass', 3000); }
   });
   const up = e => {
     if(state === 'tuto'){ tutoUp(e); return; }
     const t = now(), id = e.pointerId;
     const g = gestures.get(id);
-    if(g && !g.done && e.type === 'pointerup'){ const p = pt(e), dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
-      if(d > (g.mixed ? 22 : 8)){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; } }
-    if(g && !g.done) jump(g.t);
+    if(g && !g.done){ if(g.bomb && !g.bomb.done) jumpObj(g.bomb, g.t); else { const p = pt(e), d = Math.hypot(p.x - g.x, p.y - g.y); if(d < 12){ jumpT = 0; osc(master, 'triangle', 330, g.t, .07, .04, {glide: 520}); } } }
     gestures.delete(id);
     if(holdState && holdState.id === id){ const h = holdState.o; endHold(t, t >= h.endTime - .12 ? h.startGrade : (t - h.time)/(h.endTime - h.time) > .6 ? 'ok' : 'miss'); }
     if(scratchState && scratchState.id === id) scratchState = null;
@@ -471,16 +477,9 @@ G.trancheroute = { mount(stage, api){
 
   let slash = null;
   function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2*diff.win).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
-  function cut(t, dir){
-    const o = nearest(t, o => o.k === 'C' || o.bomb);
-    if(o && o.bomb){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); return; }
-    if(o && o.k === 'C'){ o.dt = t - o.time; resolve(o, grade(o.dt), t, dir); }
-    else noise(master, t, .05, .05, 'highpass', 3000);
-  }
-  function jump(t){
-    jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520});
-    const o = nearest(t, o => o.k === 'J'); if(o){ o.dt = t - o.time; resolve(o, grade(o.dt), t); }
-  }
+  function cutObj(o, t, dir){ o.dt = t - o.time; resolve(o, grade(o.dt), t, dir); }
+  function jumpObj(o, t){ jumpT = 0; osc(master, 'triangle', 330, t, .07, .04, {glide: 520}); o.dt = t - o.time; resolve(o, grade(o.dt), t); }
+  function explode(o, t){ resolve(o, 'miss', t); osc(master, 'sine', 60, t, .6, .6, {glide: 30}); noise(master, t, .6, .5, 'lowpass', 2000); judges.push({txt: 'BOUM', x: W/2, y: H*.28, t: 0, big: true}); }
   function split(o, dir){
     const l = Math.hypot(dir.x, dir.y) || 1, d = {x: dir.x/l, y: dir.y/l}, n = {x: -d.y, y: d.x}, x = xOf(o.beat);
     for(const s of [1, -1]) bits.push({half: true, o: {...o}, s, d, x, y: objY(o), vx: n.x*s*160 - 60, vy: n.y*s*160 - 260, rot: 0, vr: s*(5 + Math.random()*5), life: 1.4});
@@ -1083,7 +1082,7 @@ G.trancheroute = { mount(stage, api){
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; }
 
-  window.__k7 = {get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, get bpb(){ return bpb; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, tracks: TRACKS, cv};
   showMenu();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};
