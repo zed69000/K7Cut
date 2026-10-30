@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.7.0
+- Tutos en jeu : arrêt sur image quand l'obstacle arrive, projecteur, doigt animé qui montre le geste, on le fait sur le vrai écran et la partie repart
+- Menu street art : mur en béton, affiches collées, coulures de bombe, tags, titre graffiti qui dégouline, cassettes en stickers, difficulté sur du scotch
+
 ## 0.6.0
 - Menu cartoon animé : cassettes voisines visibles, glissé qui suit le doigt avec élan et ressort, bobines qui tournent, titre qui danse, notes qui s'envolent, cadenas sur les faces fermées
 - Difficulté choisie avec deux flèches, bulle d'info, gros bouton JOUER qui pulse

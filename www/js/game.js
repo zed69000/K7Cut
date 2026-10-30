@@ -48,7 +48,7 @@ const TRACKS = [
     sections: plan([['gtr','perc'], ['kick','snare','hat','bass','gtr'], ['kick','snare','hat','bass','gtr','perc'], ['gtr','chords'], ['kick','snare','hat','bass','gtr','perc','lead'], ALL, ['gtr','chords']], {all: 'CJSH', verseActs: 'CJ'}) }
 ];
 
-const VERSION = '0.6.0';
+const VERSION = '0.7.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Fenêtres larges, 5 vies', mult: 1, win: 1.3, dens: .7, hearts: 5},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1, dens: 1, hearts: 3},
@@ -59,7 +59,7 @@ const TITLES = [[0, 'Apprenti'], [60, 'Musicien'], [180, 'Virtuose'], [400, 'Ma�
 function rngFrom(str){ let h = 2166136261; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } let s = h >>> 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
 
 G.trancheroute = { mount(stage, api){
-  if(!document.getElementById('font-rubikmono')){ const l = document.createElement('link'); l.id = 'font-rubikmono'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap'; document.head.appendChild(l); }
+  if(!document.getElementById('font-rubikmono')){ const l = document.createElement('link'); l.id = 'font-rubikmono'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Permanent+Marker&family=Sedgwick+Ave+Display&display=swap'; document.head.appendChild(l); }
   const {cv, ctx, W, H, pt} = api.canvas();
   let muted = api.store.load('muted', false);
   const TAPEY = Math.round(H*.48), TT = 30, Y0 = TAPEY - TT/2, HXs = Math.round(W*.26);
@@ -362,7 +362,7 @@ G.trancheroute = { mount(stage, api){
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
-    trance = 0; rings = []; celeb = null; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
+    trance = 0; rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
     lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
     state = 'play';
@@ -422,6 +422,7 @@ G.trancheroute = { mount(stage, api){
     return best;
   }
   api.on(cv, 'pointerdown', e => {
+    if(state === 'tuto'){ tutoDown(e); return; }
     if(state !== 'play') return;
     const p = pt(e), t = now(); try{ cv.setPointerCapture(e.pointerId); }catch(err){}
     const o = pickAt(t);
@@ -431,6 +432,7 @@ G.trancheroute = { mount(stage, api){
     gestures.set(e.pointerId, {t, x: p.x, y: p.y, done: false});
   });
   api.on(cv, 'pointermove', e => {
+    if(state === 'tuto'){ tutoMove(e); return; }
     const p = pt(e), t = now();
     if(scratchState && scratchState.id === e.pointerId){ const s = scratchState, dy = p.y - s.last.y, dx = p.x - s.last.x, v = Math.abs(dy) > Math.abs(dx) ? dy : dx; s.last = p;
       const d = Math.sign(v); if(d && d !== s.dir){ if(s.acc > 10 || s.dir === 0){ if(t < s.o.endTime + .1){ s.o.strokes++; I.wik(t, d < 0); bump = Math.max(bump, .25); energy.lead = 1; confetti(HXs + 10, Y0 - 10, [PAPER, INK], 3, .5); } } s.dir = d; s.acc = 0; } s.acc += Math.abs(v); return; }
@@ -439,6 +441,7 @@ G.trancheroute = { mount(stage, api){
     if(d > 12){ g.done = true; cut(g.t, {x: dx, y: dy}); slash = {dx: dx/d, dy: dy/d, t: 0}; }
   });
   const up = e => {
+    if(state === 'tuto'){ tutoUp(e); return; }
     const t = now(), id = e.pointerId;
     const g = gestures.get(id);
     if(g && !g.done && e.type === 'pointerup'){ const p = pt(e), dx = p.x - g.x, dy = p.y - g.y, d = Math.hypot(dx, dy);
@@ -520,7 +523,7 @@ G.trancheroute = { mount(stage, api){
     if(state === 'play'){
       const t = now();
       beatNow = t/bpb;
-      if(!tutoOpen){ const tk = nextTuto(); if(tk){ openTuto(tk); draw(rt); return; } }
+      if(!tutoOpen){ const to = nextTutoObj(); if(to){ startTuto(to); draw(rt); return; } }
       while(nextStep/4*bpb < clock() + .15 && nextStep < totalBars*16){ scheduleStep(nextStep); nextStep++; }
       while(spawned*4 < beatNow + 10 && spawned < totalBars){ spawnBar(spawned); spawned++; }
       const air = jumpT < .42 && jumpT > .04;
@@ -607,60 +610,78 @@ G.trancheroute = { mount(stage, api){
   }
   let backdrop = null, backdropFor = null;
 
-  /* ---------- tutos interactifs : pause, démonstration, entraînement ---------- */
+  /* ---------- tutos en jeu : arrêt sur image, doigt animé, on fait le geste sur le vrai écran ---------- */
   const TUTO = {
-    C: {title: 'COUPER', need: 3, unit: 'coupes', text: 'Quand un bloc blanc arrive sur la tête rouge, glisse le doigt d\'un coup sec, n\'importe où sur l\'écran.', anim: 'k7swipe 1.1s ease-in-out infinite'},
-    J: {title: 'SAUTER', need: 3, unit: 'sauts', text: 'Pics noirs et bombes rouges : tape l\'écran sans glisser au moment où ils passent la tête rouge. Ne coupe jamais une bombe.', anim: 'k7tap .9s ease-in-out infinite'},
-    H: {title: 'MAINTENIR', need: 2, unit: 'notes tenues', text: 'Un ruban rouge sur la bande : pose le doigt au début du ruban et garde-le appuyé jusqu\'au bout. Le synthé chante tant que tu tiens.', anim: 'k7hold 1.6s ease-in-out infinite'},
-    S: {title: 'SCRATCHER', need: 8, unit: 'allers-retours', text: 'Une zone en zigzag : pose le doigt et fais des allers-retours rapides de haut en bas, comme un DJ qui gratte un vinyle. Chaque aller-retour fait « wik ». Remplis le compteur avant la fin du zigzag.', anim: 'k7scr .32s ease-in-out infinite'}
+    C: {verb: 'GLISSE !', hint: 'un coup sec, n\'importe où', need: 1},
+    J: {verb: 'TAPE !', hint: 'sans glisser, pour sauter', need: 1},
+    H: {verb: 'POSE ET TIENS !', hint: 'garde le doigt jusqu\'au bout du ruban', need: 1},
+    S: {verb: 'GRATTE !', hint: 'allers-retours rapides de haut en bas', need: 4}
   };
-  if(!document.getElementById('k7-tuto-css')){ const st = document.createElement('style'); st.id = 'k7-tuto-css'; st.textContent = `
-    @keyframes k7swipe{0%{transform:translate(-50px,-34px);opacity:0}15%{opacity:1}70%{transform:translate(50px,34px);opacity:1}100%{transform:translate(50px,34px);opacity:0}}
-    @keyframes k7tap{0%,100%{transform:scale(1)}40%{transform:scale(.55)}}
-    @keyframes k7hold{0%{transform:scale(1)}15%,85%{transform:scale(.6)}100%{transform:scale(1)}}
-    @keyframes k7scr{0%,100%{transform:translateY(-34px)}50%{transform:translateY(34px)}}
-    @keyframes k7in{from{transform:translateY(30px) scale(.9);opacity:0}}
-    @media (prefers-reduced-motion:reduce){.k7demo{animation-duration:3s!important}}`; document.head.appendChild(st); }
-  let tutoOpen = false, pauseRaw = 0;
+  let tutoOpen = false, pauseRaw = 0, tutoObj = null, tutoT = 0, tutoCount = 0, tutoTouch = null, holdHint = 0;
   const rawNow = () => useAudio ? actx.currentTime : performance.now()/1000;
-  function openTuto(k){
-    const d = TUTO[k]; tutoOpen = true; state = 'tuto'; pauseRaw = rawNow();
-    if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .03); }
-    gestures.clear();
-    const o = document.createElement('div'); o.id = 'k7tutoov';
-    o.style.cssText = `position:absolute;inset:0;z-index:8;background:rgba(28,27,25,.55);display:flex;align-items:center;justify-content:center;padding:16px`;
-    o.innerHTML = `<div style="width:100%;max-width:360px;background:${PAPERBG};border-radius:10px;box-shadow:0 14px 30px rgba(0,0,0,.4);overflow:hidden;animation:k7in .35s cubic-bezier(.2,1.3,.4,1);font-family:'Chakra Petch',sans-serif;color:${INK}">
-      <div style="background:${INK};color:${PAPER};padding:12px 16px;display:flex;justify-content:space-between;align-items:baseline"><b style="font-family:${FONT};font-size:20px">${d.title}</b><span style="font-size:12px;opacity:.7">nouveau geste</span></div>
-      <div style="height:6px;background:${LABELRED}"></div>
-      <p style="margin:0;padding:12px 16px 6px;font-size:14.5px;line-height:1.45">${d.text}</p>
-      <div id="k7pad" style="margin:8px 16px;height:170px;border:2px dashed ${INK};border-radius:8px;position:relative;touch-action:none;display:grid;place-items:center;background:rgba(255,255,255,.35)">
-        <div class="k7demo" style="width:34px;height:34px;border-radius:50%;background:${LABELRED};box-shadow:0 0 0 6px rgba(184,58,52,.25);animation:${d.anim};pointer-events:none"></div>
-        <div id="k7bar" style="position:absolute;left:10px;right:10px;bottom:10px;height:8px;border-radius:4px;background:rgba(28,27,25,.15);overflow:hidden"><div id="k7fill" style="height:100%;width:0;background:${LABELRED};transition:width .15s"></div></div>
-        <span style="position:absolute;top:8px;left:0;right:0;text-align:center;font-size:12px;opacity:.7">Entraîne-toi ici</span></div>
-      <div style="padding:4px 16px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span id="k7cnt" style="font-family:${FONT};font-size:14px">0 / ${d.need} ${d.unit}</span>
-        <button id="k7go" style="border:none;border-radius:4px;background:${INK};color:${PAPER};font-family:${FONT};font-size:12px;padding:11px 14px;cursor:pointer;opacity:.35" disabled>C'EST PARTI</button></div></div>`;
-    stage.appendChild(o);
-    const pad = o.querySelector('#k7pad'), fill = o.querySelector('#k7fill'), cnt = o.querySelector('#k7cnt'), go = o.querySelector('#k7go');
-    let n = 0, down = null, holdTimer = null;
-    const bumpCount = () => { n = Math.min(d.need, n + 1); fill.style.width = (n/d.need*100) + '%'; cnt.textContent = `${n} / ${d.need} ${d.unit}`; api.vibe(15);
-      if(n >= d.need){ go.disabled = false; go.style.opacity = '1'; go.style.background = LABELRED; cnt.textContent = 'Bravo !'; api.sfx.coin(); } };
-    pad.onpointerdown = e => { try{ pad.setPointerCapture(e.pointerId); }catch(err){} down = {x: e.clientX, y: e.clientY, t: performance.now(), dir: 0, acc: 0, ly: e.clientY};
-      if(k === 'H'){ const start = performance.now(); holdTimer = setInterval(() => { const p = Math.min(1, (performance.now() - start)/900); fill.style.width = Math.max(n/d.need, (n + p)/d.need)*100 + '%'; if(p >= 1){ clearInterval(holdTimer); holdTimer = null; bumpCount(); I.bell(now(), 880, .1); } }, 50); } };
-    pad.onpointermove = e => { if(!down || k !== 'S') return; const v = e.clientY - down.ly; down.ly = e.clientY; const s = Math.sign(v);
-      if(s && s !== down.dir){ if(down.acc > 14 || down.dir === 0){ bumpCount(); I.wik(clock(), s < 0); } down.dir = s; down.acc = 0; } down.acc += Math.abs(v); };
-    pad.onpointerup = pad.onpointercancel = e => { if(!down) return; const dist = Math.hypot(e.clientX - down.x, e.clientY - down.y), dur = performance.now() - down.t;
-      if(k === 'C' && dist > 40){ bumpCount(); noise(master, clock(), .06, .25, 'highpass', 5000); }
-      if(k === 'J' && dist < 14 && dur < 400){ bumpCount(); I.boing(master, clock(), 220, .14); }
-      if(holdTimer){ clearInterval(holdTimer); holdTimer = null; fill.style.width = (n/d.need*100) + '%'; }
-      down = null; };
-    go.onclick = () => {
-      api.save('tuto.' + k, true); o.remove();
-      t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play';
-      if(useAudio && music) music.gain.setTargetAtTime(.9, actx.currentTime, .05);
-      judges.push({txt: 'À TOI !', x: W/2, y: H*.3, t: 0, big: true});
-    };
+  function startTuto(o){
+    tutoOpen = true; tutoObj = o; tutoT = 0; tutoCount = 0; tutoTouch = null; state = 'tuto'; pauseRaw = rawNow();
+    if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(.12, actx.currentTime, .05); }
+    gestures.clear(); api.vibe(30);
   }
-  const nextTuto = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db > .4 && db < 2.4 && !api.load('tuto.' + o.k, false)) return o.k; } return null; };
+  function resumeTuto(){
+    api.save('tuto.' + tutoObj.k, true);
+    t0 += rawNow() - pauseRaw; tutoOpen = false; state = 'play';
+    if(useAudio && music) music.gain.setTargetAtTime(.9, actx.currentTime, .04);
+  }
+  function tutoDown(e){
+    const p = pt(e), o = tutoObj; try{ cv.setPointerCapture(e.pointerId); }catch(err){}
+    tutoTouch = {id: e.pointerId, x: p.x, y: p.y, ly: p.y, dir: 0, acc: 0};
+    if(o.k === 'H'){ resumeTuto(); const t = now(); o.holding = true; o.startGrade = 'perfect'; o.dt = 0; holdState = {o, id: e.pointerId, voice: holdVoice(o)}; holdHint = 1; tutoTouch = null; }
+  }
+  function tutoMove(e){
+    if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj;
+    if(o.k === 'C' && Math.hypot(p.x - tutoTouch.x, p.y - tutoTouch.y) > 14){ const dir = {x: p.x - tutoTouch.x, y: p.y - tutoTouch.y}; tutoTouch = null; resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), dir); slash = {dx: dir.x/Math.hypot(dir.x, dir.y), dy: dir.y/Math.hypot(dir.x, dir.y), t: 0}; }
+    if(o.k === 'S'){ const v = p.y - tutoTouch.ly; tutoTouch.ly = p.y; const s = Math.sign(v);
+      if(s && s !== tutoTouch.dir){ if(tutoTouch.acc > 12 || tutoTouch.dir === 0){ tutoCount++; I.wik(clock(), s < 0); api.vibe(10); confetti(HXs + 10, Y0 - 10, [PAPER, INK], 4, .5);
+          if(tutoCount >= TUTO.S.need){ const id = tutoTouch.id; tutoTouch = null; resumeTuto(); o.strokes = tutoCount; scratchState = {o, id, last: p, dir: s, acc: 0}; } }
+        if(tutoTouch){ tutoTouch.dir = s; tutoTouch.acc = 0; } }
+      if(tutoTouch) tutoTouch.acc += Math.abs(v); }
+  }
+  function tutoUp(e){
+    if(!tutoTouch || e.pointerId !== tutoTouch.id) return; const p = pt(e), o = tutoObj, st = tutoTouch, d = Math.hypot(p.x - st.x, p.y - st.y); tutoTouch = null;
+    if(o.k === 'J' && d < 14){ resumeTuto(); jumpT = 0; o.dt = 0; resolve(o, 'perfect', now()); }
+    if(o.k === 'C' && d > 8){ resumeTuto(); o.dt = 0; resolve(o, 'perfect', now(), {x: p.x - st.x, y: p.y - st.y}); }
+  }
+  const nextTutoObj = () => { for(const o of objs){ if(o.done || !'CJHS'.includes(o.k)) continue; const db = o.beat - beatNow; if(db <= .02 && db > -.15 && !api.load('tuto.' + o.k, false)) return o; } return null; };
+  // un doigt cartoon
+  function finger(x, y, press, a){
+    ctx.save(); ctx.translate(x, y); ctx.rotate(a || -.35); ctx.scale(1 - press*.08, 1 - press*.08);
+    ctx.fillStyle = PAPER; ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(-9, 0); ctx.quadraticCurveTo(-9, -8, 0, -8); ctx.quadraticCurveTo(9, -8, 9, 0); ctx.lineTo(9, 34); ctx.quadraticCurveTo(26, 30, 30, 42); ctx.quadraticCurveTo(34, 70, 14, 82); ctx.lineTo(-14, 82); ctx.quadraticCurveTo(-30, 66, -26, 46); ctx.quadraticCurveTo(-24, 36, -9, 38); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-5, -2); ctx.quadraticCurveTo(0, -6, 5, -2); ctx.stroke();
+    ctx.lineWidth = 2; for(const yy of [46, 56, 66]){ ctx.beginPath(); ctx.moveTo(-22, yy); ctx.lineTo(-6, yy - 2); ctx.stroke(); }
+    ctx.restore();
+    if(press > .5){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 3; ctx.globalAlpha = press - .5; ctx.beginPath(); ctx.arc(x, y, 14 + (1 - press)*30, 0, 6.283); ctx.stroke(); ctx.globalAlpha = 1; }
+  }
+  function drawTuto(rt){
+    const o = tutoObj; if(!o) return; tutoT += 1/60;
+    const ox = xOf(o.beat), oy = objY(o), d = TUTO[o.k];
+    // projecteur : tout s'assombrit sauf l'obstacle et la tête de lecture
+    ctx.save(); ctx.fillStyle = 'rgba(28,27,25,.6)'; ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283, true); ctx.fill('evenodd'); ctx.restore();
+    ctx.strokeStyle = PAPER; ctx.lineWidth = 3; ctx.setLineDash([8, 7]); ctx.lineDashOffset = -rt*30; ctx.beginPath(); ctx.arc(ox, oy, 62 + Math.sin(rt*6)*4, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
+    // le doigt fait le geste
+    const cx = W*.62, cy = H*.34; let fx = cx, fy = cy, pr = 0, trail = null;
+    if(o.k === 'C'){ const k = (tutoT % 1.1)/1.1, m = Math.min(1, k/.6); fx = cx - 60 + m*120; fy = cy - 50 + m*100; pr = k < .65 ? 1 : 0; trail = m; }
+    if(o.k === 'J'){ const k = (tutoT % .9)/.9; pr = k > .3 && k < .55 ? 1 : 0; fy = cy - (pr ? 0 : 10); }
+    if(o.k === 'H'){ const k = (tutoT % 1.6)/1.6; pr = k > .15 && k < .85 ? 1 : 0; fy = cy - (pr ? 0 : 12);
+      if(pr){ ctx.strokeStyle = LABELRED; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(cx, cy, 26, -Math.PI/2, -Math.PI/2 + (k - .15)/.7*6.283); ctx.stroke(); } }
+    if(o.k === 'S'){ fy = cy + Math.sin(tutoT*18)*40; pr = 1; }
+    if(trail != null){ ctx.strokeStyle = 'rgba(244,240,230,.85)'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(cx - 60, cy - 50); ctx.lineTo(fx, fy); ctx.stroke(); }
+    finger(fx, fy, pr);
+    // la consigne, style pochoir
+    ctx.save(); ctx.translate(W/2, H*.12); ctx.rotate(-.05); ctx.scale(1 + Math.sin(rt*8)*.03, 1 + Math.sin(rt*8)*.03);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `${Math.min(34, W*.085)}px ${FONT}`;
+    ctx.lineWidth = 10; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 3, 4); ctx.fillStyle = LABELRED; ctx.fillText(d.verb, 3, 4); ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText(d.verb, 0, 0); ctx.fillStyle = PAPER; ctx.fillText(d.verb, 0, 0);
+    ctx.font = '700 15px "Chakra Petch", sans-serif'; ctx.fillStyle = PAPER; ctx.fillText(d.hint, 0, 36);
+    if(o.k === 'S') { ctx.font = `16px ${FONT}`; ctx.fillText(`${tutoCount} / ${d.need}`, 0, 62); }
+    ctx.restore();
+  }
 
   /* ---------- célébrations : mots et illustrations à l'encre en fond, pendant que la partie continue ---------- */
   const WORDS = [[], ['BIEN JOUÉ', 'ÇA GROOVE', 'QUEL RYTHME'], ['EN FEU !', 'TU TIENS LA TRANSE', 'ÇA CHAUFFE'], ['HYPNOTIQUE', 'IMPARABLE', 'TU VOLES'], ['ROI DU RYTHME', 'LÉGENDAIRE', 'NIRVANA']];
@@ -849,6 +870,8 @@ G.trancheroute = { mount(stage, api){
       if(j.sub){ ctx.font = '600 13px "Chakra Petch", sans-serif'; ctx.fillStyle = INK; ctx.fillText(j.sub, 0, 22); }
       ctx.restore();
     }
+    if(state === 'tuto') drawTuto(rt);
+    if(holdHint && holdState){ ctx.textAlign = 'center'; ctx.font = `16px ${FONT}`; ctx.lineWidth = 6; ctx.strokeStyle = INK; ctx.strokeText('GARDE APPUYÉ…', W/2, H*.14); ctx.fillStyle = PAPER; ctx.fillText('GARDE APPUYÉ…', W/2, H*.14); } else holdHint = 0;
   }
 
   const stopBtn = document.createElement('button');
@@ -857,20 +880,76 @@ G.trancheroute = { mount(stage, api){
   stage.appendChild(stopBtn);
   stopBtn.onclick = () => { if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; } if(useAudio && music) music.gain.setValueAtTime(0, actx.currentTime); if(state === 'play' && notesRun){ api.save('notes', bank() + notesRun); notesRun = 0; } state = 'menu'; showMenu(); };
   /* ---------- menu des cassettes ---------- */
+  /* ---------- mur street art pour le menu ---------- */
+  const SPRAY = ['#ff3d7f', '#ffd23f', '#29c4ff', '#7cf05a', '#ff8a2a', '#b06bff'];
+  function splat(g, r, x, y, rad, col, drips){
+    const al = col.length > 7 ? parseInt(col.slice(7), 16)/255 : 1; col = col.slice(0, 7); g.save(); g.globalAlpha = al;
+    const gr = g.createRadialGradient(x, y, rad*.1, x, y, rad); gr.addColorStop(0, col); gr.addColorStop(.55, col); gr.addColorStop(1, col + '00');
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, 6.283); g.fill();
+    g.fillStyle = col; for(let i=0;i<120;i++){ const a = r()*6.283, d = rad*(.7 + r()*.9); g.globalAlpha = (.3 + r()*.6)*al; g.beginPath(); g.arc(x + Math.cos(a)*d, y + Math.sin(a)*d, r()*1.6, 0, 6.283); g.fill(); } g.globalAlpha = al;
+    for(let i=0;i<(drips || 0);i++){ const dx = x + (r() - .5)*rad*1.1, top = y + rad*.4, len = 20 + r()*rad*2.2, w = 2 + r()*3; g.fillStyle = col; g.fillRect(dx - w/2, top, w, len); g.beginPath(); g.arc(dx, top + len, w*.9, 0, 6.283); g.fill(); }
+    g.restore();
+  }
+  function tag(g, r, x, y, s, col){
+    g.save(); g.translate(x, y); g.rotate((r() - .5)*.4); g.strokeStyle = col; g.lineWidth = 3.5*s; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); let px = 0, py = 0; g.moveTo(0, 0);
+    for(let i=0;i<9;i++){ const nx = px + (12 + r()*16)*s, ny = (r() - .5)*30*s; g.bezierCurveTo(px + 6*s, py - 26*s*r(), nx - 8*s, ny + 26*s*r(), nx, ny); px = nx; py = ny; } g.stroke();
+    g.beginPath(); g.moveTo(-6*s, 18*s); g.quadraticCurveTo(px/2, 30*s, px + 10*s, 12*s); g.stroke();
+    g.fillStyle = col; g.beginPath(); g.moveTo(px + 6*s, -24*s); g.lineTo(px + 10*s, -36*s); g.lineTo(px + 15*s, -26*s); g.lineTo(px + 21*s, -38*s); g.lineTo(px + 24*s, -24*s); g.closePath(); g.fill();
+    g.restore();
+  }
+  function poster(g, r, x, y, w, h, col){
+    g.save(); g.translate(x, y); g.rotate((r() - .5)*.12);
+    g.fillStyle = '#efe6d0'; g.beginPath(); g.moveTo(0, 0); for(let i=0;i<=10;i++) g.lineTo(w*i/10, (r() - .5)*6); for(let i=0;i<=8;i++) g.lineTo(w + (r() - .5)*6, h*i/8); for(let i=10;i>=0;i--) g.lineTo(w*i/10, h + (r() - .5)*8); for(let i=8;i>=0;i--) g.lineTo((r() - .5)*6, h*i/8); g.closePath(); g.fill();
+    g.save(); g.clip(); g.fillStyle = col; for(let yy=8; yy<h*.62; yy+=7) for(let xx=8; xx<w - 4; xx+=7){ const rr = 2.6*(1 - yy/(h*.7))*(.6 + .4*Math.sin(xx*.05)); if(rr > .3){ g.beginPath(); g.arc(xx, yy, rr, 0, 6.283); g.fill(); } }
+      g.fillStyle = INK; g.fillRect(8, h*.7, w*.75, h*.08); g.fillRect(8, h*.82, w*.5, h*.05); g.restore();
+    g.fillStyle = 'rgba(232,217,168,.85)'; g.fillRect(-8, -6, 30, 12); g.fillRect(w - 22, -6, 30, 12);
+    g.restore();
+  }
+  function makeWall(w, h){
+    const c = document.createElement('canvas'), sc = 2; c.width = w*sc; c.height = h*sc; const g = c.getContext('2d'); g.scale(sc, sc); const r = rngFrom('mur');
+    g.fillStyle = '#bdb6aa'; g.fillRect(0, 0, w, h);
+    for(let i=0;i<10;i++){ const x = r()*w, y = r()*h, rad = 40 + r()*140, gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(${r() < .5 ? '90,80,60' : '255,255,255'},.18)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
+    grain(g, w, h, w*h/14, true); grain(g, w, h, w*h/30, false);
+    g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 2; for(const y of [h*.31, h*.64]){ g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } g.strokeStyle = 'rgba(40,30,20,.25)'; g.lineWidth = 1; for(const y of [h*.31 + 2, h*.64 + 2]){ g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    poster(g, r, w*.62, h*.06, w*.34, h*.22, SPRAY[0]); poster(g, r, -10, h*.52, w*.36, h*.24, SPRAY[2]); poster(g, r, w*.7, h*.66, w*.34, h*.2, SPRAY[1]);
+    splat(g, r, w*.18, h*.2, 70, SPRAY[1] + 'cc', 5); splat(g, r, w*.85, h*.42, 60, SPRAY[0] + 'cc', 4); splat(g, r, w*.3, h*.86, 80, SPRAY[2] + 'aa', 3); splat(g, r, w*.75, h*.95, 50, SPRAY[3] + 'aa', 2);
+    tag(g, r, w*.05, h*.4, 1, INK); tag(g, r, w*.55, h*.55, .8, PAPER); tag(g, r, w*.08, h*.97, .9, SPRAY[5]); tag(g, r, w*.58, h*.3, .7, INK);
+    g.globalAlpha = .12; g.fillStyle = INK; g.font = `${w*.5}px ${FONT}`; g.textAlign = 'center'; g.fillText('K7', w*.5, h*.78); g.globalAlpha = 1;
+    scratches(g, r, w, h, 30);
+    const vg = g.createRadialGradient(w/2, h/2, Math.min(w, h)*.3, w/2, h/2, Math.max(w, h)*.75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(20,15,10,.35)'); g.fillStyle = vg; g.fillRect(0, 0, w, h);
+    return c;
+  }
+  const GRAF = '"Sedgwick Ave Display", "Permanent Marker", ' + FONT, MARKER = '"Permanent Marker", "Chakra Petch", sans-serif';
+  function graffiti(g, txt, x, y, size, t, k){
+    g.save(); g.font = `${size}px ${GRAF}`; g.textBaseline = 'alphabetic'; let cx = x; const ws = [...txt].map(ch => g.measureText(ch).width + size*.02);
+    [...txt].forEach((ch, i) => {
+      const w = ws[i], jy = Math.sin(t*4 - i*.8)*3 - (i % 2 ? k*3 : 0), rot = Math.sin(t*2.4 + i*1.3)*.07 - .06;
+      g.save(); g.translate(cx + w/2, y + jy); g.rotate(rot);
+      for(let e=7;e>0;e--){ g.fillStyle = INK; g.fillText(ch, -w/2 + e, e); }
+      g.lineJoin = 'round'; g.lineWidth = size*.16; g.strokeStyle = INK; g.strokeText(ch, -w/2, 0);
+      const gr = g.createLinearGradient(0, -size*.8, 0, 0); const pair = i < 2 ? ['#ff3d7f', '#ffd23f'] : ['#29c4ff', '#7cf05a']; gr.addColorStop(0, pair[0]); gr.addColorStop(1, pair[1]); g.fillStyle = gr; g.fillText(ch, -w/2, 0);
+      g.lineWidth = 2; g.strokeStyle = 'rgba(255,255,255,.85)'; g.strokeText(ch, -w/2 - 1.5, -1.5);
+      if(ch !== ' '){ const dl = (t*14 + i*23) % 60; g.fillStyle = pair[1]; g.strokeStyle = INK; g.lineWidth = 2; const dx = -w*.1 + (i % 3)*w*.2; g.beginPath(); g.roundRect ? g.roundRect(dx - 3, -4, 6, 8 + dl*.6, 3) : g.rect(dx - 3, -4, 6, 8 + dl*.6); g.fill(); g.stroke(); }
+      g.restore(); cx += w;
+    });
+    for(let i=0;i<3;i++){ const ph = (t*1.3 + i*.37) % 1, sx = x + (cx - x)*(.15 + i*.35), sy = y - size*.85 + i*8, s = Math.sin(ph*Math.PI)*9; g.fillStyle = PAPER; g.beginPath(); g.moveTo(sx, sy - s); g.lineTo(sx + s*.25, sy - s*.25); g.lineTo(sx + s, sy); g.lineTo(sx + s*.25, sy + s*.25); g.lineTo(sx, sy + s); g.lineTo(sx - s*.25, sy + s*.25); g.lineTo(sx - s, sy); g.lineTo(sx - s*.25, sy - s*.25); g.closePath(); g.fill(); }
+    g.restore(); return cx - x;
+  }
+
   /* ---------- menu cartoon : scène animée, cassettes qui suivent le doigt ---------- */
   if(!document.getElementById('k7-menu-css')){ const st = document.createElement('style'); st.id = 'k7-menu-css'; st.textContent = `
     .k7m{position:absolute;inset:0;z-index:4;overflow:hidden;font-family:"Chakra Petch",sans-serif;color:${INK};touch-action:none;user-select:none;-webkit-user-select:none}
     .k7m canvas{position:absolute;inset:0;width:100%;height:100%}
     .k7m .ui{position:absolute;left:0;right:0;display:flex;padding:0 16px;pointer-events:none}
     .k7m .ui > *{pointer-events:auto}
-    .k7btn{border:3px solid ${INK};border-radius:16px;background:${PAPER};color:${INK};font-family:${FONT};cursor:pointer;box-shadow:0 5px 0 ${INK};transition:transform .12s cubic-bezier(.3,1.6,.5,1),box-shadow .12s}
+    .k7btn{border:3px solid ${INK};border-radius:14px;background:${PAPER};color:${INK};font-family:${MARKER};cursor:pointer;box-shadow:0 5px 0 ${INK},0 0 0 5px #fff;transition:transform .12s cubic-bezier(.3,1.6,.5,1),box-shadow .12s}
     .k7btn:active{transform:translateY(4px) scale(.97);box-shadow:0 1px 0 ${INK}}
     .k7btn:focus-visible{outline:3px solid ${LABELRED};outline-offset:3px}
-    .k7play{background:${LABELRED};color:${PAPER};font-size:22px;padding:14px 34px;border-radius:999px;animation:k7pulse 1.15s ease-in-out infinite}
+    .k7play{background:#ff3d7f;color:#fff;font-size:28px;padding:10px 34px;border-radius:999px;animation:k7pulse 1.15s ease-in-out infinite;text-shadow:2px 2px 0 ${INK},-1px -1px 0 ${INK},1px -1px 0 ${INK},-1px 1px 0 ${INK}}
     @keyframes k7pulse{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.06) rotate(1deg)}}
-    .k7bubble{position:relative;background:${PAPER};border:3px solid ${INK};border-radius:18px;padding:10px 14px;box-shadow:0 5px 0 ${INK};text-align:center;max-width:340px;margin:0 auto}
-    .k7bubble:before{content:"";position:absolute;top:-14px;left:50%;margin-left:-12px;border:12px solid transparent;border-bottom-color:${INK};border-top:0}
-    .k7bubble:after{content:"";position:absolute;top:-9px;left:50%;margin-left:-9px;border:9px solid transparent;border-bottom-color:${PAPER};border-top:0}
+    .k7bubble{position:relative;background:#efe6d0;padding:12px 16px 14px;box-shadow:0 8px 14px rgba(20,15,10,.35);text-align:center;max-width:330px;margin:0 auto;transform:rotate(-1.5deg);clip-path:polygon(0 3%,8% 0,20% 2%,34% 0,50% 3%,66% 0,80% 2%,93% 0,100% 4%,99% 30%,100% 60%,98% 96%,86% 100%,70% 97%,52% 100%,35% 97%,18% 100%,4% 97%,1% 70%,0 40%)}
+    .k7bubble b{font-family:${MARKER};font-weight:400}
+    .k7tape{display:inline-block;background:rgba(232,217,168,.95);padding:6px 18px;transform:rotate(-2deg);clip-path:polygon(0 8%,4% 0,8% 10%,12% 0,100% 0,97% 12%,100% 25%,96% 40%,100% 55%,97% 70%,100% 85%,96% 100%,0 100%,3% 85%,0 70%,4% 55%,0 40%,3% 25%);box-shadow:0 3px 6px rgba(0,0,0,.2)}
     .k7pop{animation:k7popin .45s cubic-bezier(.2,1.6,.4,1)}
     @keyframes k7popin{from{transform:scale(.7) rotate(-3deg);opacity:0}}
     .k7sheet{position:absolute;inset:0;z-index:6;background:rgba(28,27,25,.45);display:flex;align-items:flex-end;justify-content:center}
@@ -884,13 +963,13 @@ G.trancheroute = { mount(stage, api){
   let cur = Math.min(TRACKS.length - 1, api.load('cur', 0)), dIdx = api.load('diff', 1);
   let mPos = cur, mVel = 0, mTarget = cur, drag = null, squash = 0, mFloat = [], mTime = 0, mOpen = false;
   for(let i=0;i<14;i++) mFloat.push({x: Math.random()*W, y: Math.random()*H, s: .6 + Math.random()*.9, v: 14 + Math.random()*22, ph: Math.random()*6});
-  const menuBg = makeBackdrop(null, Math.round(W) + 40, Math.round(H) + 40, 'menu');
+  const menuBg = makeWall(Math.round(W) + 40, Math.round(H) + 40);
   const wrapI = i => ((i % TRACKS.length) + TRACKS.length) % TRACKS.length;
   function cassImg(t){ const open = unlocked(t) || bank() >= t.cost, key = t.id + (open ? 1 : 0); if(!imgCache[key]){ const im = new Image(); im.src = makeCassette(t, open); imgCache[key] = im; } return imgCache[key]; }
   const ui = {};
   menu.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:flex-end;gap:10px;align-items:flex-start">
-      <div id="k7tal" class="k7btn" style="font-size:16px;padding:7px 12px;transform:rotate(3deg);cursor:default;background:${INK};color:${PAPER};box-shadow:0 5px 0 ${LABELRED}"></div>
+      <div id="k7tal" class="k7btn" style="font-size:18px;padding:6px 12px;transform:rotate(4deg);cursor:default;background:#ffd23f;color:${INK}"></div>
       <button id="k7gear" class="k7btn" aria-label="Réglages" style="width:46px;height:42px;font-size:20px;padding:0">⚙</button></div>
     <div class="ui" style="bottom:20px;flex-direction:column;gap:14px;align-items:stretch">
       <div id="k7info" class="k7bubble"></div>
@@ -904,10 +983,10 @@ G.trancheroute = { mount(stage, api){
   function refreshUI(pop){
     const t = TRACKS[cur], open = unlocked(t), afford = !open && bank() >= t.cost, d = DIFFS[dIdx], bk = bests()[t.id + '.' + d.id];
     ui.k7tal.innerHTML = `♪ ${bank()}<div style="font-family:'Chakra Petch',sans-serif;font-size:11.5px;font-weight:700;opacity:.85">${titleOf(bank())}</div>`;
-    ui.k7info.innerHTML = `<div style="font-family:${FONT};font-size:19px">${t.name.toUpperCase()}</div><div style="font-size:13.5px">${t.label} · ${t.gestures}</div>
+    ui.k7info.innerHTML = `<div style="font-family:${MARKER};font-size:26px;line-height:1.1;color:${SPRAY[cur % SPRAY.length]};text-shadow:2px 2px 0 ${INK}">${t.name}</div><div style="font-size:13.5px">${t.label} · ${t.gestures}</div>
       <div style="font-size:13.5px;font-weight:700;margin-top:3px;color:${open ? INK : LABELRED}">${open ? (bk ? `${'★'.repeat(bk.stars)}${'☆'.repeat(3 - bk.stars)} record ${bk.score}` : 'Jamais jouée à ce niveau') : afford ? 'Tu as assez de talent pour l\'ouvrir !' : `Il te faut ${t.cost} ♪ de talent`}</div>`;
     if(pop){ ui.k7info.classList.remove('k7pop'); void ui.k7info.offsetWidth; ui.k7info.classList.add('k7pop'); }
-    ui.k7diffbox.innerHTML = `<div style="font-family:${FONT};font-size:16px;color:${dIdx >= 3 ? LABELRED : INK}">${d.name.toUpperCase()}</div><div style="font-size:12.5px;background:rgba(236,229,211,.85);border-radius:8px;padding:1px 6px">${d.note} · talent x${d.mult}</div>`;
+    ui.k7diffbox.innerHTML = `<div class="k7tape"><div style="font-family:${MARKER};font-size:22px;line-height:1;color:${dIdx >= 3 ? LABELRED : INK}">${d.name}</div><div style="font-size:12px;font-weight:700">${d.note} · talent x${d.mult}</div></div>`;
     ui.k7play.textContent = open ? 'JOUER ▶' : afford ? 'OUVRIR !' : `${t.cost} ♪`;
     ui.k7play.style.filter = open || afford ? '' : 'grayscale(1)';
   }
@@ -955,21 +1034,19 @@ G.trancheroute = { mount(stage, api){
     const g = mx; g.clearRect(0, 0, W, H);
     g.drawImage(menuBg, -20 + Math.sin(mTime*.3)*8, -20, W + 40, H + 40);
     const cx = W/2, cy = H*.42, beat = mTime*104/60, bt = beat - Math.floor(beat), kick = Math.max(0, 1 - bt*4);
-    // rayons cartoon qui tournent derrière la cassette
-    g.save(); g.translate(cx, cy); g.rotate(mTime*.25); g.fillStyle = 'rgba(255,255,255,.35)'; for(let i=0;i<12;i++){ g.rotate(6.283/12); if(i % 2){ g.beginPath(); g.moveTo(0, 0); g.lineTo(W, -60); g.lineTo(W, 60); g.closePath(); g.fill(); } } g.restore();
-    g.fillStyle = 'rgba(236,229,211,.9)'; g.beginPath(); g.arc(cx, cy, W*.36 + kick*6, 0, 6.283); g.fill(); g.strokeStyle = INK; g.lineWidth = 3; g.setLineDash([10, 9]); g.lineDashOffset = -mTime*20; g.stroke(); g.setLineDash([]);
+    // halo à la bombe de la couleur de la face, qui pulse
+    { const col = SPRAY[cur % SPRAY.length], R = W*.42 + kick*10; const gr = g.createRadialGradient(cx, cy, R*.2, cx, cy, R); gr.addColorStop(0, col + 'dd'); gr.addColorStop(.6, col + '88'); gr.addColorStop(1, col + '00'); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R, 0, 6.283); g.fill();
+      g.save(); g.translate(cx, cy); g.rotate(mTime*.2); g.fillStyle = INK; for(let i=0;i<8;i++){ g.rotate(6.283/8); g.save(); g.translate(R*.92, 0); g.rotate(mTime*2); g.beginPath(); for(let k2=0;k2<10;k2++){ const a2 = k2*Math.PI/5, rr = k2 % 2 ? 3 : 8; g.lineTo(Math.cos(a2)*rr, Math.sin(a2)*rr); } g.fill(); g.restore(); } g.restore(); }
     // notes qui s'envolent
     for(const n of mFloat){
       if(n.burst){ n.burst.vy += 900*dt; n.x += n.burst.vx*dt; n.y += n.burst.vy*dt; n.burst.life -= dt; }
       else { n.y -= n.v*dt; n.x += Math.sin(mTime*1.5 + n.ph)*12*dt; if(n.y < -30){ n.y = H + 20; n.x = Math.random()*W; } }
-      g.save(); g.translate(n.x, n.y); g.rotate(Math.sin(mTime*2 + n.ph)*.3); g.scale(n.s, n.s); g.globalAlpha = n.burst ? Math.max(0, n.burst.life) : .55; g.fillStyle = n.burst ? LABELRED : INK;
+      g.save(); g.translate(n.x, n.y); g.rotate(Math.sin(mTime*2 + n.ph)*.3); g.scale(n.s, n.s); g.globalAlpha = n.burst ? Math.max(0, n.burst.life) : .55; g.fillStyle = n.burst ? SPRAY[Math.floor(n.ph*10) % SPRAY.length] : (n.ph > 3 ? INK : SPRAY[Math.floor(n.ph*2) % SPRAY.length]);
       g.beginPath(); g.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); g.fill(); g.fillRect(1.5, -14, 3, 20); g.beginPath(); g.moveTo(4.5, -14); g.quadraticCurveTo(14, -10, 10, 0); g.quadraticCurveTo(11, -7, 4.5, -7); g.fill(); g.restore();
     }
     mFloat = mFloat.filter(n => !n.burst || n.burst.life > 0);
-    // titre qui danse
-    const title = 'K7 CUT'; g.font = `${Math.min(46, W*.12)}px ${FONT}`; g.textBaseline = 'middle'; let tx = 18;
-    for(let i=0;i<title.length;i++){ const ch = title[i], w = g.measureText(ch).width; const jy = Math.sin(mTime*5 - i*.7)*4 - (i % 2 ? kick*4 : 0);
-      g.save(); g.translate(tx + w/2, 40 + jy); g.rotate(Math.sin(mTime*3 + i)*.08); g.lineWidth = 7; g.strokeStyle = PAPER; g.strokeText(ch, -w/2, 0); g.fillStyle = i >= 3 ? LABELRED : INK; g.fillText(ch, -w/2, 0); g.restore(); tx += w; }
+    // titre en graffiti qui dégouline
+    graffiti(g, 'K7 CUT', 14, 70, Math.min(60, W*.16), mTime, kick);
     // les cassettes : voisines sur les côtés, celle du centre en grand, bobines qui tournent
     const base = Math.floor(mPos);
     for(const off of [-2, -1, 2, 1, 0].map(o => o + (mPos - base > .5 ? 1 : 0))){
@@ -979,15 +1056,17 @@ G.trancheroute = { mount(stage, api){
       const sq = ad < .5 ? squash : 0;
       g.save(); g.translate(x, y); g.rotate(d*.16 + Math.sin(mTime*1.7 + i)*.03); g.scale(sc*(1 + sq*.08), sc*(1 - sq*.08)); g.globalAlpha = Math.max(.25, 1 - ad*.45);
       g.fillStyle = 'rgba(40,20,0,.25)'; g.beginPath(); g.ellipse(0, 112, 130, 14, 0, 0, 6.283); g.fill();
+      g.save(); g.shadowColor = 'rgba(20,15,10,.4)'; g.shadowBlur = 14; g.shadowOffsetY = 8; g.fillStyle = '#fff'; g.beginPath(); g.roundRect ? g.roundRect(-168, -108, 336, 216, 22) : g.rect(-168, -108, 336, 216); g.fill(); g.restore();
       if(im.complete) g.drawImage(im, -160, -100, 320, 200);
+      g.fillStyle = '#e9e4da'; g.beginPath(); g.moveTo(168, 70); g.lineTo(168, 108 - 22); g.quadraticCurveTo(168, 108, 146, 108); g.lineTo(130, 108); g.closePath(); g.fill(); g.strokeStyle = 'rgba(0,0,0,.2)'; g.lineWidth = 2; g.stroke();
       if(open){ for(const rx of [-32, 32]){ g.save(); g.translate(rx, -2); g.rotate(mTime*(ad < .5 ? 4 : 1.2)); g.fillStyle = INK; for(let k=0;k<6;k++){ g.rotate(1.047); g.fillRect(-2.5, -13.5, 5, 5); } g.restore(); } }
       else { g.fillStyle = INK; g.beginPath(); g.arc(0, 12, 26, Math.PI, 0); g.lineWidth = 9; g.strokeStyle = INK; g.stroke(); g.fillStyle = LABELRED; g.strokeStyle = INK; g.lineWidth = 4; g.beginPath(); g.roundRect ? g.roundRect(-36, 10, 72, 54, 10) : g.rect(-36, 10, 72, 54); g.fill(); g.stroke(); g.fillStyle = PAPER; g.beginPath(); g.arc(0, 32, 7, 0, 6.283); g.fill(); g.fillRect(-3, 34, 6, 14); }
       g.restore();
     }
     // flèches cartoon
-    for(const s of [-1, 1]){ const ax = cx + s*W*.44, ay = cy + Math.sin(mTime*4)*4; g.save(); g.translate(ax + s*Math.sin(mTime*4)*3, ay); g.fillStyle = PAPER; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.moveTo(-s*8, -14); g.lineTo(s*10, 0); g.lineTo(-s*8, 14); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    for(const s of [-1, 1]){ const ax = cx + s*W*.44, ay = cy + Math.sin(mTime*4)*4; g.save(); g.translate(ax + s*Math.sin(mTime*4)*3, ay); g.fillStyle = SPRAY[1]; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.moveTo(-s*8, -14); g.lineTo(s*10, 0); g.lineTo(-s*8, 14); g.closePath(); g.fill(); g.stroke(); g.restore(); }
     // points de position
-    const dw = 10, tot = TRACKS.length*(dw + 6); for(let i=0;i<TRACKS.length;i++){ const on = i === cur; g.fillStyle = on ? LABELRED : unlocked(TRACKS[i]) ? INK : 'rgba(28,27,25,.3)'; const w = on ? 22 : dw; g.beginPath(); g.roundRect ? g.roundRect(cx - tot/2 + i*(dw + 6) - (on ? 6 : 0), cy + H*.2, w, 10, 5) : g.rect(cx - tot/2 + i*(dw + 6), cy + H*.2, w, 10); g.fill(); }
+    const dw = 10, tot = TRACKS.length*(dw + 6); for(let i=0;i<TRACKS.length;i++){ const on = i === cur; g.fillStyle = on ? SPRAY[i % SPRAY.length] : unlocked(TRACKS[i]) ? INK : 'rgba(28,27,25,.35)'; const w = on ? 22 : dw; g.beginPath(); g.roundRect ? g.roundRect(cx - tot/2 + i*(dw + 6) - (on ? 6 : 0), cy + H*.2, w, 10, 5) : g.rect(cx - tot/2 + i*(dw + 6), cy + H*.2, w, 10); g.fill(); }
   }
   let mLast = performance.now();
   (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden) menuFrame(dt); requestAnimationFrame(mLoop); })(mLast);
