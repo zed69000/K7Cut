@@ -652,7 +652,10 @@ G.trancheroute = { mount(stage, api){
     const TT = ['PAS ENCORE CALÉ', 'ÇA GROOVE', 'SUPER RYTHME', 'RYTHME PARFAIT'];
     const mood = ['brut', 'qui groove', 'en transe', 'hypnotique', 'nirvana'][TIERS.filter(x => x && maxCombo >= x).length];
     let img = null; try{ img = artwork(acc); try{ localStorage.setItem('k7cut.art.' + tr.id, img); }catch(e){} }catch(e){}
-    if(img) actions.splice(actions.length - 1, 0, {label: 'Garder mon œuvre', keep: true, fn: () => { const a = document.createElement('a'); a.href = img; a.download = `k7cut-${tr.id}-${acc}.jpg`; document.body.appendChild(a); a.click(); a.remove(); }});
+    if(img) actions.splice(actions.length - 1, 0, {label: 'Garder mon œuvre', keep: true, fn: async () => { const name = `k7cut-${tr.id}-${acc}.jpg`;
+      // dans Claude : la sauvegarde passe par la fenêtre de confirmation ; ailleurs (GitHub Pages, appli) : téléchargement classique
+      if(window.claude && window.claude.use){ try{ const dl = await window.claude.use('downloads'); if(dl){ const blob = await (await fetch(img)).blob(); await dl.save({filename: name, data: blob}); return; } }catch(e){ return; } }
+      const a = document.createElement('a'); a.href = img; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }});
     api.after(900, () => api.end({win: stars > 0, title: TT[stars], img, caption: `Ton œuvre : « ${tr.name} ${mood} »`, text: lines.join('\n'), actions}));
   }
   function fail(){ if(state !== 'play') return; state = 'over'; if(useAudio){ music.gain.setTargetAtTime(0, actx.currentTime, .2); osc(master, 'sawtooth', 220, now(), 1.2, .2, {glide: 40}); api.after(1500, () => { if(music) music.gain.setValueAtTime(.9, actx.currentTime); }); } finishRun(false); }
