@@ -235,5 +235,16 @@ BSi18n.add("es", {
   "CLASSEMENT": "CLASIFICACIÓN",
   "Ton pseudo": "Tu apodo",
   "LANCER": "EMPEZAR",
-  "ACCUEIL": "INICIO"
+  "ACCUEIL": "INICIO",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "TODOS LOS CASETES ESTÁN ABIERTOS (toca para volver a bloquear)",
+  "TOUT DÉBLOQUER": "DESBLOQUEAR TODO",
+  "Retour": "Volver",
+  "CAMPAGNE": "CAMPAÑA",
+  "CASSETTE DE LA MORT": "CASETE DE LA MUERTE",
+  "RECORDS": "RÉCORDS",
+  "{n} cassettes": "{n} casetes",
+  "Ton rang : {n} sur {t}": "Tu puesto: {n} de {t}",
+  "Classement mondial : {t} joueurs": "Clasificación mundial: {t} jugadores",
+  "Hors ligne : classement de ce téléphone": "Sin conexión: clasificación de este teléfono",
+  "Cassette de la mort · classement mondial": "Casete de la muerte · clasificación mundial"
 });

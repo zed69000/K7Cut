@@ -235,5 +235,16 @@ BSi18n.add("ja", {
   "CLASSEMENT": "ランキング",
   "Ton pseudo": "ニックネーム",
   "LANCER": "スタート",
-  "ACCUEIL": "ホーム"
+  "ACCUEIL": "ホーム",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "すべてのカセットが開放中（タップで再ロック）",
+  "TOUT DÉBLOQUER": "すべて解放",
+  "Retour": "戻る",
+  "CAMPAGNE": "キャンペーン",
+  "CASSETTE DE LA MORT": "死のカセット",
+  "RECORDS": "記録",
+  "{n} cassettes": "カセット {n} 本",
+  "Ton rang : {n} sur {t}": "あなたの順位：{t} 人中 {n} 位",
+  "Classement mondial : {t} joueurs": "世界ランキング：{t} 人",
+  "Hors ligne : classement de ce téléphone": "オフライン：この端末のランキング",
+  "Cassette de la mort · classement mondial": "死のカセット · 世界ランキング"
 });

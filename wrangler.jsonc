@@ -1,0 +1,10 @@
+{
+  // Cloudflare publie www/ tel quel (le jeu) ; seul /api passe par worker/index.js (les records de la cassette de la mort).
+  "name": "beatsplash",
+  "main": "worker/index.js",
+  "compatibility_date": "2025-01-01",
+  "assets": { "directory": "./www", "binding": "ASSETS" },
+  "durable_objects": { "bindings": [{ "name": "BOARD", "class_name": "Board" }] },
+  // Stockage SQLite : la seule forme de Durable Object incluse dans l'offre gratuite.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Board"] }]
+}

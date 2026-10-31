@@ -235,5 +235,16 @@ BSi18n.add("ko", {
   "CLASSEMENT": "순위",
   "Ton pseudo": "닉네임",
   "LANCER": "시작",
-  "ACCUEIL": "홈"
+  "ACCUEIL": "홈",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "모든 카세트가 열려 있어요 (탭하면 다시 잠금)",
+  "TOUT DÉBLOQUER": "모두 잠금 해제",
+  "Retour": "뒤로",
+  "CAMPAGNE": "캠페인",
+  "CASSETTE DE LA MORT": "죽음의 카세트",
+  "RECORDS": "기록",
+  "{n} cassettes": "카세트 {n}개",
+  "Ton rang : {n} sur {t}": "내 순위: {t}명 중 {n}위",
+  "Classement mondial : {t} joueurs": "세계 순위: {t}명",
+  "Hors ligne : classement de ce téléphone": "오프라인: 이 휴대폰의 순위",
+  "Cassette de la mort · classement mondial": "죽음의 카세트 · 세계 순위"
 });

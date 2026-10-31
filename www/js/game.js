@@ -165,7 +165,7 @@ G.trancheroute = { mount(stage, api){
   const discs = () => TRACKS.reduce((a, t) => a + discsOf(t), 0);
   const DISC = n => '◉'.repeat(n) + '○'.repeat(3 - n);
   const titleOf = n => TITLES.filter(x => n >= x[0]).pop()[1];
-  const unlocked = t => t.cost === 0 || api.load('unlock.' + t.id, false);
+  const unlocked = t => t.cost === 0 || api.load('allOpen', false) || api.load('unlock.' + t.id, false);
 
   /* ---------- audio : bus musique (filtre, pompe) + réverb + écho, compresseur et limiteur ---------- */
   let tone = null, shelf = null, revIn = null, dlyIn = null, dly = null, curves = {}, vduck = null, vox = null, voiceFrom = 0, voiceUntil = 0;
@@ -2109,6 +2109,7 @@ G.trancheroute = { mount(stage, api){
       <div style="font-size:12.5px;opacity:.8;margin-top:-6px">${tx('Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage.')}</div>
       <button class="k7btn" id="k7intro" style="padding:12px;font-size:13px">${tx('REJOUER L\'INTRO')}</button>
       <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">${tx('REVOIR LES TUTOS')}</button>
+      <button class="k7btn" id="k7all" style="padding:12px;font-size:13px">${tx(api.load('allOpen', false) ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER')}</button>
       <button class="k7btn" id="k7labo" style="padding:12px;font-size:13px;background:#ffd23f">🎧 ${tx('LABO : ÉCOUTER DE NOUVEAUX MORCEAUX')}</button>
       <div class="k7langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="k7btn${c === BSi18n.lang ? ' on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
       <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">BEAT SPLASH · version ${VERSION}</div></div>`;
@@ -2121,6 +2122,7 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     sh.querySelector('#k7labo').onclick = () => { close(); showLabo(); };
+    sh.querySelector('#k7all').onclick = e => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); e.target.textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
     sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','CD','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); e.target.textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
   };
@@ -2250,6 +2252,9 @@ G.trancheroute = { mount(stage, api){
     .k7plate.mid,.k7plate.opt{--paper:#f3ead7;height:60px;font-size:27px;width:90%;margin:0 auto}
     .k7plate.mid{transform:rotate(.8deg)}.k7plate.opt{transform:rotate(-.7deg);--paper:#ffd23f}
     .k7plate.mid::after{background:#29c4ff;transform:translate(-5px,7px)}
+    .k7plate.death{--paper:${INK};color:#fff}.k7plate.death::after{background:#e8344f}.k7plate .lbl{white-space:nowrap}
+    .k7tbtns .k7plate.mid,.k7tbtns .k7plate.opt{height:54px;font-size:24px}.k7tbtns .k7plate.death{font-size:21px}
+    .k7home.short .k7tbtns .k7plate.mid,.k7home.short .k7tbtns .k7plate.opt{height:42px;font-size:19px}.k7home.short .k7tbtns .k7plate.death{font-size:17px}
     .k7home.short .k7plate.big{height:64px;font-size:34px}.k7home.short .k7plate.big .lbl small{font-size:13px}.k7home.short .k7plate.mid,.k7home.short .k7plate.opt{height:46px;font-size:21px}.k7home.short .k7plate .drips{height:18px}
     .k7plate.big::before{background:radial-gradient(rgba(255,255,255,.2) 1.6px,transparent 2.2px) 0 0/8px 8px,var(--paper)}
     .k7plate .chev{flex:none;width:22px;height:30px}
@@ -2276,17 +2281,23 @@ G.trancheroute = { mount(stage, api){
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
   home.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
-      <div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div>
-      <div style="display:flex;gap:10px"><button id="k7death" class="k7btn k7sq" aria-label="${tx('Cassette de la mort')}" style="background:${INK};color:#fff;font-size:24px">☠</button><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq" aria-label="${tx('Retour')}" hidden><svg width="22" height="22" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
+      <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
     <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7hplay" class="k7plate big"><span class="lbl"></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
       <button id="k7hlvl" class="k7plate mid"><span class="ico">${CASS}</span><span class="lbl">${tx('CASSETTES')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`);
-  const hb = home.querySelector('.k7hbtns'); const shortH = H < 740; if(shortH) home.classList.add('short'); /* petit écran : tout se resserre pour laisser voir la scène */ hb.style.top = Math.round(shortH ? Math.max(H*.355, 220) : Math.max(H*.4, 300)) + 'px'; hb.style.gap = shortH ? '11px' : '16px'; let hbBottom = H*.62;
-  const layoutHome = () => { const r = hb.getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
-  let homeOn = false, hTime = 0; home.hidden = true;
-  const showHome = () => { homeOn = true; home.hidden = false; refreshHome(); };
-  function refreshHome(){ requestAnimationFrame(layoutHome); home.querySelector('#k7htal').innerHTML = `◉ ${discs()} &nbsp;♪ ${bank()}<small>${titleOf(bank())}</small>`; home.querySelector('.k7dot').hidden = !api.load('artNew', false);
+      <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    <div class="ui k7tbtns" style="flex-direction:column;gap:14px;padding:0 34px">
+      <button id="k7tcamp" class="k7plate big"><span class="lbl">${tx('CAMPAGNE')}<small id="k7tcsub"></small></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
+      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="font-size:28px">☠</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="k7trec" class="k7plate mid"><span class="ico">${TROPHY}</span><span class="lbl">${tx('RECORDS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="k7topt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`);
+  const hb = home.querySelector('.k7hbtns'), tb = home.querySelector('.k7tbtns'); const shortH = H < 740; if(shortH) home.classList.add('short'); /* petit écran : tout se resserre pour laisser voir la scène */
+  for(const b of [hb, tb]){ b.style.top = Math.round(shortH ? Math.max(H*.355, 220) : Math.max(H*.4, 300)) + 'px'; b.style.gap = shortH ? '11px' : '16px'; } let hbBottom = H*.62;
+  const layoutHome = () => { const r = (homeMode === 'camp' ? hb : tb).getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
+  let homeOn = false, hTime = 0, homeMode = 'title'; home.hidden = true;
+  const showHome = mode => { if(mode) homeMode = mode; homeOn = true; home.hidden = false; hb.hidden = homeMode !== 'camp'; tb.hidden = homeMode === 'camp'; home.querySelector('#k7hback').hidden = homeMode !== 'camp'; refreshHome(); };
+  function refreshHome(){ requestAnimationFrame(layoutHome); home.querySelector('#k7tcsub').textContent = tx('{n} cassettes', {n: TRACKS.length}) + ' · ' + discs() + ' ◉'; home.querySelector('#k7htal').innerHTML = `◉ ${discs()} &nbsp;♪ ${bank()}<small>${titleOf(bank())}</small>`; home.querySelector('.k7dot').hidden = !api.load('artNew', false);
     const t = TRACKS[cur], open = unlocked(t), afford = !open && discs() >= t.cost, pb = home.querySelector('#k7hplay');
     pb.querySelector('.lbl').innerHTML = `${open ? tx('JOUER') : afford ? tx('OUVRIR !') : t.cost + ' ◉'}<small>${t.name} · ${DIFFS[dIdx].name}</small>`; pb.style.filter = open || afford ? '' : 'grayscale(.7)'; }
   home.addEventListener('pointerdown', introGo, true);
@@ -2302,7 +2313,7 @@ G.trancheroute = { mount(stage, api){
   // la scène : glisser pour changer, toucher une voisine pour l'amener, toucher celle du centre pour la lancer
   let hDrag = null;
   hcv.addEventListener('pointerdown', e => { const r = hcv.getBoundingClientRect(); hDrag = {x: e.clientX, y: (e.clientY - r.top)*H/r.height, xi: (e.clientX - r.left)*W/r.width}; });
-  hcv.addEventListener('pointerup', e => { if(!hDrag) return; const dx = e.clientX - hDrag.x, d = hDrag; hDrag = null; if(d.y < hbBottom) return;
+  hcv.addEventListener('pointerup', e => { if(!hDrag) return; const dx = e.clientX - hDrag.x, d = hDrag; hDrag = null; if(d.y < hbBottom) return; if(homeMode !== 'camp'){ api.sfx.click(); showHome('camp'); return; }
     if(Math.abs(dx) > 40) return pickCass(cur + (dx < 0 ? 1 : -1));
     if(d.xi < W*.27) pickCass(cur - 1); else if(d.xi > W*.73) pickCass(cur + 1); else playCur(); });
   hcv.addEventListener('pointercancel', () => { hDrag = null; });
@@ -2390,6 +2401,37 @@ G.trancheroute = { mount(stage, api){
   /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
   let deathRun = null;
   const deathTop = () => api.load('deathTop', []);
+  // le serveur des records : le jeu servi par Cloudflare lui parle directement, ailleurs (GitHub Pages, appli) on l'appelle par son adresse
+  const RANK_API = `https://${/\.workers\.dev$/.test(location.hostname) ? location.host : 'beatsplash.sebastienalzamora.workers.dev'}/api`;
+  const pid = () => { let v = api.load('pid', ''); if(!/^[a-z0-9]{16,40}$/.test(v)){ v = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); api.save('pid', v); } return v; };
+  const pseudo = () => api.load('pseudo', '');
+  function sendScore(score, songs){ try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
+  async function fetchTop(){ try{ const r = await fetch(RANK_API + '/top?id=' + pid(), {cache: 'no-store'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
+  const esc = v => String(v).replace(/[<>&"]/g, '');
+  // la liste du classement : en ligne si le serveur répond, sinon celle du téléphone
+  async function fillBoard(box, note){
+    box.innerHTML = `<div><span></span><span>${tx('Chargement…')}</span><span></span></div>`;
+    const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span>${esc(i.n)} · ${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}</span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
+    if(g && g.top){
+      box.innerHTML = g.top.length ? g.top.map(i => row(i.r, i, i.me)).join('') + (g.me && g.me > g.top.length && g.around ? '<div><span></span><span>…</span><span></span></div>' + g.around.map(i => row(i.r, i, i.me)).join('') : '') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
+      if(note) note.textContent = g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx('Classement mondial : {t} joueurs', {t: g.total});
+    } else {
+      const top = deathTop(); box.innerHTML = top.length ? top.map((e, i) => row(i + 1, {n: e.name, s: e.score, k: e.songs}, false)).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
+      if(note) note.textContent = tx('Hors ligne : classement de ce téléphone');
+    }
+  }
+  function recordsPage(){
+    const old = stage.querySelector('.k7brief'); if(old) old.remove();
+    const el = document.createElement('div'); el.className = 'k7brief';
+    el.innerHTML = `<div class="in"><div class="hd"><span class="face">🏆</span><b>${tx('RECORDS')}</b><small>${tx('Cassette de la mort · classement mondial')}</small></div>
+      <small class="nt" style="font-weight:700"></small><div class="lb"></div>
+      <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${esc(pseudo())}">
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">☠ ${tx('LANCER')}</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
+    stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'), inp = el.querySelector('input'); fillBoard(box, nt);
+    inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); api.save('pseudo', v); if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
+    el.querySelector('[data-a=go]').onclick = () => { el.remove(); briefing(null, deathStart, true); };
+    el.querySelector('[data-a=x]').onclick = () => el.remove();
+  }
   function deathHud(){ if(deathRun && tr) api.hud(`☠ ${'♥'.repeat(Math.max(0, hearts))}${'♡'.repeat(Math.max(0, 3 - hearts))}  ·  ${deathRun.songs + 1}  ·  ${tr.name.toUpperCase()}`); }
   function deathStart(){ deathRun = {i: 0, lap: 0, order: TRACKS.slice().sort((a, b) => a.bpm - b.bpm), score: 0, hearts: 3, songs: 0}; homeOn = false; home.hidden = true; deathPlay(); }
   function deathPlay(){ const R = deathRun; diff = DIFFS[Math.min(3, 1 + R.lap)]; startTrack(R.order[R.i]); hearts = R.hearts; score = R.score; deathHud(); }
@@ -2402,7 +2444,7 @@ G.trancheroute = { mount(stage, api){
   }
   function deathOver(){
     const R = deathRun; deathRun = null; R.score = score;
-    const me = {name: api.load('pseudo', '') || tx('Moi'), score: R.score, songs: R.songs, at: Date.now()}, top = R.score > 0 ? deathTop().concat([me]).sort((a, b) => b.score - a.score).slice(0, 10) : deathTop(); if(R.score > 0) api.save('deathTop', top);
+    const me = {name: api.load('pseudo', '') || tx('Moi'), score: R.score, songs: R.songs, at: Date.now()}, top = R.score > 0 ? deathTop().concat([me]).sort((a, b) => b.score - a.score).slice(0, 10) : deathTop(); if(R.score > 0){ api.save('deathTop', top); sendScore(R.score, R.songs); }
     api.after(900, () => deathBoard(me, top));
   }
   function deathBoard(me, top){
@@ -2411,15 +2453,19 @@ G.trancheroute = { mount(stage, api){
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')} · ${tx(e.songs > 1 ? '{n} morceaux' : '{n} morceau', {n: e.songs})}</span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
     el.innerHTML = `<div class="in"><div class="hd"><span class="face">☠</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
       ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
-      <b class="sub">${tx('CLASSEMENT')}</b><div class="lb">${list()}</div>
+      <b class="sub">${tx('CLASSEMENT')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
       <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
-    stage.appendChild(el);
-    const inp = el.querySelector('input'); inp.onchange = () => { const v = inp.value.trim().slice(0, 14); api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); el.querySelector('.lb').innerHTML = list(); } };
+    stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
+    const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
     el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); el.remove(); briefing(null, deathStart, true); };
-    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me) showMenu(); };
+    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me){ showMenu(); showHome('title'); } };
   }
-  home.querySelector('#k7death').onclick = () => { api.sfx.click(); deathBoard(null); };
+  home.querySelector('#k7tdeath').onclick = () => { api.sfx.click(); deathBoard(null); };
+  home.querySelector('#k7tcamp').onclick = () => { api.sfx.click(); showHome('camp'); };
+  home.querySelector('#k7trec').onclick = () => { api.sfx.click(); recordsPage(); };
+  home.querySelector('#k7topt').onclick = () => { api.sfx.click(); ui.k7gear.onclick(); };
+  home.querySelector('#k7hback').onclick = () => { api.sfx.click(); showHome('title'); };
 
   home.querySelector('#k7trophy').onclick = () => {
     api.sfx.click(); api.save('artNew', false); refreshHome(); { const bd = menu.querySelector('#k7bdot'); if(bd) bd.hidden = true; }
@@ -2640,7 +2686,7 @@ G.trancheroute = { mount(stage, api){
     return c.toDataURL('image/png');
   }
   // on arrive sur l'accueil (titre, JOUER, CASSETTES, OPTIONS) ; le menu des cassettes est derrière
-  showMenu(); showHome();
+  showMenu(); showHome('title');
   if(document.documentElement.classList.contains('splash')) window.addEventListener('bs-splash-end', () => introGo(), {once: true});
   else api.after(250, introGo);
   if(/labo/.test(location.search)) showLabo();

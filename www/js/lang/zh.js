@@ -235,5 +235,16 @@ BSi18n.add("zh", {
   "CLASSEMENT": "排行榜",
   "Ton pseudo": "你的昵称",
   "LANCER": "开始",
-  "ACCUEIL": "首页"
+  "ACCUEIL": "首页",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "所有磁带已解锁（点击重新锁定）",
+  "TOUT DÉBLOQUER": "全部解锁",
+  "Retour": "返回",
+  "CAMPAGNE": "闯关模式",
+  "CASSETTE DE LA MORT": "死亡磁带",
+  "RECORDS": "记录",
+  "{n} cassettes": "{n} 盒磁带",
+  "Ton rang : {n} sur {t}": "你的排名：第 {n} / {t}",
+  "Classement mondial : {t} joueurs": "全球排行榜：{t} 名玩家",
+  "Hors ligne : classement de ce téléphone": "离线：本机排行榜",
+  "Cassette de la mort · classement mondial": "死亡磁带 · 全球排行榜"
 });

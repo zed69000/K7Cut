@@ -11,7 +11,7 @@ def unq(x):
     return x.replace("\\'", "'").replace('\\"', '"')
 
 keys = []
-CODE = {'muted', 'voice'}  # clés de réglage, pas du texte
+CODE = {'muted', 'voice', 'allOpen'}  # clés de réglage, pas du texte
 def add(k):
     if k and len(k) > 1 and k not in CODE and k not in keys:
         keys.append(k)

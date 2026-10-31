@@ -235,5 +235,16 @@ BSi18n.add("pt", {
   "CLASSEMENT": "CLASSIFICAÇÃO",
   "Ton pseudo": "Seu apelido",
   "LANCER": "COMEÇAR",
-  "ACCUEIL": "INÍCIO"
+  "ACCUEIL": "INÍCIO",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "TODAS AS FITAS ESTÃO ABERTAS (toque para bloquear de novo)",
+  "TOUT DÉBLOQUER": "DESBLOQUEAR TUDO",
+  "Retour": "Voltar",
+  "CAMPAGNE": "CAMPANHA",
+  "CASSETTE DE LA MORT": "FITA DA MORTE",
+  "RECORDS": "RECORDES",
+  "{n} cassettes": "{n} fitas",
+  "Ton rang : {n} sur {t}": "Sua posição: {n} de {t}",
+  "Classement mondial : {t} joueurs": "Ranking mundial: {t} jogadores",
+  "Hors ligne : classement de ce téléphone": "Offline: ranking deste celular",
+  "Cassette de la mort · classement mondial": "Fita da morte · ranking mundial"
 });

@@ -235,5 +235,16 @@ BSi18n.add("de", {
   "CLASSEMENT": "RANGLISTE",
   "Ton pseudo": "Dein Spitzname",
   "LANCER": "STARTEN",
-  "ACCUEIL": "START"
+  "ACCUEIL": "START",
+  "TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)": "ALLE KASSETTEN SIND OFFEN (tippen zum Sperren)",
+  "TOUT DÉBLOQUER": "ALLES FREISCHALTEN",
+  "Retour": "Zurück",
+  "CAMPAGNE": "KAMPAGNE",
+  "CASSETTE DE LA MORT": "KASSETTE DES TODES",
+  "RECORDS": "REKORDE",
+  "{n} cassettes": "{n} Kassetten",
+  "Ton rang : {n} sur {t}": "Dein Rang: {n} von {t}",
+  "Classement mondial : {t} joueurs": "Weltrangliste: {t} Spieler",
+  "Hors ligne : classement de ce téléphone": "Offline: Rangliste dieses Handys",
+  "Cassette de la mort · classement mondial": "Kassette des Todes · Weltrangliste"
 });
