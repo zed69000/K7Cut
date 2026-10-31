@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.26.2 — Plus de musiques qui se superposent
+- La musique de l'écran de fin est programmée 16 s à l'avance : en lançant le niveau suivant, ses notes restantes (et ses batteries, ses traînes de réverbe et d'écho) jouaient par-dessus le nouveau morceau. Elle passe maintenant par ses propres bus, coupés pour de bon dès qu'on quitte l'écran de fin, relance une partie ou revient aux menus. Les applaudissements de fin aussi.
+
 ## 0.26.1 — Le son sur iPhone
 - Sur iPhone, Safari n'ouvre le son que pendant un toucher : les touchers faits pendant l'animation silencieuse du titre étaient ignorés, donc ni cri ni musique du menu. Maintenant chaque toucher débloque le son (son vide, l'astuce iOS), et si le titre s'est animé sans le son, le cri « BEAT SPLASH » repart aussitôt.
 

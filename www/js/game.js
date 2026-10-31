@@ -104,7 +104,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.26.1';
+const VERSION = '0.26.2';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -464,12 +464,13 @@ G.trancheroute = { mount(stage, api){
   const now = () => clock() - lat*rate;
   let noiseBuf = null;
   function env(gn, T, v, a, d, sus){ gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(v, T + a); if(sus){ gn.gain.setValueAtTime(v, T + a + sus); } gn.gain.exponentialRampToValueAtTime(.0001, T + a + (sus || 0) + d); }
+  let sendVia = null; // pendant la musique de fin : réverbe et écho passent par ses bus, pour pouvoir les couper aussi
   function route(n, gn, bus, o2, T){
     n.connect(gn); let out = gn;
     if(o2.pan && actx.createStereoPanner){ const p = actx.createStereoPanner(); p.pan.value = o2.pan; gn.connect(p); out = p; }
     out.connect(bus);
-    if(o2.rev){ const s = actx.createGain(); s.gain.value = o2.rev; out.connect(s).connect(revIn); }
-    if(o2.dly){ const s = actx.createGain(); s.gain.value = o2.dly; out.connect(s).connect(dlyIn); }
+    if(o2.rev){ const s = actx.createGain(); s.gain.value = o2.rev; out.connect(s).connect(sendVia ? sendVia.rev : revIn); }
+    if(o2.dly){ const s = actx.createGain(); s.gain.value = o2.dly; out.connect(s).connect(sendVia ? sendVia.dly : dlyIn); }
   }
   function osc(bus, type, f, at, dur, vol, o2){
     if(!useAudio) return null; o2 = o2 || {};
@@ -737,7 +738,7 @@ G.trancheroute = { mount(stage, api){
     for(const k in barCache) delete barCache[k];
     frescoInit(); paintEv = []; gulp = 0; swallows = []; objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = diff.hearts; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0;
     beatNow = 0; nextStep = 0; jumpT = 9; hurtT = 0; energy = {kick: 0, snare: 0, hat: 0, bass: 0, chords: 0, lead: 0}; events = []; bump = 0; flashR = 0; gestures.clear(); holdState = null; scratchState = null; rot = 0; finished = false; spawned = 1; secShown = -1;
-    hideMenu(); api.closeEnd(); api.hud(`${tx('FACE')} ${t.face} · ${t.name.toUpperCase()}`);
+    outroStop(); hideMenu(); api.closeEnd(); api.hud(`${tx('FACE')} ${t.face} · ${t.name.toUpperCase()}`);
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; loadRecs();
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
@@ -1090,9 +1091,24 @@ G.trancheroute = { mount(stage, api){
     @media (prefers-reduced-motion:reduce){.k7rw .pop{animation:none;opacity:1}.k7rw .disc.on .burst{animation:none}}`; document.head.appendChild(st); } }
   const discSvg = (on, col) => on ? `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="${INK}"/><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/><circle cx="50" cy="50" r="33" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/><circle cx="50" cy="50" r="22" fill="${col}" stroke="${INK}" stroke-width="3"/><circle cx="50" cy="50" r="9" fill="${INK}"/><g fill="${INK}">${[0,1,2,3,4,5].map(i => `<rect x="47.5" y="27" width="5" height="6" transform="rotate(${i*60} 50 50)"/>`).join('')}</g><path d="M22 30a33 33 0 0 1 14-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/></svg>`
     : `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="#8f8a82" stroke="${INK}" stroke-width="3"/><circle cx="50" cy="50" r="30" fill="#c9c4ba" stroke="#6d6860" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="#6d6860"/><g fill="#6d6860">${[0,1,2,3,4,5].map(i => `<rect x="47.5" y="30" width="5" height="6" transform="rotate(${i*60} 50 50)"/>`).join('')}</g></svg>`;
+  // la musique de fin est programmée d'avance (16 s) : elle passe par ses propres bus, qu'on coupe pour de bon
+  // dès qu'on quitte l'écran de fin ou qu'on relance une partie (sinon les deux musiques se superposent)
+  let outroBus = null;
+  function outroStop(){
+    if(!outroBus || !actx) return; const T = actx.currentTime;
+    outroBus.forEach(g => { g.gain.cancelScheduledValues(T); g.gain.setValueAtTime(g.gain.value, T); g.gain.linearRampToValueAtTime(0, T + .06); setTimeout(() => { try{ g.disconnect(); }catch(e){} }, 300); });
+    outroBus = null;
+  }
   function outroMusic(at0, stars){
-    if(!useAudio) return; const B = bpb, d0 = chordOf(1), prog = [0, 3, 4, 0];
+    if(!useAudio) return; outroStop();
     music.gain.cancelScheduledValues(actx.currentTime); music.gain.setValueAtTime(.8, actx.currentTime);
+    const ob = actx.createGain(), od = actx.createGain(), ov = actx.createGain(), orv = actx.createGain(), odl = actx.createGain();
+    ob.connect(music); od.connect(drums || master); ov.connect(vox || master); orv.connect(revIn); odl.connect(dlyIn); outroBus = [ob, od, ov, orv, odl];
+    const m0 = music, dr0 = drums; music = ob; drums = od; sendVia = {rev: orv, dly: odl};
+    try{ outroNotes(at0, stars, ov); } finally { music = m0; drums = dr0; sendVia = null; }
+  }
+  function outroNotes(at0, stars, vox){
+    const B = bpb, d0 = chordOf(1), prog = [0, 3, 4, 0];
     for(let bar=0; bar<8; bar++){ const deg = d0 + prog[bar % 4], last = bar === 7;
       for(let b=0;b<4;b++){ const at = at0 + (bar*4 + b)*B; if(last && b > 0) break;
         I.kick(at, .9); if(b % 2) I.clap(at, .2); I.hat(at + B/2, .07, false, .2);
@@ -1137,14 +1153,14 @@ G.trancheroute = { mount(stage, api){
       ${P(10, `<div class="links"><button class="tomenu">◀ ${tx('CASSETTES')}</button>${R.nextT && unlocked(R.nextT) ? `<button class="next2">${tx('FACE')} ${R.nextT.face} : ${R.nextT.name.toUpperCase()} ▶</button>` : ''}</div>`)}
       <div style="font-size:12px;opacity:.7;text-align:center">${tx('Chaque partie peint une toile unique. Rond net = pile · jets = en avance · coulures = en retard · gris = raté')}</div></div>`;
     stage.appendChild(el);
-    const close = () => { alive = false; el.remove(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
+    const close = () => { alive = false; el.remove(); outroStop(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
     el.querySelector('.again').onclick = () => { close(); startTrack(tr); };
     const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => { close(); diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); startTrack(tr); };
     el.querySelector('.tomenu').onclick = () => { close(); showMenu(); };
     const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); startTrack(R.nextT); };
     el.querySelector('.keep').onclick = R.img ? R.keep : () => { close(); showMenu(); };
     outroMusic(at0, R.stars);
-    if(useAudio && R.stars) applause(actx.currentTime + delay + .1, R.stars/3);
+    if(useAudio && R.stars && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; playRec('bravo', actx.currentTime + delay + .1, .35 + .25*R.stars/3, {bus: outroBus[0], rev: .25, len: 2.2 + 2.7*R.stars/3, rel: 1.2}); sendVia = sv; }
     // compteurs qui défilent pendant les temps 2 à 4, confettis à chaque disque, foule qui saute sur le tempo
     const cv2 = el.querySelector('canvas'), g = cv2.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1); let alive = true, parts = [], fired = 0;
     const size = () => { cv2.width = el.clientWidth*dpr; cv2.height = el.clientHeight*dpr; }; size();
@@ -2348,7 +2364,7 @@ G.trancheroute = { mount(stage, api){
   (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden){ if(homeOn) homeFrame(dt); else menuFrame(dt); } try{ menuMusic(); }catch(e){ window.__mmErr = String(e && e.stack || e); } requestAnimationFrame(mLoop); })(mLast);
 
   function showMenu(){
-    { const rw = stage.querySelector('.k7rw'); if(rw) rw.remove(); }
+    outroStop(); { const rw = stage.querySelector('.k7rw'); if(rw) rw.remove(); }
     api.closeEnd(); state = 'menu'; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); } if(useAudio && music) music.gain.setValueAtTime(.8, actx.currentTime);
     api.hud(''); for(const k in imgCache) delete imgCache[k];
     mPos = mTarget = cur; mVel = 0; refreshUI(true);
@@ -2388,7 +2404,7 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), art: storeArt, get recs(){ return Object.keys(recBuf); }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {home: () => showHome(), art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
     const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();
