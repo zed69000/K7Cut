@@ -246,5 +246,6 @@ BSi18n.add("zh", {
   "Ton rang : {n} sur {t}": "你的排名：第 {n} / {t}",
   "Classement mondial : {t} joueurs": "全球排行榜：{t} 名玩家",
   "Hors ligne : classement de ce téléphone": "离线：本机排行榜",
-  "Cassette de la mort · classement mondial": "死亡磁带 · 全球排行榜"
+  "Cassette de la mort · classement mondial": "死亡磁带 · 全球排行榜",
+  "Classement mondial : {t} joueur": "全球排行榜：{t} 名玩家"
 });

@@ -246,5 +246,6 @@ BSi18n.add("ja", {
   "Ton rang : {n} sur {t}": "あなたの順位：{t} 人中 {n} 位",
   "Classement mondial : {t} joueurs": "世界ランキング：{t} 人",
   "Hors ligne : classement de ce téléphone": "オフライン：この端末のランキング",
-  "Cassette de la mort · classement mondial": "死のカセット · 世界ランキング"
+  "Cassette de la mort · classement mondial": "死のカセット · 世界ランキング",
+  "Classement mondial : {t} joueur": "世界ランキング：{t} 人"
 });

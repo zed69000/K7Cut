@@ -2282,7 +2282,7 @@ G.trancheroute = { mount(stage, api){
   home.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq" aria-label="${tx('Retour')}" hidden><svg width="22" height="22" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
-      <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
+      <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${INK}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${INK}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#e8344f"/></svg><span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
     <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7hplay" class="k7plate big"><span class="lbl"></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
       <button id="k7hlvl" class="k7plate mid"><span class="ico">${CASS}</span><span class="lbl">${tx('CASSETTES')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2356,6 +2356,7 @@ G.trancheroute = { mount(stage, api){
     .k7brief .bar{height:12px;border:3px solid ${INK};border-radius:8px;overflow:hidden;background:#fff}.k7brief .bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,#ffd23f 0 8px,#e8344f 8px 16px);transition:width .2s linear}
     .k7brief .go{border:4px solid ${INK};border-radius:999px;background:#ff3d7f;color:#fff;font-family:${GRAF};font-size:28px;padding:8px 18px;-webkit-text-stroke:1.5px ${INK};paint-order:stroke fill;box-shadow:0 5px 0 ${INK};cursor:pointer}
     .k7brief .go:disabled{filter:grayscale(1);opacity:.6}
+    .k7brief .acts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:nowrap;position:sticky;bottom:0;margin:0 -16px -18px;padding:10px 16px 14px;background:#f3ead7;border-top:3px solid ${INK};border-radius:0 0 14px 14px}
     .k7brief .lb{display:flex;flex-direction:column;gap:5px}
     .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
     .k7brief .lb div.me{background:#ffd23f}.k7brief .lb b{font-family:${FONT};font-size:12px}
@@ -2387,15 +2388,16 @@ G.trancheroute = { mount(stage, api){
       <b class="sub">${tx('LES BRIQUES DE CETTE CASSETTE')}</b>
       <div class="bricks">${rows}</div>
       <div class="bar"><i></i></div>
-      <button class="go" disabled>${tx('Chargement…')}</button></div>`;
+      <div class="acts"><button class="go back" aria-label="${tx('Retour')}" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0;font-size:22px;padding:8px 16px">◀</button><button class="go" data-go disabled>${tx('Chargement…')}</button></div></div>`;
     stage.appendChild(el);
     // pendant qu'on lit : le son se prépare (enregistrements, piano), la barre se remplit
     try{ muted = api.store.load('muted', false); audioInit(); loadRecs(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
-    const bar = el.querySelector('.bar i'), btn = el.querySelector('.go'), t0b = performance.now();
+    const bar = el.querySelector('.bar i'), btn = el.querySelector('[data-go]'), t0b = performance.now();
     (function fill(){ if(!el.isConnected) return; const k = Math.min(1, (performance.now() - t0b)/1300), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || performance.now() - t0b > 4000);
       bar.style.width = Math.round((ok ? 1 : Math.min(.95, k))*100) + '%';
       if(ok){ btn.disabled = false; btn.textContent = tx('C\'EST PARTI') + ' ▶'; return; } requestAnimationFrame(fill); })();
     btn.onclick = () => { api.sfx.coin(); el.remove(); go(); };
+    el.querySelector('.back').onclick = () => { api.sfx.click(); el.remove(); if(menu.hidden){ showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); };
   }
 
   /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
@@ -2414,24 +2416,14 @@ G.trancheroute = { mount(stage, api){
     const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span>${esc(i.n)} · ${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}</span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
     if(g && g.top){
       box.innerHTML = g.top.length ? g.top.map(i => row(i.r, i, i.me)).join('') + (g.me && g.me > g.top.length && g.around ? '<div><span></span><span>…</span><span></span></div>' + g.around.map(i => row(i.r, i, i.me)).join('') : '') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
-      if(note) note.textContent = g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx('Classement mondial : {t} joueurs', {t: g.total});
+      if(note) note.textContent = g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx(g.total > 1 ? 'Classement mondial : {t} joueurs' : 'Classement mondial : {t} joueur', {t: g.total});
     } else {
       const top = deathTop(); box.innerHTML = top.length ? top.map((e, i) => row(i + 1, {n: e.name, s: e.score, k: e.songs}, false)).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
       if(note) note.textContent = tx('Hors ligne : classement de ce téléphone');
     }
   }
-  function recordsPage(){
-    const old = stage.querySelector('.k7brief'); if(old) old.remove();
-    const el = document.createElement('div'); el.className = 'k7brief';
-    el.innerHTML = `<div class="in"><div class="hd"><span class="face">🏆</span><b>${tx('RECORDS')}</b><small>${tx('Cassette de la mort · classement mondial')}</small></div>
-      <small class="nt" style="font-weight:700"></small><div class="lb"></div>
-      <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${esc(pseudo())}">
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">☠ ${tx('LANCER')}</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
-    stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'), inp = el.querySelector('input'); fillBoard(box, nt);
-    inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); api.save('pseudo', v); if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
-    el.querySelector('[data-a=go]').onclick = () => { el.remove(); briefing(null, deathStart, true); };
-    el.querySelector('[data-a=x]').onclick = () => el.remove();
-  }
+  function recordsPage(){ deathBoard(null); } // les records sont ceux de la cassette de la mort : un seul écran
+
   function deathHud(){ if(deathRun && tr) api.hud(`☠ ${'♥'.repeat(Math.max(0, hearts))}${'♡'.repeat(Math.max(0, 3 - hearts))}  ·  ${deathRun.songs + 1}  ·  ${tr.name.toUpperCase()}`); }
   function deathStart(){ deathRun = {i: 0, lap: 0, order: TRACKS.slice().sort((a, b) => a.bpm - b.bpm), score: 0, hearts: 3, songs: 0}; homeOn = false; home.hidden = true; deathPlay(); }
   function deathPlay(){ const R = deathRun; diff = DIFFS[Math.min(3, 1 + R.lap)]; startTrack(R.order[R.i]); hearts = R.hearts; score = R.score; deathHud(); }
@@ -2453,7 +2445,7 @@ G.trancheroute = { mount(stage, api){
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')} · ${tx(e.songs > 1 ? '{n} morceaux' : '{n} morceau', {n: e.songs})}</span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
     el.innerHTML = `<div class="in"><div class="hd"><span class="face">☠</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
       ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
-      <b class="sub">${tx('CLASSEMENT')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
+      <b class="sub">🏆 ${tx('RECORDS')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
       <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur

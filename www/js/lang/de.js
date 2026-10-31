@@ -246,5 +246,6 @@ BSi18n.add("de", {
   "Ton rang : {n} sur {t}": "Dein Rang: {n} von {t}",
   "Classement mondial : {t} joueurs": "Weltrangliste: {t} Spieler",
   "Hors ligne : classement de ce téléphone": "Offline: Rangliste dieses Handys",
-  "Cassette de la mort · classement mondial": "Kassette des Todes · Weltrangliste"
+  "Cassette de la mort · classement mondial": "Kassette des Todes · Weltrangliste",
+  "Classement mondial : {t} joueur": "Weltrangliste: {t} Spieler"
 });

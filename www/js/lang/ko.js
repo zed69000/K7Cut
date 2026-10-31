@@ -246,5 +246,6 @@ BSi18n.add("ko", {
   "Ton rang : {n} sur {t}": "내 순위: {t}명 중 {n}위",
   "Classement mondial : {t} joueurs": "세계 순위: {t}명",
   "Hors ligne : classement de ce téléphone": "오프라인: 이 휴대폰의 순위",
-  "Cassette de la mort · classement mondial": "죽음의 카세트 · 세계 순위"
+  "Cassette de la mort · classement mondial": "죽음의 카세트 · 세계 순위",
+  "Classement mondial : {t} joueur": "세계 순위: {t}명"
 });
