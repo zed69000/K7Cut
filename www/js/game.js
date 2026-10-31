@@ -2369,7 +2369,13 @@ G.trancheroute = { mount(stage, api){
     .k7brief .go{white-space:nowrap;font-size:24px}.k7brief .acts .go[data-go]{flex:1}
     .k7brief .go:disabled{filter:grayscale(1);opacity:.6}
     .k7brief .acts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:nowrap;position:sticky;bottom:0;margin:0 -16px -18px;padding:10px 16px 14px;background:#f3ead7;border-top:3px solid ${INK};border-radius:0 0 14px 14px}
-    .k7brief .lb{display:flex;flex-direction:column;gap:5px}
+    .k7brief .lb{display:flex;flex-direction:column;gap:5px;max-height:min(30vh,212px);overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 2px 0;-webkit-mask-image:linear-gradient(#000 85%,transparent);mask-image:linear-gradient(#000 85%,transparent)}  /* le classement défile dans son cadre : LANCER reste à l'écran */
+    .k7brief .lb div{flex:none}
+    .k7brief .lb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.k7brief .lb small{font-weight:800;opacity:.55;margin-left:4px}
+    /* écran Records / cassette de la mort : tient sur une page, seule la liste défile, les boutons restent visibles */
+    .k7brief.fit{overflow:hidden;display:flex;align-items:center;justify-content:center;box-sizing:border-box}.k7brief.fit .in{max-height:100%;box-sizing:border-box;margin:0}.k7brief.fit .in > *{flex:none}
+    .k7brief.fit .in > .lb{flex:1 1 auto;min-height:92px;max-height:none}
+    @media (max-height:660px){.k7brief.fit .how{display:none}}
     .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
     @font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF;src:url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}
     .k7brief .lb .fl{font-style:normal;font-family:"Twemoji Country Flags","Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}  /* drapeaux aussi sur Windows, qui n'en a pas */
@@ -2431,9 +2437,10 @@ G.trancheroute = { mount(stage, api){
   // la liste du classement : en ligne si le serveur répond, sinon celle du téléphone
   async function fillBoard(box, note){
     box.innerHTML = `<div><span></span><span>${tx('Chargement…')}</span><span></span></div>`;
-    const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span>${flag(i.c)}${esc(i.n)} · ${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}</span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
+    const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span title="${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}">${flag(i.c)}${esc(i.n)}<small>♪${i.k}</small></span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
     if(g && g.top){
       box.innerHTML = g.top.length ? g.top.map(i => row(i.r, i, i.me)).join('') + (g.me && g.me > g.top.length && g.around ? '<div><span></span><span>…</span><span></span></div>' + g.around.map(i => row(i.r, i, i.me)).join('') : '') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
+      const mine = box.querySelector('.me'); if(mine) box.scrollTop = mine.offsetTop - box.offsetTop - box.clientHeight/2 + mine.offsetHeight/2; // sa propre ligne au milieu du cadre
       if(note) note.textContent = g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx(g.total > 1 ? 'Classement mondial : {t} joueurs' : 'Classement mondial : {t} joueur', {t: g.total});
     } else {
       const top = deathTop(); box.innerHTML = top.length ? top.map((e, i) => row(i + 1, {n: e.name, s: e.score, k: e.songs}, false)).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
@@ -2459,8 +2466,8 @@ G.trancheroute = { mount(stage, api){
   }
   function deathBoard(me, top){
     const old = stage.querySelector('.k7brief'); if(old) old.remove(); top = top || deathTop();
-    const el = document.createElement('div'); el.className = 'k7brief';
-    const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')} · ${tx(e.songs > 1 ? '{n} morceaux' : '{n} morceau', {n: e.songs})}</span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
+    const el = document.createElement('div'); el.className = 'k7brief fit';
+    const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
     el.innerHTML = `<div class="in"><div class="hd"><span class="face">${SKULL(INK)}</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
       ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
       <b class="sub" style="display:flex;align-items:center;gap:6px"><span style="width:20px;height:20px;display:inline-block">${CUP}</span>${tx('RECORDS')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
