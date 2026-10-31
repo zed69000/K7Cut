@@ -36,6 +36,14 @@ const api = {
     stage.appendChild(o);
   }
 };
-function boot(){ try{ GAMES.trancheroute.mount(stage, api); }catch(e){ stage.innerHTML = '<p style="padding:24px">Le jeu n\'a pas pu démarrer : ' + e.message + '</p>'; } }
+// marges de sécurité : quand la vue passe sous la barre d'état (appli Android plein écran) sans annoncer d'encoche, on en garde une quand même
+function safeArea(){
+  const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;height:var(--sat);width:1px;visibility:hidden'; document.body.appendChild(probe);
+  const top = probe.offsetHeight; probe.remove();
+  const full = window.innerHeight >= screen.height - 2, phone = Math.min(screen.width, screen.height) < 600;
+  if(!top && full && phone){ document.documentElement.style.setProperty('--sat', '30px'); document.documentElement.style.setProperty('--sab', 'max(16px, env(safe-area-inset-bottom, 0px))'); }
+}
+function boot(){ try{ safeArea(); }catch(e){}
+ try{ GAMES.trancheroute.mount(stage, api); }catch(e){ stage.innerHTML = '<p style="padding:24px">Le jeu n\'a pas pu démarrer : ' + e.message + '</p>'; } }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

@@ -1,5 +1,15 @@
 # Journal des versions
 
+## 0.23.0 — Tu joues ta partie, pause en jeu, vrai niveau Roi
+- **Chaque geste réussi joue ta partie du morceau**, comme dans Guitar Hero : un coup d'orchestre dans le style de la cassette (filtre French house, cuivres funk, skank reggae, piano, guitare saturée), avec l'accord du moment et la basse. Il grossit avec le combo (doublure à l'octave, accord plus large, crash). Un raté fait décrocher ta partie une mesure (accords, arpège, mélodie).
+- **Pause en jeu** (bouton ❚❚ en haut) : reprendre, recommencer, quitter. Le jeu se met aussi en pause quand l'appli passe en arrière-plan.
+- **Fin de partie** : avec au moins un disque, un gros bouton propose de rejouer la face au niveau au-dessus.
+- **Niveau Roi vraiment dur** : rythmes un cran plus denses (environ +40 % de notes), pas de mesure d'écoute, défilement plus rapide, fenêtre plus serrée, et 3 ratés de suite cassent la bande (fin de partie). Le Virtuose est aussi un peu plus dense et plus rapide.
+- **Marges de sécurité du téléphone** : le jeu reste sous la barre d'état et au-dessus de la barre de gestes (encoche, appli Android plein écran), les boutons du haut ne sortent plus du cadre.
+- **Couleur selon le sens de coupe** : bloc debout vert, diagonale jaune, couché bleu.
+- **Double rond** : les deux boutons sont reliés par une barre, pour montrer qu'on tape les deux ensemble.
+- Niveau test : le cercle et la vaguelette sont retirés (trop durs ou pas assez fun), il reste la diagonale et le double rond.
+
 ## 0.22.0 — Les nouveaux morceaux deviennent les cassettes, et 4 nouvelles briques à tester
 - **Les 6 morceaux composés remplacent les anciennes cassettes**, de la plus facile à la plus dure : A Robots de minuit (couper, taper) · B Pas de lune (+ scratch) · C Racines (+ notes longues) · D Vent des collines · E Autoroute 86 (scratch + notes longues) · F Cri du garage (tout, vite et fort). L'ancien générateur de musique par styles est retiré : chaque cassette joue sa partition.
 - **Niveau test des nouvelles briques** dans le labo, une section et un tuto par brique, puis tout mélangé :
