@@ -1,5 +1,11 @@
 # Journal des versions
 
+## 0.24.0 — BEAT SPLASH, nouvel accueil, prêt pour Google Play
+- **Le jeu s'appelle BEAT SPLASH.**
+- **Nouvel écran d'accueil**, affiché au lancement : titre au pinceau blanc sur une giclée rouge, avec une couronne et une étoile, et l'étiquette jaune « TOUCHE POUR LANCER LA CASSETTE ». Boutons en papier déchiré (JOUER en rouge, CASSETTES, OPTIONS). Décor papier beige avec trame, poteaux électriques et enceintes, la grande cassette qui saute, deux petites qui dansent, et la foule.
+- Le menu des cassettes affiche le nouveau titre en petit.
+- **Appli Android** : Capacitor 8, identifiant `com.zed69000.beatsplash`, portrait, icône et bannière de la fiche dessinées par le jeu, build et envoi automatiques sur Google Play par game-pipeline.
+
 ## 0.23.0 — Tu joues ta partie, pause en jeu, vrai niveau Roi
 - **Chaque geste réussi joue ta partie du morceau**, comme dans Guitar Hero : un coup d'orchestre dans le style de la cassette (filtre French house, cuivres funk, skank reggae, piano, guitare saturée), avec l'accord du moment et la basse. Il grossit avec le combo (doublure à l'octave, accord plus large, crash). Un raté fait décrocher ta partie une mesure (accords, arpège, mélodie).
 - **Pause en jeu** (bouton ❚❚ en haut) : reprendre, recommencer, quitter. Le jeu se met aussi en pause quand l'appli passe en arrière-plan.

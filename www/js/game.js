@@ -3,7 +3,7 @@ window.GAMES = window.GAMES || {};
 const G = window.GAMES = window.GAMES || {};
 
 /* =========================================================
-   K7 CUT — un runner rythmique en cassettes
+   BEAT SPLASH — un runner rythmique en cassettes
    ========================================================= */
 const INK = '#1c1b19', PAPER = '#f4f0e6', RED = '#d7263d';
 const FONT = '"Rubik Mono One", "Silkscreen", monospace';
@@ -104,7 +104,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.23.0';
+const VERSION = '0.24.0';
 const DIFFS = [
   {id: 'apprenti', name: 'Apprenti', note: 'Pour apprendre, tout en douceur', mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: 'Musicien', note: 'Le jeu tel qu\'il est pensé', mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -1225,6 +1225,7 @@ G.trancheroute = { mount(stage, api){
   });
 
   /* ---------- direction artistique : papier, encre, coups de pinceau, sérigraphie ---------- */
+  const TITLEF = '"Knewave", "Permanent Marker", sans-serif';
   const PAPERBG = '#ece5d3', STEEL = '#8f8c86', STEEL2 = '#6f6c66', LABELRED = '#b83a34';
   function grain(g, w, h, n, dark){ for(let i=0;i<n;i++){ g.fillStyle = `rgba(${dark ? '28,27,25' : '255,255,255'},${.03 + Math.random()*.08})`; const s = Math.random() < .9 ? 1 : 2; g.fillRect(Math.random()*w, Math.random()*h, s, s); } }
   function brush(g, r, x0, y0, x1, y1, width, alpha){
@@ -2017,7 +2018,7 @@ G.trancheroute = { mount(stage, api){
       <button class="k7btn" id="k7intro" style="padding:12px;font-size:13px">REJOUER L'INTRO</button>
       <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">REVOIR LES TUTOS</button>
       <button class="k7btn" id="k7labo" style="padding:12px;font-size:13px;background:#ffd23f">🎧 LABO : ÉCOUTER DE NOUVEAUX MORCEAUX</button>
-      <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">K7 CUT · version ${VERSION}</div></div>`;
+      <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">BEAT SPLASH · version ${VERSION}</div></div>`;
     menu.appendChild(sh);
     const close = () => sh.remove();
     sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
@@ -2098,9 +2099,8 @@ G.trancheroute = { mount(stage, api){
       g.beginPath(); g.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); g.fill(); g.fillRect(1.5, -14, 3, 20); g.beginPath(); g.moveTo(4.5, -14); g.quadraticCurveTo(14, -10, 10, 0); g.quadraticCurveTo(11, -7, 4.5, -7); g.fill(); g.restore();
     }
     mFloat = mFloat.filter(n => !n.burst || n.burst.life > 0);
-    // titre : « TOUCHE ! » avant l'intro, puis K7 CUT en graffiti
-    if(intro && intro.stage === 'wait') drawTouche(g, 18, 118, mTime, W*.8);
-    else graffiti(g, 'K7 CUT', W*.5 - Math.min(60, W*.15)*2.6, 122, Math.min(60, W*.16, W*.15), mTime, kick, intro && intro.stage === 'play' ? introPop : null);
+    // titre : « TOUCHE ! » avant l'intro, puis BEAT SPLASH en graffiti
+    drawMenuTitle(g, mTime);
     introFrame(g, dt);
     // les cassettes mascottes : voisines qui dépassent sur les côtés, celle du centre qui danse
     const base = Math.floor(mPos), look = drag ? {x: Math.max(-1, Math.min(1, -drag.v*3)), y: 0} : {x: Math.sin(mTime*.7)*.6, y: Math.sin(mTime*1.1)*.4};
@@ -2119,17 +2119,22 @@ G.trancheroute = { mount(stage, api){
   if(!document.getElementById('k7-home-css')){ const st = document.createElement('style'); st.id = 'k7-home-css'; st.textContent = `
     .k7home{position:absolute;inset:0;z-index:5;overflow:hidden}
     .k7home canvas{position:absolute;inset:0;width:100%;height:100%}
-    .k7plate{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;width:100%;border:5px solid ${INK};border-radius:12px;font-family:${GRAF};color:${INK};cursor:pointer;box-shadow:0 6px 0 ${INK};padding:0 18px;transition:transform .12s cubic-bezier(.3,1.6,.5,1),box-shadow .12s;background-clip:padding-box}
-    .k7plate:active{transform:translateY(5px);box-shadow:0 1px 0 ${INK}}
-    .k7plate:focus-visible{outline:3px solid #29c4ff;outline-offset:3px}
-    .k7plate::before{content:"";position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--stripe);border-right:4px solid ${INK};border-radius:6px 0 0 6px}
-    .k7plate i{position:absolute;width:9px;height:9px;border-radius:50%;background:#d8d2c6;border:2px solid ${INK}}
-    .k7plate i:nth-of-type(1){left:20px;top:5px}.k7plate i:nth-of-type(2){right:6px;top:5px}.k7plate i:nth-of-type(3){left:20px;bottom:5px}.k7plate i:nth-of-type(4){right:6px;bottom:5px}
-    .k7plate.big{height:76px;font-size:40px;background:#e8344f;color:#fff;-webkit-text-stroke:2px ${INK};paint-order:stroke fill;text-shadow:3px 4px 0 ${INK};--stripe:#ffd23f;transform:rotate(-1.5deg)}
-    .k7plate.big:active{transform:rotate(-1.5deg) translateY(5px)}
-    .k7plate.mid{height:58px;font-size:28px;background:#f3ead7;--stripe:#ffd23f;width:86%;margin:0 auto;transform:rotate(.8deg)}
-    .k7plate.opt{height:58px;font-size:28px;background:#ffd23f;--stripe:#29c4ff;width:80%;margin:0 auto;transform:rotate(-.6deg)}
-    .k7dot{position:absolute;right:-5px;top:-5px;width:14px;height:14px;border-radius:50%;background:#e8344f;border:3px solid ${INK}}
+    .k7plate{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;gap:14px;width:100%;border:0;background:none;font-family:${TITLEF};color:${INK};cursor:pointer;padding:0 22px;transition:transform .12s cubic-bezier(.3,1.6,.5,1)}
+    .k7plate::before,.k7plate::after{content:"";position:absolute;inset:0;z-index:-1;clip-path:polygon(0 8%,4% 0,11% 6%,19% 1%,27% 7%,36% 0,45% 5%,55% 0,63% 6%,72% 1%,81% 7%,90% 0,96% 5%,100% 2%,98% 30%,100% 55%,97% 78%,100% 100%,91% 94%,83% 100%,74% 94%,64% 100%,55% 95%,45% 100%,36% 94%,27% 100%,18% 94%,9% 100%,2% 95%,0 70%,2% 48%,0 26%)}
+    .k7plate::after{background:${INK};transform:translate(4px,6px);z-index:-2}
+    .k7plate::before{background:var(--paper)}
+    .k7plate{filter:drop-shadow(2.5px 0 0 ${INK}) drop-shadow(-2.5px 0 0 ${INK}) drop-shadow(0 2.5px 0 ${INK}) drop-shadow(0 -2.5px 0 ${INK})}
+    .k7plate:active{transform:translateY(4px)}
+    .k7plate:active::after{transform:translate(2px,2px)}
+    .k7plate:focus-visible{outline:3px solid #29c4ff;outline-offset:6px}
+    .k7plate .ico{flex:none;width:44px;height:30px;display:grid;place-items:center}
+    .k7plate .lbl{flex:1;text-align:left;letter-spacing:.5px}
+    .k7plate.big{--paper:#e8344f;height:84px;font-size:44px;color:#fff;-webkit-text-stroke:2.5px ${INK};paint-order:stroke fill;text-shadow:3px 4px 0 ${INK};transform:rotate(-2deg)}
+    .k7plate.big .lbl{text-align:center}
+    .k7plate.big:active{transform:rotate(-2deg) translateY(4px)}
+    .k7plate.mid,.k7plate.opt{--paper:#f3ead7;height:60px;font-size:27px;width:90%;margin:0 auto}
+    .k7plate.mid{transform:rotate(.8deg)}.k7plate.opt{transform:rotate(-.7deg);--paper:#f6e7a8}
+        .k7dot{position:absolute;right:-5px;top:-5px;width:14px;height:14px;border-radius:50%;background:#e8344f;border:3px solid ${INK}}
     .k7gal{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:60vh;overflow-y:auto}
     .k7gal figure{margin:0;background:#fff;border:3px solid ${INK};border-radius:10px;overflow:hidden;cursor:pointer}
     .k7gal img{display:block;width:100%;aspect-ratio:9/10;object-fit:cover}
@@ -2138,16 +2143,17 @@ G.trancheroute = { mount(stage, api){
   const home = document.createElement('div'); home.className = 'k7home'; menu.appendChild(home);
   const hcv = document.createElement('canvas'); hcv.width = W*mdpr; hcv.height = H*mdpr; home.appendChild(hcv); const hx = hcv.getContext('2d'); hx.setTransform(mdpr, 0, 0, mdpr, 0, 0);
   const TROPHY = `<svg width="26" height="26" viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="${INK}"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="${INK}" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="${INK}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+  const CASS = `<svg width="42" height="28" viewBox="0 0 42 28"><rect x="2" y="2" width="38" height="24" rx="4" fill="${INK}"/><rect x="7" y="7" width="28" height="10" rx="2" fill="#f3ead7"/><circle cx="14" cy="12" r="3" fill="${INK}"/><circle cx="28" cy="12" r="3" fill="${INK}"/><path d="M11 26l3-5h14l3 5" fill="#f3ead7"/></svg>`;
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
   home.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div>
       <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="Mes œuvres" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="Options">${GEAR}</button></div></div>
     <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
-      <button id="k7hplay" class="k7plate big"><i></i><i></i><i></i><i></i>JOUER<svg width="34" height="36" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg></button>
-      <button id="k7hlvl" class="k7plate mid"><i></i><i></i><i></i><i></i>NIVEAUX ${BARS}</button>
-      <button id="k7hopt" class="k7plate opt"><i></i><i></i><i></i><i></i>OPTIONS ${GEAR}</button></div>`);
-  const hb = home.querySelector('.k7hbtns'); hb.style.top = Math.round(Math.max(H*.31, 200)) + 'px'; let hbBottom = H*.62;
+      <button id="k7hplay" class="k7plate big"><span class="lbl">JOUER</span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg></button>
+      <button id="k7hlvl" class="k7plate mid"><span class="ico">${CASS}</span><span class="lbl">CASSETTES</span></button>
+      <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">OPTIONS</span></button></div>`);
+  const hb = home.querySelector('.k7hbtns'); hb.style.top = Math.round(Math.max(H*.4, 300)) + 'px'; hb.style.gap = '16px'; let hbBottom = H*.62;
   const layoutHome = () => { const r = hb.getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
   let homeOn = false, hTime = 0; home.hidden = true;
   const showHome = () => { homeOn = true; home.hidden = false; refreshHome(); };
@@ -2176,38 +2182,89 @@ G.trancheroute = { mount(stage, api){
   };
   // titre TOUCHÉ : jaune, le É en rouge, les lettres giclent avec la voix
   function homePop(i){ if(!intro) return 1; if(intro.stage !== 'play') return 1; const dt2 = intro.t - .08 - Math.min(i, 5)*ISTEP; if(dt2 < 0) return .001; const last = intro.t - .08 - 6*ISTEP*1.5; const b = 1 + Math.exp(-dt2*9)*Math.sin(dt2*30)*.5 + (dt2 < .06 ? .7 - dt2*10 : 0); return last > 0 ? b + Math.exp(-last*6)*.4 : b; }
-  function drawHomeTitle(g, cx, y, t){
-    const txt = [...'TOUCHÉ']; g.font = `100px ${GRAF}`; const ws = txt.map(c => g.measureText(c).width), tw = ws.reduce((a, b) => a + b, 0), size = Math.min(110, 100*W*.84/tw, H*.12), k = size/100;
-    g.save(); g.translate(cx - tw*k/2, y); g.rotate(-.05 + Math.sin(t*2)*.01); g.font = `${size}px ${GRAF}`; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
-    let x = 0; txt.forEach((c, i) => { const w = ws[i]*k, p = homePop(i), jy = Math.sin(t*4 - i*.7)*3; g.save(); g.translate(x + w/2, jy); g.scale(p, p); g.rotate((i % 2 ? .04 : -.03));
-      for(let e=8;e>0;e--){ g.fillStyle = INK; g.fillText(c, -w/2 + e*.8, e); }
-      g.lineWidth = size*.18; g.strokeStyle = INK; g.strokeText(c, -w/2, 0);
-      const gr = g.createLinearGradient(0, -size*.8, 0, 0); if(i === 5){ gr.addColorStop(0, '#ff5a6e'); gr.addColorStop(1, '#d7263d'); } else { gr.addColorStop(0, '#fff07a'); gr.addColorStop(1, '#ffc21f'); } g.fillStyle = gr; g.fillText(c, -w/2, 0);
-      g.fillStyle = 'rgba(28,27,25,.25)'; for(let d=0;d<3;d++) g.fillRect(-w/2 + w*(.2 + d*.25), -size*.05, 3, 6 + ((i*7 + d*5) % 12));
+  let titleSplat = null;
+  function makeTitleSplat(){ const c = document.createElement('canvas'), S = 460; c.width = S*2; c.height = S*1.2; const g = c.getContext('2d'); g.scale(2, 2); const r = rngFrom('beatsplash');
+    crisp(g, r, S*.36, S*.3, 96, '#e8344f', 4); crisp(g, r, S*.62, S*.27, 82, '#e8344f', 3); crisp(g, r, S*.5, S*.36, 70, '#d7263d', 2);
+    for(let i=0;i<70;i++){ const a = r()*6.283, d = 100 + r()*130; g.fillStyle = r() < .7 ? '#e8344f' : INK; g.globalAlpha = .55 + r()*.45; g.beginPath(); g.arc(S*.5 + Math.cos(a)*d*1.2, S*.3 + Math.sin(a)*d*.55, 1 + r()*3.5, 0, 6.283); g.fill(); }
+    return c; }
+  function star(g, x, y, R, rot){ g.save(); g.translate(x, y); g.rotate(rot); g.beginPath(); for(let i=0;i<10;i++){ const a = i*Math.PI/5 - Math.PI/2, rr = i % 2 ? R*.45 : R; g.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } g.closePath(); g.fill(); g.restore(); }
+  function brushWord(g, word, x0, y, size, t, i0){
+    // chaque lettre : ombre noire décalée, contour épais, blanc cassé, et des traces de pinceau
+    g.font = `${size}px ${TITLEF}`; let x = x0;
+    [...word].forEach((c, k) => { const i = i0 + k, w = g.measureText(c).width, p = homePop(i), jy = Math.sin(t*4 - i*.6)*2.5;
+      g.save(); g.translate(x + w/2, y + jy); g.scale(p, p); g.rotate(((i*37) % 7 - 3)*.012);
+      g.lineJoin = 'round'; g.fillStyle = INK; g.fillText(c, -w/2 + size*.06, size*.07);
+      g.lineWidth = size*.15; g.strokeStyle = INK; g.strokeText(c, -w/2, 0);
+      g.fillStyle = '#fbf6ea'; g.fillText(c, -w/2, 0);
+      g.save(); g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(28,27,25,.12)'; for(let d=0;d<4;d++) g.fillRect(-w/2 + w*(.12 + d*.22), -size*(.75 - d*.07), w*.07, size*.5); g.restore();
       g.restore(); x += w; });
-    g.restore();
-    // bande noire « POUR LANCER LA CASSETTE »
-    g.save(); g.translate(cx, y + size*.32); g.rotate(-.03); g.font = `${Math.min(20, W*.05)}px ${MARKER}`; const bw = g.measureText('POUR LANCER LA CASSETTE').width + 30;
-    g.fillStyle = INK; g.beginPath(); g.moveTo(-bw/2, -15); for(let i=0;i<=10;i++) g.lineTo(-bw/2 + i*bw/10, -15 + (i % 2 ? -3 : 2)); g.lineTo(bw/2 + 6, 0); for(let i=10;i>=0;i--) g.lineTo(-bw/2 + i*bw/10, 15 + (i % 2 ? 3 : -2)); g.lineTo(-bw/2 - 6, 0); g.closePath(); g.fill();
-    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('POUR LANCER LA CASSETTE', 0, 1); g.restore();
   }
+  // le titre en petit sur le menu des cassettes : une ligne, la même giclée rouge
+  function drawMenuTitle(g, t){
+    if(!titleSplat) titleSplat = makeTitleSplat(); g.save(); g.font = `100px ${TITLEF}`; const size = Math.min(46, 100*W*.6/g.measureText('BEAT SPLASH').width), z = W*.62/460;
+    g.globalAlpha = .9; g.drawImage(titleSplat, W*.02, 64, 460*z, 276*z*.7); g.globalAlpha = 1;
+    g.translate(0, 122); g.rotate(-.04); brushWord(g, 'BEAT SPLASH', 18, 0, size, t, 99); g.restore();
+  }
+  function drawHomeTitle(g, cx, y, t){
+    g.save(); g.font = `100px ${TITLEF}`; const w1 = g.measureText('BEAT').width, w2 = g.measureText('SPLASH').width, size = Math.min(96, 100*W*.74/w2, H*.1), k = size/100, top = y - size*1.05;
+    if(!titleSplat) titleSplat = makeTitleSplat();
+    { const z = W*1.05/460, kick = Math.max(0, 1 - ((t*104/60) % 1)*4); g.drawImage(titleSplat, cx - 230*z*(1 + kick*.02), top - 40*z, 460*z*(1 + kick*.02), 276*z); }
+    g.translate(cx, y); g.rotate(-.06);
+    brushWord(g, 'BEAT', -w2*k/2 + size*.05, -size*.82, size*.88, t, 0);
+    brushWord(g, 'SPLASH', -w2*k/2, size*.1, size, t, 4);
+    // couronne jaune sur le B, étoile noire au bout de SPLASH
+    g.save(); g.translate(-w2*k/2 + size*.3, -size*1.62); g.rotate(-.18 + Math.sin(t*3)*.05); const cw = size*.42;
+    g.beginPath(); g.moveTo(-cw/2, 0); g.lineTo(-cw/2, -cw*.55); g.lineTo(-cw/4, -cw*.2); g.lineTo(0, -cw*.7); g.lineTo(cw/4, -cw*.2); g.lineTo(cw/2, -cw*.55); g.lineTo(cw/2, 0); g.closePath();
+    g.lineJoin = 'round'; g.lineWidth = 5; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.fill(); g.restore();
+    g.fillStyle = INK; star(g, w1*k*.88 - w2*k/2 + size*.55, -size*1.1, size*.2, .2 + Math.sin(t*2)*.1);
+    g.restore();
+    // étiquette jaune scotchée « TOUCHE POUR LANCER LA CASSETTE »
+    g.save(); g.translate(cx + W*.04, y + size*.6); g.rotate(-.05); const fs = Math.min(19, W*.048); g.font = `${fs}px ${MARKER}`; const txt = 'TOUCHE POUR LANCER LA CASSETTE', bw = g.measureText(txt).width + 34;
+    g.fillStyle = INK; g.fillRect(-bw/2 + 4, -fs + 5, bw, fs*2); g.fillStyle = '#ffd23f'; g.beginPath(); g.moveTo(-bw/2, -fs); for(let i=0;i<=8;i++) g.lineTo(-bw/2 + i*bw/8, -fs + (i % 2 ? -2 : 1)); g.lineTo(bw/2, fs); for(let i=8;i>=0;i--) g.lineTo(-bw/2 + i*bw/8, fs + (i % 2 ? 2 : -1)); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.save(); g.rotate(.5); g.fillRect(-bw/2 - 4, -fs - 18, 30, 12); g.restore();
+    g.fillStyle = INK; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, 0, 1); g.restore();
+  }
+  // le décor de l'accueil, peint une fois : papier beige taché, trame, poteaux électriques, enceintes
+  let homeBg = null;
+  function makeHomeBg(){ const c = document.createElement('canvas'), w = Math.round(W), h = Math.round(H); c.width = w*mdpr; c.height = h*mdpr; const g = c.getContext('2d'); g.scale(mdpr, mdpr); const r = rngFrom('papier');
+    const gr = g.createRadialGradient(w*.5, h*.4, 40, w*.5, h*.5, h*.75); gr.addColorStop(0, '#efe3c6'); gr.addColorStop(1, '#cdbb94'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    for(let i=0;i<2600;i++){ g.fillStyle = r() < .5 ? 'rgba(80,60,30,.08)' : 'rgba(255,255,255,.12)'; g.fillRect(r()*w, r()*h, 1 + r()*2, 1 + r()*2); }
+    // trame de points noirs dans les coins
+    for(const [ox, oy] of [[0, 0], [w, h*.55]]) for(let i=0;i<500;i++){ const a = r()*6.283, d = Math.pow(r(), .7)*w*.45, x = ox + Math.cos(a)*d, y = oy + Math.sin(a)*d*.8; g.fillStyle = INK; g.globalAlpha = .7*(1 - d/(w*.45)); g.beginPath(); g.arc(x, y, 1 + r()*2.4, 0, 6.283); g.fill(); } g.globalAlpha = 1;
+    // coups de bombe noirs en diagonale
+    for(let i=0;i<5;i++){ g.save(); g.translate(r()*w, r()*h*.7); g.rotate(-.6 + r()*.2); g.globalAlpha = .18 + r()*.25; g.fillStyle = INK; for(let j=0;j<5;j++) g.fillRect(-60 + j*4, j*7, 120 + r()*80, 3 + r()*3); g.restore(); } g.globalAlpha = 1;
+    // poteaux électriques et fils
+    g.strokeStyle = 'rgba(28,27,25,.75)'; g.fillStyle = 'rgba(28,27,25,.75)'; g.lineWidth = 2;
+    const poles = [[w*.07, h*.5, 1], [w*.86, h*.62, .7]];
+    for(const [x, y, sc] of poles){ g.fillRect(x - 4*sc, y - 170*sc, 8*sc, 260*sc); g.fillRect(x - 34*sc, y - 150*sc, 68*sc, 6*sc); g.fillRect(x - 26*sc, y - 128*sc, 52*sc, 5*sc); }
+    for(const dy of [-148, -126]){ g.beginPath(); g.moveTo(-10, h*.5 + dy - 30); g.quadraticCurveTo(w*.3, h*.5 + dy + 30, w*.86, h*.62 + dy*.7); g.quadraticCurveTo(w*.95, h*.62 + dy*.7 + 12, w + 10, h*.6 + dy*.7); g.stroke(); }
+    // enceintes en bas, avec autocollants
+    const sp = (x, y, sw, sh) => { g.fillStyle = INK; g.fillRect(x, y, sw, sh); g.strokeStyle = '#3a3733'; g.lineWidth = 3; g.strokeRect(x + 5, y + 5, sw - 10, sh - 10); for(const [cy2, rr] of [[.32, .26], [.72, .18]]){ g.fillStyle = '#2b2926'; g.beginPath(); g.arc(x + sw/2, y + sh*cy2, sw*rr, 0, 6.283); g.fill(); g.fillStyle = '#4a4640'; g.beginPath(); g.arc(x + sw/2, y + sh*cy2, sw*rr*.35, 0, 6.283); g.fill(); } };
+    sp(-14, h*.84, w*.24, h*.2); sp(w*.2, h*.88, w*.2, h*.15); sp(w*.78, h*.86, w*.25, h*.18);
+    g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(w*.09, h*.9, 13, 0, 6.283); g.fill(); g.fillStyle = INK; g.beginPath(); g.arc(w*.09 - 4.5, h*.9 - 3.5, 2, 0, 6.283); g.arc(w*.09 + 4.5, h*.9 - 3.5, 2, 0, 6.283); g.fill(); g.lineWidth = 2; g.strokeStyle = INK; g.beginPath(); g.arc(w*.09, h*.9 + 1, 7, .3, Math.PI - .3); g.stroke();
+    g.strokeStyle = '#f3ead7'; g.lineWidth = 2; g.save(); g.translate(w*.88, h*.91); g.beginPath(); for(let i=0;i<10;i++){ const a = i*Math.PI/5 - Math.PI/2, rr = i % 2 ? 6 : 13; g.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } g.closePath(); g.stroke(); g.restore();
+    // giclées rouges
+    for(const [x, y, R] of [[w*.9, h*.3, 16], [w*.15, h*.93, 12], [w*.6, h*.88, 10]]){ crisp(g, r, x, y, R, '#e8344f', 2); }
+    return c; }
   function crowd(g, y, t, kick){ g.fillStyle = INK; for(let i=0;i<18;i++){ const x = i*W/16 - 10 + (i % 2)*8, h = 26 + ((i*37) % 14), jump = Math.max(0, Math.sin(t*104/60*Math.PI + i))*6*(.4 + kick); g.beginPath(); g.arc(x, y - h - jump, 12, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(x, y - h*.35 - jump, 18, h*.6, 0, Math.PI, 0); g.fill(); g.fillRect(x - 18, y - h*.35 - jump, 36, 60); if(i % 3 === 0){ g.lineWidth = 6; g.strokeStyle = INK; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y - h - jump + 6); g.lineTo(x + 18, y - h - 28 - jump); g.stroke(); } } }
   function reel(g, x, y, R, t){ g.fillStyle = INK; g.beginPath(); g.arc(x, y, R, 0, 6.283); g.fill(); g.fillStyle = '#f3ead7'; g.beginPath(); g.arc(x, y, R*.55, 0, 6.283); g.fill(); g.lineWidth = 3; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y, R*.4, 0, 6.283); g.fill(); g.save(); g.translate(x, y); g.rotate(t*1.2); g.fillStyle = '#f3ead7'; for(let i=0;i<6;i++){ g.rotate(1.047); g.fillRect(-R*.06, -R*.42, R*.12, R*.12); } g.restore(); }
   function homeFrame(dt){
     hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*104/60, kick = Math.max(0, 1 - (beat % 1)*4);
-    g.clearRect(0, 0, W, H); g.drawImage(menuBg, -20 + Math.sin(hTime*.3)*6, -20, W + 40, H + 40);
-    // rayons de scène
-    g.save(); g.globalAlpha = .1 + kick*.05; g.fillStyle = '#fff'; g.translate(W/2, -20); for(let i=0;i<7;i++){ g.rotate(i ? .16 : -.5); g.beginPath(); g.moveTo(0, 0); g.lineTo(-30, H); g.lineTo(30, H); g.closePath(); g.fill(); } g.restore();
-    drawHomeTitle(g, W/2, Math.max(H*.19, 76 + Math.min(110, H*.12)*.72), hTime);
-    // la scène : piste, obstacles, bobines, foule
-    const ty = H*.86; reel(g, W*.1, ty + 20, W*.2, hTime); reel(g, W*.9, ty + 20, W*.2, -hTime);
-    g.fillStyle = INK; g.save(); g.translate(0, ty); g.rotate(-.04); g.fillRect(-20, -12, W + 40, 24); g.fillStyle = LABELRED; for(let i=0;i<6;i++) g.fillRect((i*W/5 + hTime*60) % (W + 40) - 20, -2, 14, 4); g.restore();
-    for(const [x, v] of [[W*.3, 1], [W*.7, 1]]){ g.save(); g.translate(x, ty - 36); g.rotate(-.04); g.fillStyle = '#f3ead7'; g.strokeStyle = INK; g.lineWidth = 3; rrp(g, -11, -26, 22, 52, 6); g.fill(); g.stroke(); g.strokeStyle = LABELRED; g.lineWidth = 3.5; for(let i=0;i<3;i++){ const yy = 12 - i*12; g.beginPath(); g.moveTo(-6, yy + 4); g.lineTo(0, yy - 3); g.lineTo(6, yy + 4); g.stroke(); } g.restore(); }
-    g.save(); g.translate(W/2, ty - 18); g.fillStyle = INK; g.beginPath(); g.arc(0, 2, 14, 0, 6.283); g.fill(); g.fillStyle = '#f3ead7'; g.beginPath(); g.arc(0, -1, 11, 0, 6.283); g.fill(); g.fillStyle = LABELRED; g.beginPath(); g.arc(0, -1, 4.5 + kick*1.5, 0, 6.283); g.fill(); g.restore();
-    // deux cassettes qui dansent sur scène
-    const room = H*.86 - 40 - hbBottom, sc = Math.max(.24, Math.min(.42, W/900, room/330)), my = hbBottom + 30 + 150*sc, j1 = Math.abs(Math.sin(beat*Math.PI))*22, j2 = Math.abs(Math.sin(beat*Math.PI + 1.6))*22;
-    g.save(); g.translate(W*.22, my - j1); g.rotate(-.22 + Math.sin(beat*Math.PI)*.08); g.scale(sc, sc); mascot(g, TRACKS[0], 0, true, true, hTime, {x: .6, y: -.3}); g.restore();
-    g.save(); g.translate(W*.78, my - 8 - j2); g.rotate(.2 - Math.sin(beat*Math.PI)*.08); g.scale(sc, sc); mascot(g, TRACKS[1], 1, true, true, hTime + 1, {x: .6, y: -.3}); g.restore();
+    g.clearRect(0, 0, W, H); if(!homeBg) homeBg = makeHomeBg(); g.drawImage(homeBg, 0, 0, W, H);
+    { const sz = Math.min(96, W*.74/4.1, H*.1); drawHomeTitle(g, W/2, 84 + sz*1.6, hTime); }
+    // éclairs jaunes autour de la cassette, qui claquent sur le temps
+    const room = H - 40 - hbBottom, sc = Math.max(.26, Math.min(.6, W/640, room/330)), jump = Math.abs(Math.sin(beat*Math.PI*.5))*26, mx2 = W*.5, my2 = hbBottom + 40 + 130*sc;
+    g.save(); g.fillStyle = '#ffd23f'; g.strokeStyle = INK; g.lineWidth = 2.5; g.globalAlpha = .6 + kick*.4;
+    for(const [ax, ay, ar] of [[mx2 - 150*sc, my2 - 120*sc, -.6], [mx2 + 160*sc, my2 - 140*sc, .5], [mx2 + 190*sc, my2 + 10*sc, 1.2]]){ g.save(); g.translate(ax, ay); g.rotate(ar); g.scale(1 + kick*.2, 1 + kick*.2); g.beginPath(); g.moveTo(-5, -22); g.lineTo(6, -22); g.lineTo(2, 22); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    g.restore();
+    // deux petites cassettes qui dansent sur les enceintes
+    const j1 = Math.abs(Math.sin(beat*Math.PI))*14, j2 = Math.abs(Math.sin(beat*Math.PI + 1.6))*14, s2 = sc*.45;
+    g.save(); g.translate(W*.12, H*.84 - 6 - j1); g.rotate(-.25 + Math.sin(beat*Math.PI)*.08); g.scale(s2, s2); mascot(g, TRACKS[1], 1, true, true, hTime + 1, {x: .6, y: -.3}); g.restore();
+    g.save(); g.translate(W*.88, H*.86 - 6 - j2); g.rotate(.22 - Math.sin(beat*Math.PI)*.08); g.scale(s2, s2); mascot(g, TRACKS[2], 2, true, true, hTime + 2, {x: -.6, y: -.3}); g.restore();
+    // la grande cassette qui saute au milieu
+    g.save(); g.translate(mx2, my2 - jump); g.rotate(-.12 + Math.sin(beat*Math.PI*.5)*.06); g.scale(sc, sc); mascot(g, TRACKS[0], 0, true, true, hTime, {x: .4, y: -.4}); g.restore();
+    // notes qui flottent
+    g.fillStyle = INK; for(let i=0;i<4;i++){ const nx = W*(.12 + i*.26), ny = hbBottom + 30 + ((hTime*20 + i*60) % 120); g.save(); g.translate(nx, ny); g.rotate(Math.sin(hTime*2 + i)*.3); g.globalAlpha = .75; g.beginPath(); g.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); g.fill(); g.fillRect(1.5, -14, 3, 20); g.beginPath(); g.moveTo(4.5, -14); g.quadraticCurveTo(14, -10, 10, 0); g.quadraticCurveTo(11, -7, 4.5, -7); g.fill(); g.restore(); }
     crowd(g, H + 30, hTime, kick);
   }
   let mLast = performance.now();
@@ -2254,8 +2311,26 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
-  showMenu();
+  window.__k7 = {home: () => showHome(), art: storeArt, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
+  function storeArt(w, h, kind){
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();
+    if(kind !== 'fg'){ const gr = g.createRadialGradient(w*.5, h*.45, 10, w*.5, h*.5, Math.max(w, h)*.7); gr.addColorStop(0, '#efe3c6'); gr.addColorStop(1, '#cdbb94'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      const r = rngFrom('icone'); for(let i=0;i<w*h/90;i++){ g.fillStyle = r() < .5 ? 'rgba(80,60,30,.08)' : 'rgba(255,255,255,.12)'; g.fillRect(r()*w, r()*h, 1 + r()*w/400, 1 + r()*w/400); } }
+    if(kind === 'banner'){
+      g.drawImage(titleSplat, w*.02, -h*.05, h*1.5, h*.9);
+      g.save(); g.translate(w*.06, h*.5); g.rotate(-.06); g.font = `100px ${TITLEF}`; const sz = 100*w*.4/g.measureText('SPLASH').width; brushWord(g, 'BEAT', 0, -sz*.05, sz*.88, 0, 99); brushWord(g, 'SPLASH', 0, sz*.9, sz, 0, 99); g.restore();
+      g.save(); g.translate(w*.74, h*.47); g.rotate(-.12); g.scale(h/520, h/520); mascot(g, TRACKS[0], 0, true, true, .3, {x: -.4, y: -.3}); g.restore();
+      g.save(); g.translate(w*.94, h*.78); g.rotate(.25); g.scale(h/1500, h/1500); mascot(g, TRACKS[2], 2, true, true, 1.3, {x: -.6, y: -.3}); g.restore();
+    } else {
+      const z = kind === 'fg' ? .62 : .82; // l'icône adaptative garde son dessin dans le cercle central
+      g.drawImage(titleSplat, w*(.5 - .8*z), h*(.5 - .62*z), w*1.6*z, w*.96*z);
+      g.save(); g.translate(w/2, h*.47); g.rotate(-.1); g.scale(w*z/330, w*z/330); mascot(g, TRACKS[0], 0, true, true, .3, {x: .3, y: -.3}); g.restore();
+    }
+    return c.toDataURL('image/png');
+  }
+  // on arrive sur l'accueil (titre, JOUER, CASSETTES, OPTIONS) ; le menu des cassettes est derrière
+  showMenu(); showHome();
   if(/labo/.test(location.search)) showLabo();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};

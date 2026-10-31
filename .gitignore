@@ -3,3 +3,8 @@ android/
 ios/
 .DS_Store
 dist/
+
+# Signature de release : la clé d'envoi Google Play reste hors du dépôt
+keystore.properties
+*.jks
+*.keystore

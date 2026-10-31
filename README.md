@@ -1,4 +1,4 @@
-# K7 CUT
+# BEAT SPLASH
 
 Jeu de rythme mobile en cassettes : on coupe, saute, maintient et scratche sur une bande, et chaque coupe réussie joue la mélodie du morceau. 6 faces (Robots de minuit, Pas de lune, Racines, Vent des collines, Autoroute 86, Cri du garage) à débloquer avec les disques gagnés.
 
@@ -53,3 +53,13 @@ Les polices viennent de Google Fonts : hors ligne, le jeu bascule sur des police
 | Tester de nouvelles briques ou morceaux | le labo (`LAB`, Réglages → « LABO », ou `?labo` dans l'adresse) |
 
 Les motifs d'obstacles sont générés à partir d'une graine propre à chaque cassette : ils sont identiques à chaque partie.
+
+## Google Play
+
+Appli Android `com.zed69000.beatsplash`, construite par Capacitor et envoyée par la chaîne commune [game-pipeline](https://github.com/zed69000/game-pipeline).
+
+- **Version** : `VERSION` dans `www/js/game.js`. Le numéro Play (versionCode) en découle : a*10000 + b*100 + c (0.24.0 -> 2400), il doit augmenter à chaque envoi.
+- **Build automatique** : `.github/workflows/play-release.yml` se lance quand la ligne `VERSION` change sur `main` (ou à la main dans Actions).
+- **Réglages natifs** (portrait, version, signature, icône) : `tools/app/configure-native.mjs`, appliqué après `npx cap add android`.
+- **Icône et images de la fiche** : dessinées par le jeu, `python tests/store_art.py` (serveur local sur le port 8770) écrit `tools/app/android-res/` et `store/`.
+- **Clé d'envoi** : `beatsplash-upload.jks` et `keystore.properties` à la racine, jamais commités. À sauvegarder à part (gestionnaire de mots de passe).

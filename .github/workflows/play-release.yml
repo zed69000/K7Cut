@@ -1,0 +1,46 @@
+# Envoie BEAT SPLASH sur Google Play (tests internes) par la chaîne commune zed69000/game-pipeline.
+# Se lance tout seul quand VERSION change dans www/js/game.js, ou à la main : Actions > « Android · Google Play » > Run workflow.
+# Secrets du dépôt : voir game-pipeline/README.md (clé d'envoi + compte de service).
+# Le numéro de version Play (versionCode) vient de VERSION : 0.24.0 -> 2400.
+name: Android · Google Play
+
+on:
+  push:
+    branches: [main]
+    paths: [www/js/game.js]
+  workflow_dispatch:
+
+jobs:
+  # game.js change souvent : on ne construit que si la ligne VERSION a bougé
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.v.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || git diff HEAD~1 -- www/js/game.js | grep -q "^+const VERSION"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  play:
+    needs: version
+    if: needs.version.outputs.changed == 'true'
+    uses: zed69000/game-pipeline/.github/workflows/android-play.yml@main
+    with:
+      package-name: com.zed69000.beatsplash
+      aab-path: android/app/build/outputs/bundle/release/app-release.aab
+      # l'appli n'est pas encore publiée en production : la release arrive en brouillon, il reste à cliquer « Déployer »
+      release-status: draft
+      build-command: |
+        npm install --no-audit --no-fund
+        npx cap add android
+        node tools/app/configure-native.mjs
+        npx cap sync android
+        cd android && ./gradlew bundleRelease
+    secrets: inherit

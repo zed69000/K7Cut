@@ -1,20 +1,18 @@
 {
-  "name": "k7cut",
-  "version": "0.1.0",
+  "name": "beat-splash",
+  "version": "0.24.0",
   "private": true,
-  "description": "K7 CUT : jeu de rythme mobile en cassettes",
+  "description": "BEAT SPLASH : jeu de rythme mobile en cassettes",
   "scripts": {
     "dev": "npx serve www",
-    "cap:sync": "npx cap sync",
-    "cap:android": "npx cap add android && npx cap sync android",
-    "cap:ios": "npx cap add ios && npx cap sync ios"
+    "android": "npx cap add android && node tools/app/configure-native.mjs && npx cap sync android",
+    "android:bundle": "cd android && ./gradlew bundleRelease"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.1.2"
+    "@capacitor/cli": "^8.5.3"
   },
   "dependencies": {
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/ios": "^6.1.2"
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/android": "^8.5.3"
   }
 }
