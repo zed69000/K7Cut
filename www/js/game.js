@@ -104,7 +104,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.26.2';
+const VERSION = '0.26.3';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -314,23 +314,34 @@ G.trancheroute = { mount(stage, api){
   // joue un morceau d'enregistrement, niveau égalisé ; at = heure audio réelle
   function playRec(k, T, vol, o2){
     const b = recBuf[k], r = RECS[k]; if(!b || !useAudio) return false; o2 = o2 || {};
-    const src = actx.createBufferSource(), gn = actx.createGain(), pr = o2.rate || 1, a = r.a + (o2.from || 0), len = Math.min(o2.len || 99, r.b - a), dur = len/pr, g = vol*.5/r.peak;
+    const src = actx.createBufferSource(), gn = actx.createGain(), pr = o2.rate || 1, a = o2.seg ? o2.seg[0] : r.a + (o2.from || 0), len = Math.min(o2.len || 99, (o2.seg ? o2.seg[1] : r.b) - a), dur = len/pr, g = o2.seg ? vol*.1/o2.seg[3] : vol*.5/r.peak;
     src.buffer = b; src.playbackRate.value = pr;
     gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(g, T + (o2.att || .01)); gn.gain.setValueAtTime(g, T + Math.max(.02, dur - (o2.rel || .08))); gn.gain.linearRampToValueAtTime(0, T + dur);
     let n = src; if(o2.hp){ const f2 = actx.createBiquadFilter(); f2.type = 'highpass'; f2.frequency.value = o2.hp; n.connect(f2); n = f2; }
+    if(o2.lp){ const f2 = actx.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = o2.lp; n.connect(f2); n = f2; }
     route(n, gn, o2.bus || master, {rev: o2.rev ?? .15, dly: o2.dly || 0, pan: o2.pan || 0}, T); src.start(T, a, len + .02); src.stop(T + dur + .05);
     return true;
   }
-  // la belle voix, transposée sur une note (on reste près de sa hauteur naturelle pour qu'elle reste belle)
+  // la belle voix chante un arpège (la, do#, mi, sol#, la#) : ses notes tenues, mesurées sur l'enregistrement [début, fin, hauteur, niveau]
+  const VSEGS = [[.80, 1.28, 223, .043], [1.48, 1.75, 281, .046], [2.50, 2.73, 333, .13], [3.08, 3.28, 416, .21], [3.40, 3.56, 452, .12]];
+  // on prend la note tenue la plus proche de celle à chanter, pour la transposer le moins possible (et rester juste)
   function voiceNote(bus, at, f, vol, o2){
     if(!recBuf.voix) return false; o2 = o2 || {};
-    let pr = f*tapeK()/RECS.voix.f0; while(pr > 1.42) pr /= 2; while(pr < .71) pr *= 2;
-    const len = Math.min(RECS.voix.b - RECS.voix.a - .1, (o2.long ? 1.1 : .32)*pr);
-    playRec('voix', RT(at), vol*.9, {bus, rate: pr*(o2.det || 1), from: o2.long ? 0 : .4, len, att: .03, rel: o2.long ? .35 : .1, rev: o2.rev ?? .3, dly: o2.dly || 0, pan: o2.pan || 0});
+    const ft = f*tapeK(); let best = null;
+    for(const sg of VSEGS){ let pr = ft/sg[2]; while(pr > 1.42) pr /= 2; while(pr < .71) pr *= 2;
+      const cost = Math.abs(12*Math.log2(pr)) + (o2.long ? Math.max(0, .45 - (sg[1] - sg[0]))*12 : 0);
+      if(!best || cost < best.cost) best = {sg, pr, cost}; }
+    const {sg, pr} = best, len = Math.min(sg[1] - sg[0], o2.long ? 9 : .3*pr);
+    playRec('voix', RT(at), vol*.9, {bus, seg: sg, rate: pr*(o2.det || 1), len, att: .02, rel: o2.long ? .2 : .08, hp: Math.max(160, o2.hp || 0), lp: o2.lp, rev: o2.rev ?? .3, dly: o2.dly || 0, pan: o2.pan || 0});
     hit('lead', at); return true;
   }
   // les applaudissements, plus ou moins nourris
-  function applause(T, amount){ playRec('bravo', T, .35 + .25*amount, {rev: .25, len: 2.2 + 2.7*Math.min(1, amount), rel: 1.2}); }
+  // une salle entière : on empile l'enregistrement, décalé, accéléré ou ralenti un peu et étalé en stéréo
+  function applause(T, amount, bus){
+    amount = Math.max(.3, Math.min(1, amount)); const n = Math.round(5 + 9*amount), len = 2.4 + 2.2*amount;
+    for(let i=0;i<n;i++){ const pr = .86 + Math.random()*.28, from = Math.random()*Math.max(0, RECS.bravo.b - len*pr - .05);
+      playRec('bravo', T + Math.random()*.3*(i ? 1 : 0), (.55 + .35*amount)*1.2/Math.sqrt(n), {bus, rate: pr, from, len: len*pr, att: .15 + Math.random()*.2, rel: .9 + Math.random()*.8, rev: .3, pan: (i/(n - 1)*2 - 1)*.85}); }
+  }
   const voiceOn = () => api.load('voice', true) && (voiceBuf || recBuf.voix);
   function sing(bus, at, f, idx, vol, o2){
     if(!useAudio || !voiceBuf) return false; o2 = o2 || {};
@@ -1160,7 +1171,7 @@ G.trancheroute = { mount(stage, api){
     const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); startTrack(R.nextT); };
     el.querySelector('.keep').onclick = R.img ? R.keep : () => { close(); showMenu(); };
     outroMusic(at0, R.stars);
-    if(useAudio && R.stars && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; playRec('bravo', actx.currentTime + delay + .1, .35 + .25*R.stars/3, {bus: outroBus[0], rev: .25, len: 2.2 + 2.7*R.stars/3, rel: 1.2}); sendVia = sv; }
+    if(useAudio && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; applause(actx.currentTime + delay + .1, R.stars/3, outroBus[0]); sendVia = sv; }
     // compteurs qui défilent pendant les temps 2 à 4, confettis à chaque disque, foule qui saute sur le tempo
     const cv2 = el.querySelector('canvas'), g = cv2.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1); let alive = true, parts = [], fired = 0;
     const size = () => { cv2.width = el.clientWidth*dpr; cv2.height = el.clientHeight*dpr; }; size();

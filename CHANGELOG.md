@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.26.3 — La voix chante juste, la salle applaudit
+- **La belle voix chante juste** : l'enregistrement est un arpège (la, do#, mi, sol#, la#), pas une note unique. Le jeu la croyait sur 317 Hz et prenait un passage chanté en la : chaque note sortait à environ 6 demi-tons de l'accord. Maintenant on prend la note tenue la plus proche de celle à chanter (au plus un demi-ton et demi de transposition, moins de 15 cents d'écart mesuré), niveau égalisé, graves de la pièce coupés.
+- **Une vraie salle qui applaudit** : à la fin d'un niveau (et au palier NIRVANA), l'enregistrement est empilé 5 à 14 fois, décalé, un peu accéléré ou ralenti et étalé en stéréo. Même sans disque, un applaudissement poli.
+
 ## 0.26.2 — Plus de musiques qui se superposent
 - La musique de l'écran de fin est programmée 16 s à l'avance : en lançant le niveau suivant, ses notes restantes (et ses batteries, ses traînes de réverbe et d'écho) jouaient par-dessus le nouveau morceau. Elle passe maintenant par ses propres bus, coupés pour de bon dès qu'on quitte l'écran de fin, relance une partie ou revient aux menus. Les applaudissements de fin aussi.
 
