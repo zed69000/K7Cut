@@ -136,7 +136,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.26.3';
+const VERSION = '0.27.0';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},

@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.27.0 — Une seule page, 4 nouvelles chansons, la cassette de la mort
+- **Accueil sur une seule page** (d'après la maquette) : la cassette se choisit sur scène (glisser, toucher une voisine, toucher celle du centre pour la lancer), JOUER lance la cassette choisie, CASSETTES ouvre un volet avec la liste et la difficulté. Décor refait : titre rose et blanc, giclées colorées, trames, bobines, éclairs, couronne ; mise en page resserrée sur petits écrans.
+- **4 nouvelles chansons** : Boule à facettes (disco, découverte de la diagonale), Trottoir 90 (hip-hop, découverte des deux doigts), Velours (néo-soul), La Forge (métal, toutes les briques). 10 cassettes.
+- **Diagonale et deux doigts** dans les niveaux (aussi dans Vent des collines, Autoroute 86, Cri du garage).
+- **Progression rééquilibrée** : une nouvelle brique à peu près par cassette, une densité propre à chaque morceau (Robots de minuit allégé), prix 0 · 2 · 4 · 5 · 7 · 9 · 11 · 13 · 15 · 18 disques.
+- **Avant chaque niveau** : petit chargement, la règle du jeu et chaque brique de la cassette avec son geste (NOUVEAU sur celles jamais faites). « Revoir les tutos » réactive aussi diagonale et deux doigts.
+- **Cassette de la mort** (bouton ☠) : 3 cœurs, chaque raté en coûte un, les morceaux s'enchaînent du plus lent au plus rapide puis repartent plus durs ; classement des 10 meilleurs scores avec pseudo.
+
 ## 0.26.3 — La voix chante juste, la salle applaudit
 - **La belle voix chante juste** : l'enregistrement est un arpège (la, do#, mi, sol#, la#), pas une note unique. Le jeu la croyait sur 317 Hz et prenait un passage chanté en la : chaque note sortait à environ 6 demi-tons de l'accord. Maintenant on prend la note tenue la plus proche de celle à chanter (au plus un demi-ton et demi de transposition, moins de 15 cents d'écart mesuré), niveau égalisé, graves de la pièce coupés.
 - **Une vraie salle qui applaudit** : à la fin d'un niveau (et au palier NIRVANA), l'enregistrement est empilé 5 à 14 fois, décalé, un peu accéléré ou ralenti et étalé en stéréo. Même sans disque, un applaudissement poli.
