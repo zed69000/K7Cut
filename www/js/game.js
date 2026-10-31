@@ -154,6 +154,7 @@ G.trancheroute = { mount(stage, api){
   const REELY = Math.round(H*.83), REELR = Math.min(W*.19, H*.11), EQY = Math.round(H*.665);
   let PPB = 100;
   let actx = null, master = null, music = null, pump = null, t0 = 0, useAudio = false;
+  const MBPM = 118; // tempo de la musique des menus : les cassettes dansent dessus
   let diff = DIFFS[0], tr = null, sections, totalBars, bpb, objs, bits, judges, state = 'menu', score, combo, maxCombo, hearts, stats, beatNow, nextStep, jumpT, hurtT, energy, events, bump, flashR, gesture, motif, notesRun, holdState, scratchState, rot, finished, trance = 0, rings = [], hookMask = [1,0,0,1,0,1,0,0];
 
   /* ---------- sauvegarde ---------- */
@@ -177,7 +178,7 @@ G.trancheroute = { mount(stage, api){
       const comp = actx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 6; comp.ratio.value = 3; comp.attack.value = .015; comp.release.value = .12;
       const glue = actx.createWaveShaper(); glue.curve = curve(1.6); glue.oversample = '2x';
       const lim = actx.createDynamicsCompressor(); lim.threshold.value = -1.5; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .05;
-      master = actx.createGain(); master.gain.value = .7; master.connect(comp).connect(glue).connect(lim).connect(actx.destination);
+      master = actx.createGain(); master.gain.value = .7; master.connect(comp).connect(glue).connect(lim).connect(actx.destination); window.__k7out = lim; /* pour les tests : enregistrer la sortie */
       pump = actx.createGain(); pump.connect(master);
       shelf = actx.createBiquadFilter(); shelf.type = 'highshelf'; shelf.frequency.value = 5000; shelf.gain.value = 0; shelf.connect(pump);
       tone = actx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 20000; tone.Q.value = .8; tone.connect(shelf);
@@ -538,7 +539,7 @@ G.trancheroute = { mount(stage, api){
   const freq = (deg, oct) => { const sc = tr.scale, d = ((deg % 7) + 7) % 7, o = Math.floor(deg/7); return tr.root*Math.pow(2, (sc[d] + 12*o)/12)*(oct || 1); };
   function hit(ch, at){ events.push({ch, at}); }
   // la pompe : tout le morceau respire sur la grosse caisse (fort en électro, léger ailleurs)
-  function duck(at, depth){ if(!useAudio) return; const el = !tr || (tr.song ? !!tr.song.pump : ['disco','synthwave','french'].includes(tr.style)), T = RT(at); /* sans morceau (menus) : pompe électro */ pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || (el ? .35 : .72), T); pump.gain.linearRampToValueAtTime(1, T + 60/(tr ? tr.bpm : 104)*(el ? .6 : .35)); }
+  function duck(at, depth){ if(!useAudio) return; const el = !tr || state === 'menu' || (tr.song ? !!tr.song.pump : ['disco','synthwave','french'].includes(tr.style)), T = RT(at); /* sans morceau (menus) : pompe électro */ pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || (el ? .35 : .72), T); pump.gain.linearRampToValueAtTime(1, T + 60/(tr && state !== 'menu' ? tr.bpm : MBPM)*(el ? .6 : .35)); }
 
   /* instruments */
   const I = {
@@ -1929,7 +1930,7 @@ G.trancheroute = { mount(stage, api){
     g.restore();
   }
   function mascot(g, t, idx, open, sel, time, look){
-    const col = open ? SPRAY[idx % SPRAY.length] : '#a39d92', beat = time*104/60*Math.PI, bob = sel ? Math.abs(Math.sin(beat))*9 : Math.abs(Math.sin(beat))*3;
+    const col = open ? SPRAY[idx % SPRAY.length] : '#a39d92', beat = time*MBPM/60*Math.PI, bob = sel ? Math.abs(Math.sin(beat))*9 : Math.abs(Math.sin(beat))*3;
     // ombre au sol
     g.fillStyle = 'rgba(28,27,25,.3)'; g.beginPath(); g.ellipse(0, 166, 128 - bob*2, 11, 0, 0, 6.283); g.fill();
     // jambes et baskets qui battent la mesure
@@ -2202,7 +2203,7 @@ G.trancheroute = { mount(stage, api){
     squash *= Math.pow(.02, dt);
     const g = mx; g.clearRect(0, 0, W, H);
     g.drawImage(menuBg, -20 + Math.sin(mTime*.3)*8, -20, W + 40, H + 40);
-    const cassR = Math.min(W*.37, Math.max(64, (stackTop - 178)/2.1)), cx = W/2, cy = 178 + (stackTop - 178)*.47, beat = mTime*104/60, bt = beat - Math.floor(beat), kick = Math.max(0, 1 - bt*4);
+    const cassR = Math.min(W*.37, Math.max(64, (stackTop - 178)/2.1)), cx = W/2, cy = 178 + (stackTop - 178)*.47, beat = mTime*MBPM/60, bt = beat - Math.floor(beat), kick = Math.max(0, 1 - bt*4);
     // giclées de peinture derrière la cassette, qui pulsent sur le temps
     { if(!bgSplat) bgSplat = makeBgSplat(); const z = cassR/150*1.15*(1 + kick*.035); g.drawImage(bgSplat, cx - 210*z, cy - 210*z, 420*z, 420*z); }
     // notes qui s'envolent
@@ -2468,7 +2469,7 @@ G.trancheroute = { mount(stage, api){
   function drawHomeTitle(g, cx, y, t){
     g.save(); g.font = `100px ${TITLEF}`; const w1 = g.measureText('BEAT').width, w2 = g.measureText('SPLASH').width, size = Math.min(96, 100*W*.74/w2, H*(H < 740 ? .078 : .1)), k = size/100, top = y - size*1.05;
     if(!titleSplat) titleSplat = makeTitleSplat();
-    { const z = W*1.05/460, kick = Math.max(0, 1 - ((t*104/60) % 1)*4); g.drawImage(titleSplat, cx - 230*z*(1 + kick*.02), top - 40*z, 460*z*(1 + kick*.02), 276*z); }
+    { const z = W*1.05/460, kick = Math.max(0, 1 - ((t*MBPM/60) % 1)*4); g.drawImage(titleSplat, cx - 230*z*(1 + kick*.02), top - 40*z, 460*z*(1 + kick*.02), 276*z); }
     g.translate(cx, y); g.rotate(-.06);
     brushWord(g, 'BEAT', -w2*k/2 + size*.05, -size*.82, size*.88, t, 0);
     brushWord(g, 'SPLASH', -w2*k/2, size*.1, size, t, 4, '#ff3d7f');
@@ -2512,10 +2513,10 @@ G.trancheroute = { mount(stage, api){
     // giclées rouges
     for(const [x, y, R] of [[w*.9, h*.3, 16], [w*.15, h*.93, 12], [w*.6, h*.88, 10]]){ crisp(g, r, x, y, R, '#e8344f', 2); }
     return c; }
-  function crowd(g, y, t, kick){ g.fillStyle = INK; for(let i=0;i<18;i++){ const x = i*W/16 - 10 + (i % 2)*8, h = 26 + ((i*37) % 14), jump = Math.max(0, Math.sin(t*104/60*Math.PI + i))*6*(.4 + kick); g.beginPath(); g.arc(x, y - h - jump, 12, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(x, y - h*.35 - jump, 18, h*.6, 0, Math.PI, 0); g.fill(); g.fillRect(x - 18, y - h*.35 - jump, 36, 60); if(i % 3 === 0){ g.lineWidth = 6; g.strokeStyle = INK; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y - h - jump + 6); g.lineTo(x + 18, y - h - 28 - jump); g.stroke(); } } }
+  function crowd(g, y, t, kick){ g.fillStyle = INK; for(let i=0;i<18;i++){ const x = i*W/16 - 10 + (i % 2)*8, h = 26 + ((i*37) % 14), jump = Math.max(0, Math.sin(t*MBPM/60*Math.PI + i))*6*(.4 + kick); g.beginPath(); g.arc(x, y - h - jump, 12, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(x, y - h*.35 - jump, 18, h*.6, 0, Math.PI, 0); g.fill(); g.fillRect(x - 18, y - h*.35 - jump, 36, 60); if(i % 3 === 0){ g.lineWidth = 6; g.strokeStyle = INK; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y - h - jump + 6); g.lineTo(x + 18, y - h - 28 - jump); g.stroke(); } } }
   function reel(g, x, y, R, t){ g.fillStyle = INK; g.beginPath(); g.arc(x, y, R, 0, 6.283); g.fill(); g.fillStyle = '#f3ead7'; g.beginPath(); g.arc(x, y, R*.55, 0, 6.283); g.fill(); g.lineWidth = 3; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y, R*.4, 0, 6.283); g.fill(); g.save(); g.translate(x, y); g.rotate(t*1.2); g.fillStyle = '#f3ead7'; for(let i=0;i<6;i++){ g.rotate(1.047); g.fillRect(-R*.06, -R*.42, R*.12, R*.12); } g.restore(); }
   function homeFrame(dt){
-    hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*104/60, kick = Math.max(0, 1 - (beat % 1)*4);
+    hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*MBPM/60, kick = Math.max(0, 1 - (beat % 1)*4);
     g.clearRect(0, 0, W, H); if(!homeBg) homeBg = makeHomeBg(); g.drawImage(homeBg, 0, 0, W, H);
     { const sz = Math.min(96, W*.74/4.1, H*(H < 740 ? .078 : .1)); drawHomeTitle(g, W/2, (H < 740 ? 70 : 84) + sz*1.6, hTime); }
     // éclairs jaunes autour de la cassette, qui claquent sur le temps
@@ -2541,26 +2542,39 @@ G.trancheroute = { mount(stage, api){
     crowd(g, H + 30, hTime, kick);
   }
   let mLast = performance.now();
-  /* ---------- musique des menus : une boucle funk à 104 BPM, le tempo où dansent les cassettes ---------- */
-  // la mesure : la (i), fa (VI), do (III), sol (VII) ; grosse caisse à chaque temps, clap sur 2 et 4, basse qui rebondit, accords filtrés
-  const MM = {step: 60/104/4, roots: [55, 43.65, 65.41, 49], next: 0, n: 0, on: false};
-  const MKICK = 'x...x...x...x...', MCLAP = '....x.......x...', MHAT = '..x...x...x...x.', MBASS = [[0, 1, 2], [3, 1, 1], [6, 2, 1], [8, 1, 2], [10, 1, 1], [11, 2, 1], [14, 1, 2]], MSTAB = [3, 6, 11];
+  /* ---------- musique des menus : de la french house filtrée, 118 BPM ---------- */
+  // une boucle d'accords « échantillonnée » derrière un filtre qui s'ouvre et se referme sur 16 mesures, la pompe sur chaque
+  // grosse caisse, une basse funk en octaves, le charleston ouvert entre les temps, et une voix de robot qui répond toutes les 4 mesures
+  // la grille : la m7, ré 7, sol maj7, mi m7 (fréquences des fondamentales en Hz, et les intervalles de chaque accord)
+  const MM = {step: 60/MBPM/4, roots: [55, 73.42, 49, 82.41], ch: [[1, 1.189, 1.498, 1.782], [1, 1.26, 1.498, 1.782], [1, 1.26, 1.498, 1.888], [1, 1.189, 1.498, 1.782]], next: 0, n: 0, on: false};
+  const MKICK = 'x...x...x...x...', MCLAP = '....x.......x...', MOHAT = '..x...x...x...x.', MSAMP = [0, 3, 6, 8, 10, 11, 14];
+  const MBASS = [[0, 1, 2], [2, 2, 1], [4, 1, 1], [6, 2, 1], [8, 1, 2], [10, 2, 1], [11, 1.5, 1], [14, 2, 2]];
+  // la voix de robot : [pas dans les 2 mesures, demi-tons au-dessus de la, durée en doubles croches]
+  const MTALK = [[0, 12, 2], [3, 15, 2], [6, 17, 3], [10, 15, 2], [12, 12, 4], [20, 19, 2], [22, 17, 2], [24, 15, 6]];
   function menuMusic(){
     const want = !menu.hidden && state === 'menu' && !laboOn && useAudio && actx && actx.state === 'running' && !(intro && intro.stage !== 'wait');
     if(!want){ MM.on = false; return; }
     if(!MM.on){ // on reprend proprement : horloge du jeu sur celle de l'audio, bus de musique ouvert
       MM.on = true; t0 = 0; resetRate(); MM.next = actx.currentTime + .1; MM.n = 0;
+      master.gain.cancelScheduledValues(actx.currentTime); master.gain.setTargetAtTime(.36, actx.currentTime, .3); // musique de fond : plus douce qu'en partie
       music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(.8, actx.currentTime, .05);
       tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); if(vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); }
     }
-    if(events.length > 200) events.length = 0; // en menu, personne ne consomme les impulsions visuelles
+    if(!events) events = []; /* pas encore de partie ni d'intro sonore */ if(events.length > 200) events.length = 0; // en menu, personne ne consomme les impulsions visuelles
     while(MM.next < actx.currentTime + .2){
-      const at = MM.next, p = MM.n % 16, bar = Math.floor(MM.n/16), r = MM.roots[bar % 4], fill = bar % 8 === 7;
-      if(MKICK[p] === 'x') I.kick(at, .8);
-      if(MCLAP[p] === 'x' || (fill && p >= 13)) I.clap(at, .15);
-      if(MHAT[p] === 'x') I.hat(at, .06, true, .2); else if(p % 2 === 0) I.hat(at, .035, false, -.2);
-      const b = MBASS.find(q => q[0] === p); if(b) I.bass(at, r*b[1], b[2]*MM.step*.9, 'funk');
-      if(MSTAB.includes(p)) [1, 1.19, 1.5].forEach((m, i) => osc(music, 'sawtooth', r*4*m, at, MM.step*1.6, .022, {lp: [2400, 900, 4], pan: (i - 1)*.35, rev: .2}));
+      const at = MM.next, p = MM.n % 16, bar = Math.floor(MM.n/16), k = bar % 4, r = MM.roots[k], sec = bar % 16, drop = sec === 15;
+      // le filtre : fermé au début, grand ouvert à la mesure 12, il retombe ; la mesure 16 coupe la grosse caisse pour la relance
+      const open = .5 - .5*Math.cos((bar % 16 + p/16)/16*Math.PI*2), cut = 380 + 4200*open;
+      if(MKICK[p] === 'x' && !drop){ I.kick(at, .85); duck(at, .3); }
+      if(drop && p === 0) noise(master, at, MM.step*16, .05, 'highpass', 600, 9000, false, {rev: .3});
+      if(sec === 0 && p === 0 && bar) I.crash(at);
+      if(MCLAP[p] === 'x' && sec >= 2) I.clap(at, .12);
+      if(MOHAT[p] === 'x' && sec >= 1) I.hat(at, .07, true, .15); else if(p % 2 === 0 && sec >= 4) I.hat(at, .03, false, -.2);
+      const b = MBASS.find(q => q[0] === p); if(b && sec >= 2 && !drop) I.bass(at, r*b[1], b[2]*MM.step*.85, 'funk');
+      // les accords coupés comme un sample de disco, derrière le filtre
+      if(MSAMP.includes(p)) MM.ch[k].forEach((m, i) => { for(const dt of [-9, 9]) osc(music, 'sawtooth', r*4*m, at, MM.step*1.7, .016, {lp: [cut, cut*.6, 7], pan: (i - 1.5)*.25 + dt/60, detune: dt + i*3, rev: .15}); osc(music, 'square', r*8*m, at, MM.step*1.2, .005, {lp: [cut*1.3, cut*.7, 5], pan: -(i - 1.5)*.25}); });
+      // la voix de robot répond aux mesures 3-4 de chaque groupe de 4, quand le filtre est assez ouvert
+      if(k >= 2 && open > .3){ const st = (k - 2)*16 + p, tk2 = MTALK.find(q => q[0] === st); if(tk2) I.talk(at, 220*Math.pow(2, tk2[1]/12), tk2[2]*MM.step*.95); }
       MM.next += MM.step; MM.n++;
     }
   }
