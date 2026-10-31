@@ -1,5 +1,11 @@
 # Journal des versions
 
+## 0.28.0 — Menu titre, records mondiaux, musique french house
+- **Menu titre** au lancement : CAMPAGNE (le choix des cassettes, avec un bouton retour), CASSETTE DE LA MORT, RECORDS, OPTIONS.
+- **Records mondiaux** de la cassette de la mort, gardés sur Cloudflare (serveur `beatsplash`, comme Cosmos) : pseudo, score et morceaux tenus de chaque joueur, ton rang ; hors ligne, le classement du téléphone.
+- **Options : tout débloquer** (et rebloquer).
+- **Musique des menus** refaite en french house filtrée à 118 BPM, plus douce ; elle ne se coupe plus quand l'intro n'a pas pu jouer le son.
+
 ## 0.27.0 — Une seule page, 4 nouvelles chansons, la cassette de la mort
 - **Accueil sur une seule page** (d'après la maquette) : la cassette se choisit sur scène (glisser, toucher une voisine, toucher celle du centre pour la lancer), JOUER lance la cassette choisie, CASSETTES ouvre un volet avec la liste et la difficulté. Décor refait : titre rose et blanc, giclées colorées, trames, bobines, éclairs, couronne ; mise en page resserrée sur petits écrans.
 - **4 nouvelles chansons** : Boule à facettes (disco, découverte de la diagonale), Trottoir 90 (hip-hop, découverte des deux doigts), Velours (néo-soul), La Forge (métal, toutes les briques). 10 cassettes.
