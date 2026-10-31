@@ -23,6 +23,8 @@ export class Board extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
     ctx.storage.sql.exec("CREATE TABLE IF NOT EXISTS death (id TEXT PRIMARY KEY, name TEXT NOT NULL, score INTEGER NOT NULL, songs INTEGER NOT NULL, seen INTEGER NOT NULL)");
+    // le pays du joueur (pour son petit drapeau), ajouté après coup aux classements déjà commencés
+    try { ctx.storage.sql.exec("ALTER TABLE death ADD COLUMN cc TEXT"); } catch (e) {}
   }
 
   async fetch(request) {
@@ -41,9 +43,11 @@ export class Board extends DurableObject {
       // un morceau rapporte au plus quelques centaines de milliers de points : au-delà, c'est trafiqué
       const songs = Math.max(0, Math.min(500, Math.round(Number(body.songs) || 0)));
       const score = Math.max(0, Math.min(800000 * (songs + 1), Math.round(Number(body.score) || 0)));
+      // le pays : celui envoyé avec le score s'il y en a un, sinon celui que Cloudflare voit (adresse de connexion)
+      const cc = [body.cc, request.cf && request.cf.country].map(v => String(v || "").toUpperCase()).find(v => /^[A-Z]{2}$/.test(v) && v !== "XX" && v !== "T1") || null;
       const old = this.ctx.storage.sql.exec("SELECT score, songs FROM death WHERE id = ?", id).toArray()[0];
       const best = old && old.score >= score ? old : { score, songs };
-      this.ctx.storage.sql.exec("INSERT INTO death (id, name, score, songs, seen) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name, score = excluded.score, songs = excluded.songs, seen = excluded.seen", id, name, best.score, best.songs, Date.now());
+      this.ctx.storage.sql.exec("INSERT INTO death (id, name, score, songs, seen, cc) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET name = excluded.name, score = excluded.score, songs = excluded.songs, seen = excluded.seen, cc = COALESCE(excluded.cc, death.cc)", id, name, best.score, best.songs, Date.now(), cc);
       return json(this.rank(id));
     }
     if (url.pathname === "/api/top") return json(this.rank(url.searchParams.get("id") || ""));
@@ -52,8 +56,8 @@ export class Board extends DurableObject {
 
   /* Le haut du classement, et le joueur avec ses voisins. Ceux qui n'ont encore rien marqué n'y figurent pas. */
   rank(id) {
-    const rows = this.ctx.storage.sql.exec("SELECT id, name, score, songs FROM death WHERE score > 0 ORDER BY score DESC, name ASC").toArray();
-    const list = rows.map((r, i) => ({ r: i + 1, n: r.name, s: r.score, k: r.songs, ...(r.id === id ? { me: 1 } : {}) }));
+    const rows = this.ctx.storage.sql.exec("SELECT id, name, score, songs, cc FROM death WHERE score > 0 ORDER BY score DESC, name ASC").toArray();
+    const list = rows.map((r, i) => ({ r: i + 1, n: r.name, s: r.score, k: r.songs, ...(r.cc ? { c: r.cc } : {}), ...(r.id === id ? { me: 1 } : {}) }));
     const at = list.findIndex(r => r.me);
     return {
       total: list.length,

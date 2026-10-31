@@ -2371,6 +2371,8 @@ G.trancheroute = { mount(stage, api){
     .k7brief .acts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:nowrap;position:sticky;bottom:0;margin:0 -16px -18px;padding:10px 16px 14px;background:#f3ead7;border-top:3px solid ${INK};border-radius:0 0 14px 14px}
     .k7brief .lb{display:flex;flex-direction:column;gap:5px}
     .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
+    @font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF;src:url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}
+    .k7brief .lb .fl{font-style:normal;font-family:"Twemoji Country Flags","Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}  /* drapeaux aussi sur Windows, qui n'en a pas */
     .k7brief .lb div.me{background:#ffd23f}.k7brief .lb b{font-family:${FONT};font-size:12px}
     .k7brief input{font:inherit;font-size:15px;border:3px solid ${INK};border-radius:10px;padding:8px 10px;width:100%;box-sizing:border-box}`; document.head.appendChild(st); }
   const SKULL = (eye) => `<svg viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="currentColor"/><circle cx="8.7" cy="10.6" r="2.4" fill="${eye}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${eye}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${eye}"/></svg>`;
@@ -2424,10 +2426,12 @@ G.trancheroute = { mount(stage, api){
   function sendScore(score, songs){ try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
   async function fetchTop(){ try{ const r = await fetch(RANK_API + '/top?id=' + pid(), {cache: 'no-store'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
   const esc = v => String(v).replace(/[<>&"]/g, '');
+  // le petit drapeau du pays (code à deux lettres -> emoji drapeau)
+  const flag = c => /^[A-Z]{2}$/.test(c || '') ? `<i class="fl">${String.fromCodePoint(...[...c].map(l => 0x1F1A5 + l.charCodeAt(0)))}</i> ` : '';
   // la liste du classement : en ligne si le serveur répond, sinon celle du téléphone
   async function fillBoard(box, note){
     box.innerHTML = `<div><span></span><span>${tx('Chargement…')}</span><span></span></div>`;
-    const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span>${esc(i.n)} · ${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}</span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
+    const g = await fetchTop(), row = (r, i, me) => `<div class="${me ? 'me' : ''}"><b>${r}</b><span>${flag(i.c)}${esc(i.n)} · ${tx(i.k > 1 ? '{n} morceaux' : '{n} morceau', {n: i.k})}</span><b>${i.s.toLocaleString('fr-FR')}</b></div>`;
     if(g && g.top){
       box.innerHTML = g.top.length ? g.top.map(i => row(i.r, i, i.me)).join('') + (g.me && g.me > g.top.length && g.around ? '<div><span></span><span>…</span><span></span></div>' + g.around.map(i => row(i.r, i, i.me)).join('') : '') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
       if(note) note.textContent = g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx(g.total > 1 ? 'Classement mondial : {t} joueurs' : 'Classement mondial : {t} joueur', {t: g.total});
