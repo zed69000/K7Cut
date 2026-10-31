@@ -104,7 +104,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.26.0';
+const VERSION = '0.26.1';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -2112,6 +2112,17 @@ G.trancheroute = { mount(stage, api){
     return last > 0 ? b + Math.exp(-last*6)*.35 : b;
   }
   mcv.addEventListener('pointerdown', introGo, true); menu.addEventListener('pointerdown', introGo, true);
+  // iPhone : le son ne s'ouvre que pendant un toucher. Chaque toucher le débloque (avec un son vide, l'astuce iOS),
+  // et si le titre s'est animé sans le son, le cri repart tout de suite
+  function unlockAudio(){
+    try{
+      muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; if(!actx) return;
+      if(actx.state !== 'running'){ actx.resume(); const sb = actx.createBufferSource(); sb.buffer = actx.createBuffer(1, 1, 22050); sb.connect(actx.destination); sb.start(0); }
+      loadVoice(); loadRecs();
+      if(useAudio && intro && (intro.silent || intro.stage === 'load' || (intro.stage === 'wait' && intro.shown))) intro = {stage: 'load', t: 0, shown: intro.shown};
+    }catch(e){}
+  }
+  document.addEventListener('pointerdown', unlockAudio, true); document.addEventListener('touchend', unlockAudio, true);
   function introFrame(g, dt){
     if(!intro) return;
     intro.t += dt;

@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.26.1 — Le son sur iPhone
+- Sur iPhone, Safari n'ouvre le son que pendant un toucher : les touchers faits pendant l'animation silencieuse du titre étaient ignorés, donc ni cri ni musique du menu. Maintenant chaque toucher débloque le son (son vide, l'astuce iOS), et si le titre s'est animé sans le son, le cri « BEAT SPLASH » repart aussitôt.
+
 ## 0.26.0 — Vos voix dans le jeu
 - **« BEAT SPLASH » crié par l'équipe** à l'ouverture : le titre se construit lettre par lettre en même temps (B-E-A-T puis S-P-L-A-S-H), avec un coup de grosse caisse sur chaque mot.
 - **L'intro démarre toute seule** quand l'écran Musclor Duck se ferme. Avant, elle attendait un toucher sur l'accueil, et le premier toucher servait souvent à fermer l'écran Musclor Duck : pas de son à l'ouverture. Si le téléphone n'autorise pas encore le son, le titre s'anime en silence et le premier toucher rejoue le cri.
