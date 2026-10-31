@@ -104,7 +104,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.25.0';
+const VERSION = '0.26.0';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -303,7 +303,35 @@ G.trancheroute = { mount(stage, api){
     try{ const bin = atob(window.K7_VOICE.split(',')[1]), u = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i);
       actx.decodeAudioData(u.buffer, buf => { voiceBuf = buf; }, () => {}); }catch(e){}
   }
-  const voiceOn = () => api.load('voice', true) && voiceBuf;
+  // nos enregistrements (mémos vocaux) : où commence et finit le son utile, sa hauteur, son crête pour le niveau
+  const RECS = {titre: {url: 'audio/titre.m4a', a: 2.05, b: 3.65, peak: .374}, voix: {url: 'audio/voix.m4a', a: .62, b: 3.75, peak: .221, f0: 317}, bravo: {url: 'audio/bravo.m4a', a: 0, b: 4.95, peak: .143}};
+  const recBuf = {};
+  function loadRecs(){
+    if(!actx) return;
+    for(const [k, r] of Object.entries(RECS)) if(!recBuf[k] && !r.loading){ r.loading = true;
+      fetch(r.url).then(x => x.arrayBuffer()).then(ab => new Promise((ok, ko) => actx.decodeAudioData(ab, ok, ko))).then(b => { recBuf[k] = b; }).catch(() => { r.loading = false; }); }
+  }
+  // joue un morceau d'enregistrement, niveau égalisé ; at = heure audio réelle
+  function playRec(k, T, vol, o2){
+    const b = recBuf[k], r = RECS[k]; if(!b || !useAudio) return false; o2 = o2 || {};
+    const src = actx.createBufferSource(), gn = actx.createGain(), pr = o2.rate || 1, a = r.a + (o2.from || 0), len = Math.min(o2.len || 99, r.b - a), dur = len/pr, g = vol*.5/r.peak;
+    src.buffer = b; src.playbackRate.value = pr;
+    gn.gain.setValueAtTime(0, T); gn.gain.linearRampToValueAtTime(g, T + (o2.att || .01)); gn.gain.setValueAtTime(g, T + Math.max(.02, dur - (o2.rel || .08))); gn.gain.linearRampToValueAtTime(0, T + dur);
+    let n = src; if(o2.hp){ const f2 = actx.createBiquadFilter(); f2.type = 'highpass'; f2.frequency.value = o2.hp; n.connect(f2); n = f2; }
+    route(n, gn, o2.bus || master, {rev: o2.rev ?? .15, dly: o2.dly || 0, pan: o2.pan || 0}, T); src.start(T, a, len + .02); src.stop(T + dur + .05);
+    return true;
+  }
+  // la belle voix, transposée sur une note (on reste près de sa hauteur naturelle pour qu'elle reste belle)
+  function voiceNote(bus, at, f, vol, o2){
+    if(!recBuf.voix) return false; o2 = o2 || {};
+    let pr = f*tapeK()/RECS.voix.f0; while(pr > 1.42) pr /= 2; while(pr < .71) pr *= 2;
+    const len = Math.min(RECS.voix.b - RECS.voix.a - .1, (o2.long ? 1.1 : .32)*pr);
+    playRec('voix', RT(at), vol*.9, {bus, rate: pr*(o2.det || 1), from: o2.long ? 0 : .4, len, att: .03, rel: o2.long ? .35 : .1, rev: o2.rev ?? .3, dly: o2.dly || 0, pan: o2.pan || 0});
+    hit('lead', at); return true;
+  }
+  // les applaudissements, plus ou moins nourris
+  function applause(T, amount){ playRec('bravo', T, .35 + .25*amount, {rev: .25, len: 2.2 + 2.7*Math.min(1, amount), rel: 1.2}); }
+  const voiceOn = () => api.load('voice', true) && (voiceBuf || recBuf.voix);
   function sing(bus, at, f, idx, vol, o2){
     if(!useAudio || !voiceBuf) return false; o2 = o2 || {};
     const sg = VSEG[((idx % 7) + 7) % 7], T = RT(at), src = actx.createBufferSource(), gn = actx.createGain();
@@ -407,14 +435,14 @@ G.trancheroute = { mount(stage, api){
     for(let i=0;i<line.length;i++){
       const at = when + i*step, root = chordOf(Math.floor(at/bpb/4)) + 7, deg = root + line[i], f = freq(deg, 4), last = i === line.length - 1, syl = (lvl + i*2) % 7;
       const base = {long: last, rev: fx.rev, dly: last ? fx.dly : fx.dly*.3, drive: fx.drive, hp: fx.hp, lp: fx.lp};
-      sing(vox, at, f, syl, vol*(last ? 1 : .8), base);
+      if(!voiceNote(vox, at, f, vol*(last ? 1 : .8), base)) sing(vox, at, f, syl, vol*(last ? 1 : .8), base);
       // les doublures arrivent avec le combo : une voix seule d'abord, un chœur ensuite
-      if(lvl >= 2 && fx.dbl) sing(vox, at, f*Math.pow(2, fx.dbl/12), syl, vol*.28, {...base, pan: .3});
-      if(lvl >= 2 && fx.chorus){ sing(vox, at, f, syl, vol*.3, {...base, det: 1.006, pan: -.6}); sing(vox, at, f, syl, vol*.3, {...base, det: .994, pan: .6}); }
+      if(lvl >= 2 && fx.dbl && !voiceNote(vox, at, f*Math.pow(2, fx.dbl/12), vol*.28, {...base, pan: .3})) sing(vox, at, f*Math.pow(2, fx.dbl/12), syl, vol*.28, {...base, pan: .3});
+      if(lvl >= 2 && fx.chorus){ for(const [dt, pn] of [[1.006, -.6], [.994, .6]]) if(!voiceNote(vox, at, f, vol*.3, {...base, det: dt, pan: pn})) sing(vox, at, f, syl, vol*.3, {...base, det: dt, pan: pn}); }
       if(fx.robot) I.talk(at, f, last ? .35 : .14);
       if(fx.stut && last && lvl >= 2){ sing(vox, at + bpb/2, f, syl, vol*.45, {...base, long: false}); }
-      if(lvl >= 3 && last) sing(vox, at + .015, freq(deg + 2, 4), syl + 1, vol*.35, {...base, pan: -.4});
-      if(lvl >= 5 && last) sing(vox, at + .03, freq(deg + 4, 4), syl + 2, vol*.3, {...base, pan: .45});
+      if(lvl >= 3 && last && !voiceNote(vox, at + .015, freq(deg + 2, 4), vol*.35, {...base, pan: -.4})) sing(vox, at + .015, freq(deg + 2, 4), syl + 1, vol*.35, {...base, pan: -.4});
+      if(lvl >= 5 && last && !voiceNote(vox, at + .03, freq(deg + 4, 4), vol*.3, {...base, pan: .45})) sing(vox, at + .03, freq(deg + 4, 4), syl + 2, vol*.3, {...base, pan: .45});
     }
     // la mélodie de fond se tait et la musique se pousse le temps de la phrase
     voiceFrom = when; voiceUntil = end;
@@ -466,7 +494,7 @@ G.trancheroute = { mount(stage, api){
   const freq = (deg, oct) => { const sc = tr.scale, d = ((deg % 7) + 7) % 7, o = Math.floor(deg/7); return tr.root*Math.pow(2, (sc[d] + 12*o)/12)*(oct || 1); };
   function hit(ch, at){ events.push({ch, at}); }
   // la pompe : tout le morceau respire sur la grosse caisse (fort en électro, léger ailleurs)
-  function duck(at, depth){ if(!useAudio) return; const el = tr.song ? !!tr.song.pump : ['disco','synthwave','french'].includes(tr.style), T = RT(at); pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || (el ? .35 : .72), T); pump.gain.linearRampToValueAtTime(1, T + 60/tr.bpm*(el ? .6 : .35)); }
+  function duck(at, depth){ if(!useAudio) return; const el = !tr || (tr.song ? !!tr.song.pump : ['disco','synthwave','french'].includes(tr.style)), T = RT(at); /* sans morceau (menus) : pompe électro */ pump.gain.cancelScheduledValues(T); pump.gain.setValueAtTime(depth || (el ? .35 : .72), T); pump.gain.linearRampToValueAtTime(1, T + 60/(tr ? tr.bpm : 104)*(el ? .6 : .35)); }
 
   /* instruments */
   const I = {
@@ -710,7 +738,7 @@ G.trancheroute = { mount(stage, api){
     frescoInit(); paintEv = []; gulp = 0; swallows = []; objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = diff.hearts; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0;
     beatNow = 0; nextStep = 0; jumpT = 9; hurtT = 0; energy = {kick: 0, snare: 0, hat: 0, bass: 0, chords: 0, lead: 0}; events = []; bump = 0; flashR = 0; gestures.clear(); holdState = null; scratchState = null; rot = 0; finished = false; spawned = 1; secShown = -1;
     hideMenu(); api.closeEnd(); api.hud(`${tx('FACE')} ${t.face} · ${t.name.toUpperCase()}`);
-    muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted;
+    muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; loadRecs();
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
     trance = 0; lastRec = null; voiceFrom = voiceUntil = 0; stemCut = -9; paused = false; pauseEl.hidden = true; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
@@ -728,7 +756,7 @@ G.trancheroute = { mount(stage, api){
   const TIERS = [0, 10, 25, 50, 100], TNAME = ['', tx('EN RYTHME'), tx('TRANSE'), tx('HYPNOSE'), tx('NIRVANA')], TMULT = [1, 1.5, 2, 3, 4];
   function setTrance(n, t){
     if(n === trance) return; const up = n > trance; trance = n;
-    if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)), fx = VFX[tr.style] || {}; [0, 2, 4].forEach((k2, i) => sing(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), 6, .45*(fx.vol || 1), {long: true, pan: (i - 1)*.5, rev: .45, drive: fx.drive, hp: fx.hp, lp: fx.lp})); } celebrate(n); judges.push({txt: TNAME[n], sub: tx('points x{n}', {n: TMULT[n]}), x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
+    if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)), fx = VFX[tr.style] || {}; [0, 2, 4].forEach((k2, i) => { const o3 = {long: true, pan: (i - 1)*.5, rev: .45, drive: fx.drive, hp: fx.hp, lp: fx.lp}; if(!voiceNote(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), .45*(fx.vol || 1), o3)) sing(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), 6, .45*(fx.vol || 1), o3); }); } celebrate(n); if(n >= 4 && useAudio) applause(RT(t), .5); judges.push({txt: TNAME[n], sub: tx('points x{n}', {n: TMULT[n]}), x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
       if(useAudio){ const T = actx.currentTime; tone.frequency.setTargetAtTime(20000, T, .05); shelf.gain.setTargetAtTime(n*1.5, T, .4); } }
   }
   function tapeStop(t){
@@ -1116,6 +1144,7 @@ G.trancheroute = { mount(stage, api){
     const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); startTrack(R.nextT); };
     el.querySelector('.keep').onclick = R.img ? R.keep : () => { close(); showMenu(); };
     outroMusic(at0, R.stars);
+    if(useAudio && R.stars) applause(actx.currentTime + delay + .1, R.stars/3);
     // compteurs qui défilent pendant les temps 2 à 4, confettis à chaque disque, foule qui saute sur le tempo
     const cv2 = el.querySelector('canvas'), g = cv2.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1); let alive = true, parts = [], fired = 0;
     const size = () => { cv2.width = el.clientWidth*dpr; cv2.height = el.clientHeight*dpr; }; size();
@@ -2049,18 +2078,27 @@ G.trancheroute = { mount(stage, api){
   /* ---------- intro du menu : ta voix chante K-7-C-U-T, les lettres giclent une à une ---------- */
   let intro = {stage: 'wait', t: 0}; // à chaque lancement
   const IBPM = 104, ISTEP = 60/IBPM/2, ILET = [0, 1, 3, 4, 5]; // syllabe i -> lettre (l'espace saute)
+  // quand chaque lettre de BEAT SPLASH gicle : B-E-A-T sur « BEAT », S-P-L-A-S-H sur « SPLASH » (calé sur l'enregistrement)
+  const POPT = [.1, .16, .22, .28, .58, .65, .72, .79, .86, .93];
   function introGo(){
     if(!intro || intro.stage !== 'wait') return;
     intro.stage = 'load'; intro.t = 0;
-    try{ muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; if(actx && actx.state === 'suspended') actx.resume(); loadVoice(); }catch(e){}
+    try{ muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; if(actx && actx.state === 'suspended') actx.resume(); loadVoice(); loadRecs(); }catch(e){}
   }
   function introPlay(){
     intro.stage = 'play'; intro.t = 0;
-    if(!useAudio) return;
+    if(!useAudio || actx.state !== 'running'){ intro.silent = true; return; }
     events = []; t0 = 0; resetRate(); const s0 = actx.currentTime + .08, f = [196, 220, 247, 294, 330, 392, 392];
+    // votre « BEAT SPLASH », un coup de grosse caisse sur chaque mot, la cymbale quand le titre est complet
+    if(playRec('titre', s0, 1, {rev: .3, dly: .2})){
+      for(const at of [s0 + POPT[0], s0 + POPT[4]]){ osc(master, 'sine', 160, at, .3, .8, {glide: 42, gt: .1}); noise(master, at, .012, .2, 'highpass', 2500); }
+      try{ I.crash(s0 + 1.2); I.clap(s0 + 1.2, .4); }catch(e){}
+      return;
+    }
+    const shout = false;
     for(let i=0;i<7;i++){ const at = s0 + i*ISTEP*(i === 6 ? 1.5 : 1);
       if(i % 2 === 0){ osc(master, 'sine', 160, at, .3, .8, {glide: 42, gt: .1}); noise(master, at, .012, .2, 'highpass', 2500); }
-      if(!sing(vox, at, f[i], i, i === 6 ? .9 : .75, {long: i === 6, rev: .3, dly: i === 6 ? .3 : 0})) osc(master, 'triangle', f[i]*2, at, .18, .2);
+      if(!shout && !sing(vox, at, f[i], i, i === 6 ? .9 : .75, {long: i === 6, rev: .3, dly: i === 6 ? .3 : 0})) osc(master, 'triangle', f[i]*2, at, .18, .2);
     }
     try{ I.crash(s0 + 6*ISTEP*1.5); I.clap(s0 + 6*ISTEP*1.5, .4); }catch(e){}
   }
@@ -2077,11 +2115,12 @@ G.trancheroute = { mount(stage, api){
   function introFrame(g, dt){
     if(!intro) return;
     intro.t += dt;
-    if(intro.stage === 'load' && (voiceBuf || !useAudio || intro.t > 1.5)) introPlay();
+    if(intro.stage === 'load'){ const live = useAudio && actx && actx.state === 'running'; if((live && recBuf.titre) || !useAudio || intro.t > 1.5) introPlay(); }
     if(intro.stage === 'play'){
       const pt2 = intro.t - .08 - ILET.length*ISTEP;
-      for(let i=0;i<ILET.length;i++){ const d2 = intro.t - .08 - i*ISTEP; if(d2 > 0 && d2 < dt + .001){ mFloat.push(...Array.from({length: 6}, () => ({x: 30 + ILET[i]*W*.11, y: 50, v: 0, s: .8 + Math.random()*.6, ph: Math.random()*6, burst: {vx: (Math.random() - .5)*380, vy: -200 - Math.random()*250, life: 1}}))); squash = .4; } }
-      if(intro.t > 2.6) intro = null;
+      for(let i=0;i<POPT.length;i++){ const d2 = intro.t - .08 - POPT[i]; if(d2 > 0 && d2 < dt + .001){ mFloat.push(...Array.from({length: 4}, () => ({x: W*(.2 + i*.065), y: H*.16, v: 0, s: .8 + Math.random()*.6, ph: Math.random()*6, burst: {vx: (Math.random() - .5)*380, vy: -200 - Math.random()*250, life: 1}}))); squash = .4; } }
+      // animé sans le son (pas encore le droit au son) : le prochain toucher rejouera le cri
+      if(intro.t > 2.6) intro = intro.silent ? {stage: 'wait', t: 0, shown: true} : null;
       return;
     }
   }
@@ -2185,7 +2224,7 @@ G.trancheroute = { mount(stage, api){
       const a = document.createElement('a'); a.href = im.src; a.download = name; document.body.appendChild(a); a.click(); a.remove(); });
   };
   // titre TOUCHÉ : jaune, le É en rouge, les lettres giclent avec la voix
-  function homePop(i){ if(!intro) return 1; if(intro.stage !== 'play') return 1; const dt2 = intro.t - .08 - Math.min(i, 5)*ISTEP; if(dt2 < 0) return .001; const last = intro.t - .08 - 6*ISTEP*1.5; const b = 1 + Math.exp(-dt2*9)*Math.sin(dt2*30)*.5 + (dt2 < .06 ? .7 - dt2*10 : 0); return last > 0 ? b + Math.exp(-last*6)*.4 : b; }
+  function homePop(i){ if(!intro) return 1; if(intro.stage !== 'play') return intro.shown ? 1 : .001; /* le titre attend son cri */ const dt2 = intro.t - .08 - POPT[Math.min(i, 9)]; if(dt2 < 0) return .001; const last = intro.t - 1.25; const b = 1 + Math.exp(-dt2*9)*Math.sin(dt2*30)*.5 + (dt2 < .06 ? .7 - dt2*10 : 0); return last > 0 ? b + Math.exp(-last*6)*.4 : b; }
   let titleSplat = null;
   function makeTitleSplat(){ const c = document.createElement('canvas'), S = 460; c.width = S*2; c.height = S*1.2; const g = c.getContext('2d'); g.scale(2, 2); const r = rngFrom('beatsplash');
     crisp(g, r, S*.36, S*.3, 96, '#e8344f', 4); crisp(g, r, S*.62, S*.27, 82, '#e8344f', 3); crisp(g, r, S*.5, S*.36, 70, '#d7263d', 2);
@@ -2272,7 +2311,30 @@ G.trancheroute = { mount(stage, api){
     crowd(g, H + 30, hTime, kick);
   }
   let mLast = performance.now();
-  (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden){ if(homeOn) homeFrame(dt); else menuFrame(dt); } requestAnimationFrame(mLoop); })(mLast);
+  /* ---------- musique des menus : une boucle funk à 104 BPM, le tempo où dansent les cassettes ---------- */
+  // la mesure : la (i), fa (VI), do (III), sol (VII) ; grosse caisse à chaque temps, clap sur 2 et 4, basse qui rebondit, accords filtrés
+  const MM = {step: 60/104/4, roots: [55, 43.65, 65.41, 49], next: 0, n: 0, on: false};
+  const MKICK = 'x...x...x...x...', MCLAP = '....x.......x...', MHAT = '..x...x...x...x.', MBASS = [[0, 1, 2], [3, 1, 1], [6, 2, 1], [8, 1, 2], [10, 1, 1], [11, 2, 1], [14, 1, 2]], MSTAB = [3, 6, 11];
+  function menuMusic(){
+    const want = !menu.hidden && state === 'menu' && !laboOn && useAudio && actx && actx.state === 'running' && !(intro && intro.stage !== 'wait');
+    if(!want){ MM.on = false; return; }
+    if(!MM.on){ // on reprend proprement : horloge du jeu sur celle de l'audio, bus de musique ouvert
+      MM.on = true; t0 = 0; resetRate(); MM.next = actx.currentTime + .1; MM.n = 0;
+      music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(.8, actx.currentTime, .05);
+      tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); if(vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); }
+    }
+    if(events.length > 200) events.length = 0; // en menu, personne ne consomme les impulsions visuelles
+    while(MM.next < actx.currentTime + .2){
+      const at = MM.next, p = MM.n % 16, bar = Math.floor(MM.n/16), r = MM.roots[bar % 4], fill = bar % 8 === 7;
+      if(MKICK[p] === 'x') I.kick(at, .8);
+      if(MCLAP[p] === 'x' || (fill && p >= 13)) I.clap(at, .15);
+      if(MHAT[p] === 'x') I.hat(at, .06, true, .2); else if(p % 2 === 0) I.hat(at, .035, false, -.2);
+      const b = MBASS.find(q => q[0] === p); if(b) I.bass(at, r*b[1], b[2]*MM.step*.9, 'funk');
+      if(MSTAB.includes(p)) [1, 1.19, 1.5].forEach((m, i) => osc(music, 'sawtooth', r*4*m, at, MM.step*1.6, .022, {lp: [2400, 900, 4], pan: (i - 1)*.35, rev: .2}));
+      MM.next += MM.step; MM.n++;
+    }
+  }
+  (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden){ if(homeOn) homeFrame(dt); else menuFrame(dt); } try{ menuMusic(); }catch(e){ window.__mmErr = String(e && e.stack || e); } requestAnimationFrame(mLoop); })(mLast);
 
   function showMenu(){
     { const rw = stage.querySelector('.k7rw'); if(rw) rw.remove(); }
@@ -2315,7 +2377,7 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), art: storeArt, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {home: () => showHome(), art: storeArt, get recs(){ return Object.keys(recBuf); }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
     const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();
@@ -2335,6 +2397,8 @@ G.trancheroute = { mount(stage, api){
   }
   // on arrive sur l'accueil (titre, JOUER, CASSETTES, OPTIONS) ; le menu des cassettes est derrière
   showMenu(); showHome();
+  if(document.documentElement.classList.contains('splash')) window.addEventListener('bs-splash-end', () => introGo(), {once: true});
+  else api.after(250, introGo);
   if(/labo/.test(location.search)) showLabo();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};

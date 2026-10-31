@@ -51,7 +51,8 @@ function boot(){ try{ safeArea(); }catch(e){}
   if(!el || !root.classList.contains('splash')) return;
   // le trait gravé tremble légèrement, comme une animation dessinée image par image
   let step = 0; const boil = setInterval(() => { step = (step + 1) % 3; art.setAttribute('filter', 'url(#spWob' + (step + 1) + ')'); }, 170);
-  const end = () => { clearInterval(boil); root.classList.remove('splash'); };
+  // la fin de l'écran prévient le jeu, qui lance son intro (un toucher sur l'écran compte comme geste pour le son)
+  const end = () => { clearInterval(boil); root.classList.remove('splash'); window.dispatchEvent(new Event('bs-splash-end')); };
   const timer = setTimeout(end, 2850);
   el.addEventListener('pointerdown', () => { clearTimeout(timer); end(); }, {once: true});
 })();

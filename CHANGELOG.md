@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.26.0 — Vos voix dans le jeu
+- **« BEAT SPLASH » crié par l'équipe** à l'ouverture : le titre se construit lettre par lettre en même temps (B-E-A-T puis S-P-L-A-S-H), avec un coup de grosse caisse sur chaque mot.
+- **L'intro démarre toute seule** quand l'écran Musclor Duck se ferme. Avant, elle attendait un toucher sur l'accueil, et le premier toucher servait souvent à fermer l'écran Musclor Duck : pas de son à l'ouverture. Si le téléphone n'autorise pas encore le son, le titre s'anime en silence et le premier toucher rejoue le cri.
+- **La belle voix** enregistrée chante les phrases de combo et les paliers de transe, transposée sur les notes du morceau (la voix synthétique reste en secours).
+- **Musique dans les menus** : une boucle funk à 104 BPM (le tempo où dansent les cassettes) démarre après le cri et tourne sur l'accueil et le choix des cassettes ; elle s'arrête pendant les parties.
+- **Applaudissements** sur l'écran de fin (plus nourris avec 3 disques) et au palier NIRVANA.
+- Les enregistrements sont dans `www/audio/` (titre, voix, bravo) ; leurs débuts, fins et niveaux sont réglés dans `RECS` (game.js).
+
 ## 0.25.0 — BEAT SPLASH en 8 langues
 - **Le jeu est traduit** dans les mêmes langues que Date Gravity : français, anglais, espagnol, allemand, portugais, chinois, japonais et coréen. La langue du téléphone est choisie toute seule, et on peut la changer dans les réglages.
 - Même système que Date Gravity : la clé d'un texte est la phrase française (`tx("…")`), une langue par fichier `www/js/lang/<code>.js`. `python tools/i18n_keys.py` liste les textes, `--check` signale ceux qui manquent dans une langue.
