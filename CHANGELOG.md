@@ -1,5 +1,15 @@
 # Journal des versions
 
+## 0.28.1 — Records réparés, nouveau look street art
+- **Records et cassette de la mort sur le même écran** : les règles, le classement mondial, ton pseudo et LANCER. Le bouton RECORDS ouvre bien cet écran. « Mes œuvres » a maintenant une icône de tableau, pour ne plus la confondre avec le trophée des records.
+- **Bouton retour avant chaque niveau** : on peut toujours revenir au menu, y compris depuis la cassette de la mort.
+- **Fenêtres centrées** sur l'écran, façon papier scotché légèrement de travers, avec une ombre d'encre.
+- **Icônes dessinées** : tête de mort, trophée, cadre.
+- **Les boutons bougent** sur le tempo de la musique des menus (désactivé si le téléphone demande moins d'animations).
+- **Bas de l'écran plus calme** : les personnages ne sautent plus, la foule lève les bras et les cassettes se balancent à peine.
+- **Nouvelle typo** : Bungee pour l'interface, Rubik pour le texte, plus lisible. Le logo garde sa police. Tailles ajustées pour les petits écrans.
+- « 1 joueur » au singulier dans le classement.
+
 ## 0.28.0 — Menu titre, records mondiaux, musique french house
 - **Menu titre** au lancement : CAMPAGNE (le choix des cassettes, avec un bouton retour), CASSETTE DE LA MORT, RECORDS, OPTIONS.
 - **Records mondiaux** de la cassette de la mort, gardés sur Cloudflare (serveur `beatsplash`, comme Cosmos) : pseudo, score et morceaux tenus de chaque joueur, ton rang ; hors ligne, le classement du téléphone.
