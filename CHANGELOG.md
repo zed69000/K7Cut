@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 0.25.0 — BEAT SPLASH en 8 langues
+- **Le jeu est traduit** dans les mêmes langues que Date Gravity : français, anglais, espagnol, allemand, portugais, chinois, japonais et coréen. La langue du téléphone est choisie toute seule, et on peut la changer dans les réglages.
+- Même système que Date Gravity : la clé d'un texte est la phrase française (`tx("…")`), une langue par fichier `www/js/lang/<code>.js`. `python tools/i18n_keys.py` liste les textes, `--check` signale ceux qui manquent dans une langue.
+- Fiche Google Play traduite dans chaque langue : `store/fiche-<code>.md`.
+- L'étiquette « TOUCHE POUR LANCER LA CASSETTE » rétrécit si la phrase est longue (allemand).
+- Le labo (outil de choix des morceaux) reste en français.
+
 ## 0.24.1 — Écran Musclor Duck, page de confidentialité
 - **Écran d'ouverture Musclor Duck**, le même que Date Gravity : le petit canard, son ombre de colosse, « MUSCLOR DUCK games ». Il s'affiche au premier lancement de la session, s'efface seul après 2,5 s, et un toucher le passe.
 - **Page de confidentialité** : `confidentialite.html`. Rien n'est collecté, la progression reste sur le téléphone.
