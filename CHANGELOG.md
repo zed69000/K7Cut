@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.24.1 — Écran Musclor Duck, page de confidentialité
+- **Écran d'ouverture Musclor Duck**, le même que Date Gravity : le petit canard, son ombre de colosse, « MUSCLOR DUCK games ». Il s'affiche au premier lancement de la session, s'efface seul après 2,5 s, et un toucher le passe.
+- **Page de confidentialité** : `confidentialite.html`. Rien n'est collecté, la progression reste sur le téléphone.
+- **Fiche Google Play** : textes dans `store/fiche.md`, captures prises dans le jeu par `tests/store_shots.py`.
+
 ## 0.24.0 — BEAT SPLASH, nouvel accueil, prêt pour Google Play
 - **Le jeu s'appelle BEAT SPLASH.**
 - **Nouvel écran d'accueil**, affiché au lancement : titre au pinceau blanc sur une giclée rouge, avec une couronne et une étoile, et l'étiquette jaune « TOUCHE POUR LANCER LA CASSETTE ». Boutons en papier déchiré (JOUER en rouge, CASSETTES, OPTIONS). Décor papier beige avec trame, poteaux électriques et enceintes, la grande cassette qui saute, deux petites qui dansent, et la foule.

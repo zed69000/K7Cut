@@ -45,5 +45,15 @@ function safeArea(){
 }
 function boot(){ try{ safeArea(); }catch(e){}
  try{ GAMES.trancheroute.mount(stage, api); }catch(e){ stage.innerHTML = '<p style="padding:24px">Le jeu n\'a pas pu démarrer : ' + e.message + '</p>'; } }
+// écran d'ouverture MusclorDuck : il s'efface seul ; un toucher le passe tout de suite
+(function(){
+  const root = document.documentElement, el = document.getElementById('splash'), art = document.getElementById('spArt');
+  if(!el || !root.classList.contains('splash')) return;
+  // le trait gravé tremble légèrement, comme une animation dessinée image par image
+  let step = 0; const boil = setInterval(() => { step = (step + 1) % 3; art.setAttribute('filter', 'url(#spWob' + (step + 1) + ')'); }, 170);
+  const end = () => { clearInterval(boil); root.classList.remove('splash'); };
+  const timer = setTimeout(end, 2850);
+  el.addEventListener('pointerdown', () => { clearTimeout(timer); end(); }, {once: true});
+})();
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

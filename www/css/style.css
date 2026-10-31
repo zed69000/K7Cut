@@ -24,3 +24,23 @@ button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.end,.end-card{animation:none}}
 
 .end-art{margin:0;position:relative;border-bottom:3px solid #1c1b19}.end-art img{display:block;width:100%;height:auto}.end-art figcaption{position:absolute;left:8px;top:8px;background:#1c1b19;color:#f4f0e6;font-family:'Permanent Marker',sans-serif;font-size:14px;padding:3px 9px;border-radius:4px;transform:rotate(-2deg)}
+
+/* même écran d'ouverture que Date Gravity */
+/* écran d'ouverture : le studio MusclorDuck, en linogravure rouge (maquette J14).
+   Un petit canard noir, et sur le mur son ombre : un colosse gravé au trait clair. Deux secondes et demie,
+   puis le menu. Un toucher le passe. */
+#splash{display:none}
+html.splash #splash{position:fixed!important;inset:0;z-index:70!important;display:block;background:#f0e6cf;animation:spOut .35s ease 2.45s forwards}
+.spBlock{position:absolute;left:7%;right:7%;top:6%;bottom:6%;border-radius:1rem;background:#d8232f;transform:rotate(-1.5deg);animation:spPress .4s cubic-bezier(.2,1.5,.4,1) both}
+#splash svg{position:absolute;left:0;top:12%;width:100%;overflow:visible}
+.spFloor,.spSmall{animation:spFade .3s ease .3s both}
+.spTrail{animation:spFade .3s ease .55s both}
+/* l'ombre monte sur le mur depuis les pattes */
+.spBig{transform-box:fill-box;transform-origin:50% 100%;animation:spGrow .55s cubic-bezier(.2,1.5,.4,1) .6s both}
+.spName{position:absolute;left:0;right:0;top:62%;text-align:center;font:400 3rem/.9 "Bowlby One",Rubik,Arial,sans-serif;text-transform:uppercase;color:#17130f;animation:spPop .35s cubic-bezier(.2,1.7,.4,1) 1.15s both}
+.spTag{position:absolute;left:0;right:0;top:calc(62% + 6.6rem);text-align:center;font:900 1.1rem/1 Rubik,Arial,sans-serif;letter-spacing:.34em;text-indent:.34em;text-transform:uppercase;color:#f0e6cf;animation:spFade .3s ease 1.4s both}
+@keyframes spPress{from{transform:rotate(-1.5deg) scale(1.14);opacity:0}to{transform:rotate(-1.5deg);opacity:1}}
+@keyframes spFade{from{opacity:0}to{opacity:1}}
+@keyframes spGrow{from{transform:scale(.6,0);opacity:0}to{transform:none;opacity:1}}
+@keyframes spPop{from{transform:scale(1.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes spOut{to{opacity:0;visibility:hidden}}
