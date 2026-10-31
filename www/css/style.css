@@ -1,5 +1,5 @@
 /* Un seul thème assumé : la cassette jaune. Colonne au format téléphone, centrée sur grand écran. */
-:root{ --yellow:#f2cd4c; --yellow2:#d6a93a; --ink:#1c1b19; --paper:#f4f0e6; --red:#d7263d; --display:"Rubik Mono One","Courier New",monospace; --body:"Chakra Petch",system-ui,sans-serif; color-scheme:light; }
+:root{ --yellow:#f2cd4c; --yellow2:#d6a93a; --ink:#1c1b19; --paper:#f4f0e6; --red:#d7263d; --display:"Bungee","Rubik",sans-serif; --body:"Rubik",system-ui,sans-serif; color-scheme:light; }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--ink);font-family:var(--body)}
 body{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));-webkit-tap-highlight-color:transparent}
@@ -23,7 +23,7 @@ button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
 @media (prefers-reduced-motion:reduce){.end,.end-card{animation:none}}
 
-.end-art{margin:0;position:relative;border-bottom:3px solid #1c1b19}.end-art img{display:block;width:100%;height:auto}.end-art figcaption{position:absolute;left:8px;top:8px;background:#1c1b19;color:#f4f0e6;font-family:'Permanent Marker',sans-serif;font-size:14px;padding:3px 9px;border-radius:4px;transform:rotate(-2deg)}
+.end-art{margin:0;position:relative;border-bottom:3px solid #1c1b19}.end-art img{display:block;width:100%;height:auto}.end-art figcaption{position:absolute;left:8px;top:8px;background:#1c1b19;color:#f4f0e6;font-family:var(--display);font-size:14px;padding:3px 9px;border-radius:4px;transform:rotate(-2deg)}
 
 /* même écran d'ouverture que Date Gravity */
 /* écran d'ouverture : le studio MusclorDuck, en linogravure rouge (maquette J14).

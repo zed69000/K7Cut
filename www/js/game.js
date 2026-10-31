@@ -6,7 +6,7 @@ const G = window.GAMES = window.GAMES || {};
    BEAT SPLASH — un runner rythmique en cassettes
    ========================================================= */
 const INK = '#1c1b19', PAPER = '#f4f0e6', RED = '#d7263d';
-const FONT = '"Rubik Mono One", "Silkscreen", monospace';
+const FONT = '"Bungee", "Rubik", sans-serif'; // titres, boutons, chiffres : Bungee (lisible, enseigne de rue) ; le texte courant est en Rubik
 const MAJ = [0, 2, 4, 5, 7, 9, 11], MIN = [0, 2, 3, 5, 7, 8, 10];
 const ALL = ['kick','snare','hat','bass','chords','arp','perc','lead','gtr'];
 
@@ -147,7 +147,7 @@ const TITLES = [[0, tx('Apprenti')], [60, tx('Musicien')], [180, tx('Virtuose')]
 function rngFrom(str){ let h = 2166136261; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } let s = h >>> 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
 
 G.trancheroute = { mount(stage, api){
-  if(!document.getElementById('font-rubikmono')){ const l = document.createElement('link'); l.id = 'font-rubikmono'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Permanent+Marker&family=Sedgwick+Ave+Display&display=swap'; document.head.appendChild(l); }
+  if(!document.getElementById('font-rubikmono')){ const l = document.createElement('link'); l.id = 'font-rubikmono'; l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Bungee&family=Knewave&family=Rubik:wght@500;600;700;800;900&display=swap'; document.head.appendChild(l); }
   const {cv, ctx, W, H, pt} = api.canvas();
   let muted = api.store.load('muted', false);
   const TAPEY = Math.round(H*.48), TT = 30, Y0 = TAPEY - TT/2, HXs = Math.round(W*.26);
@@ -1096,7 +1096,7 @@ G.trancheroute = { mount(stage, api){
   function rhythmPct(){ const tot = stats.perfect + stats.good + stats.ok + stats.miss; return tot ? Math.round((stats.perfect + stats.good*.8 + stats.ok*.4)/tot*100) : null; }
   /* ---------- page de récompense : animée sur un petit air de fin, calé sur le tempo de la face ---------- */
   function rwCss(){ if(!document.getElementById('k7-rw-css')){ const st = document.createElement('style'); st.id = 'k7-rw-css'; st.textContent = `
-    .k7rw{position:absolute;inset:0;z-index:12;overflow-y:auto;overflow-x:hidden;background:#efe5cf;font-family:"Chakra Petch",sans-serif;color:${INK};-webkit-overflow-scrolling:touch}
+    .k7rw{position:absolute;inset:0;z-index:12;overflow-y:auto;overflow-x:hidden;background:#efe5cf;font-family:"Rubik",sans-serif;color:${INK};-webkit-overflow-scrolling:touch}
     .k7rw canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
     .k7rw .in{position:relative;min-height:100%;padding:18px 16px 22px;display:flex;flex-direction:column;gap:14px;max-width:480px;margin:0 auto;box-sizing:border-box}
     .k7rw .pop{opacity:0;animation:k7rwpop .5s cubic-bezier(.2,1.6,.4,1) forwards;animation-delay:calc(var(--d) + var(--n)*var(--b))}
@@ -1550,7 +1550,7 @@ G.trancheroute = { mount(stage, api){
     const ly = Y0 - (o.k === 'C' && o.shape !== 'wide' ? 92 : o.k === 'O' ? 96 : 76);
     if(tutoOk) tutoTag(tx('OUI ! SUR LA LIGNE ROUGE, EN RYTHME'), W/2, ly, 15, '#7cf05a', HXs);
     else if(tutoWrong > 0) tutoTag(tx(o.k === 'J' ? 'SANS GLISSER !' : o.k === 'H' ? 'TIENS PLUS LONGTEMPS !' : o.k === 'C' ? 'DANS LE SENS DE LA FLÈCHE !' : o.k === 'O' ? 'UN TOUR COMPLET !' : o.k === 'W' ? 'ZIGZAG VERS LA DROITE !' : o.k === 'D' ? 'DEUX DOIGTS ENSEMBLE !' : 'PLUS VITE !'), W/2, ly, 16, LABELRED, x);
-    else { tutoTag(d.verb, W/2, ly, 18, PAPER, x); ctx.save(); ctx.textAlign = 'center'; ctx.font = `700 13px "Chakra Petch", sans-serif`; ctx.fillStyle = PAPER; ctx.fillText(o.k === 'S' ? `${d.hint} · ${tutoCount}/${d.need}` : tx('essaie maintenant, {h}', {h: d.hint}), W/2, ly - 26); ctx.restore(); }
+    else { tutoTag(d.verb, W/2, ly, 18, PAPER, x); ctx.save(); ctx.textAlign = 'center'; ctx.font = `700 13px "Rubik", sans-serif`; ctx.fillStyle = PAPER; ctx.fillText(o.k === 'S' ? `${d.hint} · ${tutoCount}/${d.need}` : tx('essaie maintenant, {h}', {h: d.hint}), W/2, ly - 26); ctx.restore(); }
   }
   // aide au-dessus de chaque bloc ou rond qui arrive : bien visible au début, elle s'efface quand tu as compris
   function drawCue(o, x, y){
@@ -1806,7 +1806,7 @@ G.trancheroute = { mount(stage, api){
       ctx.font = `${j.big ? 26 : j.g === 'perfect' ? 21 : 17}px ${FONT}`; if(j.big){ const w = ctx.measureText(j.txt).width; if(w > W - 40) ctx.font = `${26*(W - 40)/w}px ${FONT}`; } ctx.lineJoin = 'round';
       ctx.lineWidth = 9; ctx.strokeStyle = INK; ctx.strokeText(j.txt, 2, 3); ctx.lineWidth = 6; ctx.strokeStyle = jc === INK ? PAPER : jc; ctx.strokeText(j.txt, 0, 0);
       ctx.fillStyle = jc === INK ? INK : '#fff'; ctx.fillText(j.txt, 0, 0);
-      if(j.sub){ ctx.font = '600 13px "Chakra Petch", sans-serif'; ctx.fillStyle = INK; ctx.fillText(j.sub, 0, 22); }
+      if(j.sub){ ctx.font = '600 13px "Rubik", sans-serif'; ctx.fillStyle = INK; ctx.fillText(j.sub, 0, 22); }
       ctx.restore();
     }
     if(state === 'tuto') drawTuto(rt);
@@ -1909,7 +1909,7 @@ G.trancheroute = { mount(stage, api){
     scratches(g, r, w, h, 18);
     return c;
   }
-  const GRAF = '"Sedgwick Ave Display", "Permanent Marker", ' + FONT, MARKER = '"Permanent Marker", "Chakra Petch", sans-serif';
+  const GRAF = FONT, MARKER = FONT;
   /* ---------- la cassette mascotte : yeux-bobines, gants, baskets ---------- */
   function rrp(g, x, y, w, h, r){ g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
   function glove(g, x, y, rot, kind){
@@ -2015,7 +2015,7 @@ G.trancheroute = { mount(stage, api){
 
   /* ---------- menu cartoon : scène animée, cassettes qui suivent le doigt ---------- */
   if(!document.getElementById('k7-menu-css')){ const st = document.createElement('style'); st.id = 'k7-menu-css'; st.textContent = `
-    .k7m{position:absolute;inset:0;z-index:4;overflow:hidden;font-family:"Chakra Petch",sans-serif;color:${INK};touch-action:none;user-select:none;-webkit-user-select:none}
+    .k7m{position:absolute;inset:0;z-index:4;overflow:hidden;font-family:"Rubik",sans-serif;color:${INK};touch-action:none;user-select:none;-webkit-user-select:none}
     .k7m canvas{position:absolute;inset:0;width:100%;height:100%}
     .k7m .ui{position:absolute;left:0;right:0;display:flex;padding:0 16px;pointer-events:none}
     .k7m .ui > *{pointer-events:auto}
@@ -2025,7 +2025,7 @@ G.trancheroute = { mount(stage, api){
     .k7play{background:#ff3d7f;color:#fff;font-family:${GRAF};font-size:38px;line-height:1;padding:8px 14px 8px 30px;border:5px solid ${INK};border-radius:999px;display:flex;align-items:center;gap:12px;animation:k7pulse 1.15s ease-in-out infinite;-webkit-text-stroke:2px ${INK};paint-order:stroke fill;text-shadow:3px 4px 0 ${INK};box-shadow:0 6px 0 ${INK},0 0 0 5px #fff,0 6px 0 5px #fff}
     .k7pi{display:grid;place-items:center;width:46px;height:40px;background:#fff;border:4px solid ${INK};border-radius:10px;-webkit-text-stroke:0;text-shadow:none}
     .k7badge{background:#ffd23f;border:4px solid ${INK};border-radius:16px;padding:6px 12px 7px;box-shadow:0 5px 0 ${INK},0 0 0 5px #fff;transform:rotate(-2deg);font-family:${MARKER};font-size:21px;line-height:1.05;color:${INK};white-space:nowrap}
-    .k7badge small{display:block;font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:12.5px}
+    .k7badge small{display:block;font-family:"Rubik",sans-serif;font-weight:700;font-size:12.5px}
     .k7sq{width:50px;height:46px;padding:0;display:grid;place-items:center;border-width:4px}
     .k7round{width:50px;height:50px;padding:0;border-radius:50%;display:grid;place-items:center;border-width:4px;box-shadow:0 0 0 5px #ffd23f,0 0 0 8px ${INK},0 5px 0 8px ${INK}}
     .k7round:active{box-shadow:0 0 0 5px #ffd23f,0 0 0 8px ${INK}}
@@ -2236,7 +2236,7 @@ G.trancheroute = { mount(stage, api){
   if(!document.getElementById('k7-home-css')){ const st = document.createElement('style'); st.id = 'k7-home-css'; st.textContent = `
     .k7home{position:absolute;inset:0;z-index:5;overflow:hidden}
     .k7home canvas{position:absolute;inset:0;width:100%;height:100%}
-    .k7plate{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;gap:14px;width:100%;border:0;background:none;font-family:${TITLEF};color:${INK};cursor:pointer;padding:0 22px;transition:transform .12s cubic-bezier(.3,1.6,.5,1)}
+    .k7plate{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;gap:14px;width:100%;border:0;background:none;font-family:${FONT};color:${INK};cursor:pointer;padding:0 22px;transition:transform .12s cubic-bezier(.3,1.6,.5,1)}
     .k7plate::before,.k7plate::after{content:"";position:absolute;inset:0;z-index:-1;clip-path:polygon(0 8%,4% 0,11% 6%,19% 1%,27% 7%,36% 0,45% 5%,55% 0,63% 6%,72% 1%,81% 7%,90% 0,96% 5%,100% 2%,98% 30%,100% 55%,97% 78%,100% 100%,91% 94%,83% 100%,74% 94%,64% 100%,55% 95%,45% 100%,36% 94%,27% 100%,18% 94%,9% 100%,2% 95%,0 70%,2% 48%,0 26%)}
     .k7plate::after{background:${INK};transform:translate(4px,6px);z-index:-2}
     .k7plate::before{background:var(--paper)}
@@ -2261,18 +2261,19 @@ G.trancheroute = { mount(stage, api){
     .k7plate.death{--paper:${INK};color:#fff}.k7plate.death::after{background:#e8344f}.k7plate .lbl{white-space:nowrap}
     .k7tbtns .k7plate.mid,.k7tbtns .k7plate.opt{height:54px;font-size:24px}.k7tbtns .k7plate.death{font-size:21px}
     .k7home.short .k7tbtns .k7plate.mid,.k7home.short .k7tbtns .k7plate.opt{height:42px;font-size:19px}.k7home.short .k7tbtns .k7plate.death{font-size:17px}
-    .k7home.short .k7plate.big{height:64px;font-size:34px}.k7home.short .k7plate.big .lbl small{font-size:13px}.k7home.short .k7plate.mid,.k7home.short .k7plate.opt{height:46px;font-size:21px}.k7home.short .k7plate .drips{height:18px}
+    .k7home.short .k7plate.big{height:64px;font-size:34px}.k7home.short .k7plate.big .lbl small{font-size:11.5px}.k7home.short .k7plate.mid,.k7home.short .k7plate.opt{height:46px;font-size:21px}.k7home.short .k7plate .drips{height:18px}
     .k7plate.big::before{background:radial-gradient(rgba(255,255,255,.2) 1.6px,transparent 2.2px) 0 0/8px 8px,var(--paper)}
-    .k7plate .chev{flex:none;width:22px;height:30px}
+    .k7plate .chev{flex:none;width:22px;height:30px}.k7plate > svg{flex:none}
     .k7plate .drips{position:absolute;left:18%;top:calc(100% - 4px);width:64%;height:30px;z-index:-1;pointer-events:none}
     .k7plate.big .lbl{display:flex;flex-direction:column;align-items:center;line-height:.95}
-    .k7plate.big .lbl small{font-family:${MARKER};font-size:15px;-webkit-text-stroke:0;text-shadow:none;color:#fff;background:${INK};padding:2px 10px 1px;margin-top:4px;transform:rotate(1deg);letter-spacing:.3px;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}
+    .k7plate.big .lbl small{font-family:Rubik,sans-serif;font-weight:800;text-transform:uppercase;font-size:13px;-webkit-text-stroke:0;text-shadow:none;color:#fff;background:${INK};padding:2px 10px 1px;margin-top:4px;transform:rotate(1deg);letter-spacing:.3px;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}
     .k7clist{display:flex;flex-direction:column;gap:9px}
+    #k7cdiff .k7diff{padding:6px 16px 7px 14px}#k7cdiff .k7diff .dn{font-size:19px}#k7cdiff .k7mult{right:-14px}
     .k7crow{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:4px 12px;text-align:left;background:#fff;border:3px solid ${INK};border-radius:12px;padding:8px 12px;box-shadow:0 4px 0 ${INK};font:inherit;color:${INK};cursor:pointer}
     .k7crow.on{background:#ffd23f}.k7crow.lock{background:#e4ddcc}
     .k7crow .sw{grid-row:span 2;width:38px;height:26px;border:3px solid ${INK};border-radius:5px;position:relative}
     .k7crow .sw::after{content:"";position:absolute;left:5px;right:5px;top:6px;height:8px;border-radius:3px;background:#f3ead7}
-    .k7crow .nm{font-family:${MARKER};font-size:19px;line-height:1.1}.k7crow .mt{font-size:12px;font-weight:600;opacity:.75}
+    .k7crow .nm{font-family:${MARKER};font-size:16px;line-height:1.1}.k7crow .mt{font-size:12px;font-weight:600;opacity:.75}
     .k7crow .ss{grid-row:span 2;font-family:${MARKER};font-size:14px;text-align:right;color:#d7263d;max-width:110px}
         .k7dot{position:absolute;right:-5px;top:-5px;width:14px;height:14px;border-radius:50%;background:#e8344f;border:3px solid ${INK}}
     .k7gal{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:60vh;overflow-y:auto}
@@ -2332,7 +2333,7 @@ G.trancheroute = { mount(stage, api){
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `🔒 ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${SPRAY[i % SPRAY.length]}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');
     sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">${tx('CASSETTES')}</b><button class="k7btn" id="k7cx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Fermer')}">✕</button></div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:22px;padding:8px 0 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="k7clist"></div></div>`;
     menu.appendChild(sh); const close = () => sh.remove();
     const fill = () => { sh.querySelector('#k7cdiff').innerHTML = diffHtml(); sh.querySelector('.k7clist').innerHTML = rows();
@@ -2365,6 +2366,7 @@ G.trancheroute = { mount(stage, api){
     .k7brief .br i{font-style:normal;font-family:${FONT};font-size:10px;background:#e8344f;color:#fff;padding:3px 6px;border-radius:6px;transform:rotate(4deg)}
     .k7brief .bar{height:12px;border:3px solid ${INK};border-radius:8px;overflow:hidden;background:#fff}.k7brief .bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,#ffd23f 0 8px,#e8344f 8px 16px);transition:width .2s linear}
     .k7brief .go{border:4px solid ${INK};border-radius:999px;background:#ff3d7f;color:#fff;font-family:${GRAF};font-size:28px;padding:8px 18px;-webkit-text-stroke:1.5px ${INK};paint-order:stroke fill;box-shadow:0 5px 0 ${INK};cursor:pointer}
+    .k7brief .go{white-space:nowrap;font-size:24px}.k7brief .acts .go[data-go]{flex:1}
     .k7brief .go:disabled{filter:grayscale(1);opacity:.6}
     .k7brief .acts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:nowrap;position:sticky;bottom:0;margin:0 -16px -18px;padding:10px 16px 14px;background:#f3ead7;border-top:3px solid ${INK};border-radius:0 0 14px 14px}
     .k7brief .lb{display:flex;flex-direction:column;gap:5px}
@@ -2644,7 +2646,7 @@ G.trancheroute = { mount(stage, api){
     for(const q of stage.querySelectorAll('.k7rw, .k7lab')) q.remove();
     if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setValueAtTime(.8, actx.currentTime); }
     if(!document.getElementById('k7-lab-css')){ const st = document.createElement('style'); st.id = 'k7-lab-css'; st.textContent = `
-      .k7lab{position:absolute;inset:0;z-index:12;overflow-y:auto;background:#efe5cf;color:${INK};font-family:"Chakra Petch",sans-serif;-webkit-overflow-scrolling:touch}
+      .k7lab{position:absolute;inset:0;z-index:12;overflow-y:auto;background:#efe5cf;color:${INK};font-family:"Rubik",sans-serif;-webkit-overflow-scrolling:touch}
       .k7lab .in{padding:16px 14px 28px;display:flex;flex-direction:column;gap:12px;max-width:480px;margin:0 auto}
       .k7lab h2{margin:4px 0 0;font-family:${GRAF};font-weight:400;font-size:clamp(30px,9vw,42px);color:#ffd23f;-webkit-text-stroke:3px ${INK};paint-order:stroke fill;text-shadow:3px 4px 0 ${INK};transform:rotate(-3deg)}
       .k7lab .intro{font-size:14px;line-height:1.4}
