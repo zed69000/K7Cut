@@ -1,4 +1,4 @@
-["C","CV","CH","J","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); localStorage.setItem("k7cut.tuto3." + k, "true"); });
+["C","CV","CH","CD","J","D","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); localStorage.setItem("k7cut.tuto3." + k, "true"); });
 window.__bot = function(sigma, mode){
   const k = window.__k7, cv = k.cv; const r = cv.getBoundingClientRect(); const cx = r.left + r.width*.6, cy = r.top + r.height*.3;
   const seen = new Set(), plan = []; let pid = 10;
@@ -12,15 +12,16 @@ window.__bot = function(sigma, mode){
         const vis = k.objs.filter(o => !o.done && hw(o) && o.beat - t/k.bpb < 6 && !o.__ov).sort((a, b) => a.beat - b.beat);
         for(let i=1;i<vis.length;i++){ const a = vis[i - 1], b = vis[i], gap = (b.beat - a.beat)*k.ppb, need = hw(a) + hw(b);
           const big = (a.k === 'C' || a.k === 'J') && (b.k === 'C' || b.k === 'J'); if(gap < need && big){ b.__ov = 1; window.__rep.flags.push('CHEVAUCHE ' + a.k + (a.shape || '') + '/' + b.k + (b.shape || '') + ' ' + Math.round(gap) + '<' + need); } } }
-      for(const o of k.objs){ if(seen.has(o) || o.done || !['C','J','H','S'].includes(o.k)) continue;
+      for(const o of k.objs){ if(seen.has(o) || o.done || !['C','J','H','S','D'].includes(o.k)) continue;
         if(o.time - t < .4){ seen.add(o); if(mode === 'lose' && o.beat >= 60 && o.beat < 72 && (o.k === 'C' || o.k === 'J')){ continue; } plan.push({o, at: o.time + gauss()*sigma, stage: 0, id: pid++}); } }
       for(const a of plan){ if(a.fin) continue; const o = a.o;
+        if(a.stage === 0 && t >= a.at && o.k === 'D'){ fire('pointerdown', cx - 20, cy, a.id); fire('pointerdown', cx + 20, cy, a.id + 5000); fire('pointerup', cx - 20, cy, a.id); fire('pointerup', cx + 20, cy, a.id + 5000); a.stage = 2; a.fin = true; a.err = Math.round((t - o.time)*1000); window.__rep.acts++; continue; }
         if(a.stage === 0 && t >= a.at){ a.jt0 = k.jumpT; fire('pointerdown', cx, cy, a.id); a.stage = 1; a.t1 = t; a.err = Math.round((t - o.time)*1000); continue; }
         if(a.stage === 1){
           let style = mode === 'wrong' ? (o.k === 'C' ? 'tap' : (o.bomb ? 'tap' : 'swipe')) : mode === 'lose' ? (o.k === 'C' ? 'swipe' : 'tap') : mode === 'backward' ? (o.k === 'C' ? 'swipe' : 'tap') : mode === 'sloppy' ? (o.bomb ? 'tap' : (Math.random() < .5 ? 'tap' : 'swipe')) : (o.k === 'C' ? 'swipe' : 'tap');
           if(o.k === 'C' || o.k === 'J'){
             const cutsB = k.objs.filter(q => q.k === 'C' && q.done && q.result !== 'miss').length, jt = k.jumpT;
-            if(style === 'swipe'){ const v = o.shape === 'wide' ? [1, .25] : o.shape === 'tall' ? [.25, -1] : [1, 1]; const w = mode === 'backward' ? -1 : 1; fire('pointermove', cx + v[0]*28*w, cy + v[1]*28*w, a.id); fire('pointerup', cx + v[0]*36*w, cy + v[1]*36*w, a.id); }
+            if(style === 'swipe'){ const v = o.shape === 'wide' ? [1, .25] : o.shape === 'tall' ? [.25, -1] : [1, -1]; /* diagonale : vers le haut et la droite */ const w = mode === 'backward' ? -1 : 1; fire('pointermove', cx + v[0]*28*w, cy + v[1]*28*w, a.id); fire('pointerup', cx + v[0]*36*w, cy + v[1]*36*w, a.id); }
             else { fire('pointermove', cx + 4, cy + 5, a.id); fire('pointerup', cx + 5, cy + 6, a.id); }
             a.fin = true; a.check = t;
             const cutsA = k.objs.filter(q => q.k === 'C' && q.done && q.result !== 'miss').length;

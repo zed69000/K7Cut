@@ -50,7 +50,39 @@ const SONGS = [
       {name: 'Deux doigts', bars: 8, tier: 1, acts: 'JD', layers: ['kick','snare','hat','bass','chords','perc','lead']},
       {name: 'Tout mélangé', bars: 8, tier: 1, acts: 'CJGD', layers: ALL},
       {name: 'Fin', bars: 2, tier: 'rest', acts: '', layers: ['chords']}] },
-  { id: 'robots', face: 'A', name: tx('Robots de minuit'), style: 'french', label: tx('French house · 122 BPM'), ref: 'esprit Daft Punk', bpm: 122, root: 73.42, scale: DOR, prog: [0, 0, 3, 4], swing: 0, cost: 0,
+  { id: 'facettes', dens: 0.82, face: 'C', name: tx('Boule à facettes'), style: 'disco', label: tx('Disco · 120 BPM'), ref: 'esprit Chic', bpm: 120, root: 61.74, scale: DOR, prog: [0, 5, 3, 4], swing: 0, cost: 4,
+    bg: ['#ff9ad5', '#d4479a'], deco: 'leds', gestures: tx('+ Diagonale'), delay: .5, desc: 'Basse en octaves qui rebondit, cordes qui s\'envolent, guitare funky et charleston ouvert sur chaque contretemps',
+    song: {kick: 'kick', snare: 'clap', bass: {kind: 'funk', line: [[0, 0, 1], [2, 7, 1], [4, 0, 1], [6, 7, 1], [8, 0, 1], [10, 7, 1], [12, 2, 1], [14, 7, 1]]},
+      chords: {kind: 'strings', steps: [0], dur: 16}, organ: {steps: [2, 6, 10, 14]}, lead: 'brass', arp: {notes: [0, 4, 7, 4], every: 2, oct: 8, kind: 'cleangtr'},
+      drums: {kick: 'x...x...x...x...', snare: '....x.......x...', ohat: '..x...x...x...x.'},
+      drums2: {kick: 'x...x...x...x...', snare: '....x.......x...', ohat: '..x...x...x...x.', hat: 'x.x.x.x.x.x.x.x.', perc: '......x.......x.'},
+      hook: [4, null, 4, 5, null, 4, 2, null,  0, null, 2, null, 4, null, null, null,  4, null, 4, 5, null, 7, 6, null,  5, null, 4, null, 2, null, null, null]},
+    sections: plan(LL(), {newAct: 'G', newName: tx('En diagonale !'), all: 'CJG'}) },
+  { id: 'trottoir', face: 'E', name: tx('Trottoir 90'), style: 'hiphop', label: tx('Hip-hop boom bap · 88 BPM'), ref: 'esprit A Tribe Called Quest', bpm: 88, root: 55, scale: MIN, prog: [0, 0, 5, 6], swing: .12, cost: 7,
+    bg: ['#ffb347', '#d9822b'], deco: 'speakers', gestures: tx('+ Deux doigts'), delay: .75, desc: 'Grosse caisse lourde, caisse claire sèche, piano électrique jazzy et basse 808 qui glisse',
+    song: {kick: 'kick', snare: 'snareclap', bass: {kind: '808', line: [[0, 0, 4], [7, 0, 2], [10, 4, 2], [12, 3, 4]]},
+      chords: {kind: 'rhodes', steps: [0, 7, 10], dur: 3, seventh: true}, lead: 'bell', perc: 'shaker',
+      drums: {kick: 'x.....x...x.....', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.'},
+      drums2: {kick: 'x.....x.x.x...x.', snare: '....x.......x..o', hat: 'xxx.xxx.xxx.xxx.', perc: '..o...o...o...o.'},
+      hook: [7, null, 6, null, 4, null, null, 3,  4, null, null, null, 0, null, null, null,  7, null, 6, null, 4, null, 6, 7,  9, null, 7, null, null, null, null, null]},
+    sections: plan(LL(), {newAct: 'DJ', newName: tx('À deux doigts !'), all: 'CJD'}) },
+  { id: 'velours', dens: 1.55, face: 'H', name: tx('Velours'), style: 'synthwave', label: tx('Néo-soul · 72 BPM'), ref: 'esprit D\'Angelo', bpm: 72, root: 58.27, scale: MAJ, prog: [0, 3, 1, 4], swing: .1, cost: 13,
+    bg: ['#c9a2ff', '#7e57c2'], deco: 'stripes', gestures: tx('Notes longues + deux doigts'), delay: .75, desc: 'Lent et moelleux : basse qui marche, accords de piano électrique, caisse claire sur le bord',
+    song: {kick: 'kick', snare: 'rim', bass: {kind: 'walk', line: [[0, 0, 3], [4, 2, 2], [6, 4, 2], [8, 0, 3], [12, 5, 2], [14, 4, 2]]},
+      chords: {kind: 'rhodes', steps: [0, 6, 10], dur: 4, seventh: true}, lead: 'piano', perc: 'shaker', arp: {notes: [0, 2, 4, 6], every: 4, oct: 8, kind: 'glock'},
+      drums: {kick: 'x.......x.x.....', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.'},
+      drums2: {kick: 'x......xx.x.....', snare: '....x.......x...', hat: 'xoxoxoxoxoxoxoxo', perc: 'o.o.o.o.o.o.o.o.'},
+      hook: [4, null, null, 5, 4, null, 2, null,  0, null, null, null, null, null, 1, 2,  4, null, null, 5, 4, null, 7, null,  6, null, 4, null, null, null, null, null]},
+    sections: plan(LL(), {newAct: 'DJ', newName: tx('À deux doigts !'), all: 'CJHD'}) },
+  { id: 'forge', face: 'J', name: tx('La Forge'), style: 'metal', label: tx('Métal · 150 BPM'), ref: 'esprit Metallica', bpm: 150, root: 82.41, scale: PHR, prog: [0, 1, 0, 6], swing: 0, cost: 18,
+    bg: ['#ff6b4a', '#b0301c'], deco: 'scribble', gestures: tx('Le grand final : toutes les briques'), delay: .5, desc: 'Double grosse caisse, guitares saturées en rafale, et tout ce que tu as appris d\'un coup',
+    song: {kick: 'kickRock', snare: 'rock', bass: {kind: 'grit', line: [[0, 0, 1], [2, 0, 1], [4, 0, 1], [6, 0, 1], [8, 0, 1], [10, 0, 1], [12, 1, 1], [14, 0, 1]]},
+      chords: {kind: 'power', steps: [0, 8], dur: 6}, gtr: {steps: [0, 2, 4, 6, 8, 10, 12, 14], dur: 2, palm: [2, 4, 10, 12]}, lead: 'gtrlead', arp: {notes: [0, 1, 4, 1], every: 2, oct: 2, kind: 'cleangtr'},
+      drums: {kick: 'x.x.x.x.x.x.x.x.', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.'},
+      drums2: {kick: 'xxxxxxxxxxxxxxxx', snare: '....x.......x...', ride: 'x.x.x.x.x.x.x.x.', perc: 'x.......x.......'},
+      hook: [7, null, 8, null, 7, null, 4, null,  3, null, 4, null, 1, null, 0, null,  7, null, 8, null, 10, null, 8, null,  7, null, null, null, null, null, null, null]},
+    sections: plan([['kick','arp'], ['kick','snare','hat','bass','arp'], ['kick','snare','hat','bass','gtr','lead'], ['chords','arp'], ['kick','snare','hat','bass','gtr','perc','lead'], ['kick','snare','hat','bass','gtr','perc','lead','chords'], ['chords']], {all: 'CJSHGD'}) },
+  { id: 'robots', dens: 0.62, face: 'A', name: tx('Robots de minuit'), style: 'french', label: tx('French house · 122 BPM'), ref: 'esprit Daft Punk', bpm: 122, root: 73.42, scale: DOR, prog: [0, 0, 3, 4], swing: 0, cost: 0,
     bg: ['#b7a6ff', '#6b55d6'], deco: 'leds', gestures: tx('Couper · Taper'), delay: .75, desc: 'Boucle disco filtrée qui s\'ouvre et se ferme, pompe énorme, voix de robot',
     song: {kick: 'kick', snare: 'clap', pump: true, bass: {kind: 'funk', line: [[0, 0, 2], [3, 0, 1], [6, 7, 1], [8, 0, 2], [10, 4, 1], [11, 0, 1], [14, 7, 2]]},
       chords: {kind: 'filter', steps: [0, 3, 6, 8, 11, 14], dur: 1, seventh: true, sweep: true}, lead: 'talk', perc: 'shaker',
@@ -58,31 +90,31 @@ const SONGS = [
       drums2: {kick: 'x...x...x...x...', snare: '....x.......x...', ohat: '..x...x...x...x.', hat: 'x.x.x.x.x.x.x.x.', perc: 'oxoooxoooxoooxoo'},
       hook: [7, null, null, 7, null, 9, 7, null,  5, null, 4, null, 2, null, null, null,  7, null, null, 7, null, 9, 11, null,  9, 7, null, 5, null, 4, null, null]},
     sections: plan(LL()) },
-  { id: 'autoroute', face: 'E', name: tx('Autoroute 86'), style: 'synthwave', label: tx('Synthwave de nuit · 112 BPM'), ref: 'esprit Kavinsky', bpm: 112, root: 61.74, scale: MIN, prog: [0, 5, 2, 6], swing: 0, cost: 9,
+  { id: 'autoroute', dens: 1.18, face: 'G', name: tx('Autoroute 86'), style: 'synthwave', label: tx('Synthwave de nuit · 112 BPM'), ref: 'esprit Kavinsky', bpm: 112, root: 61.74, scale: MIN, prog: [0, 5, 2, 6], swing: 0, cost: 11,
     bg: ['#f58fb2', '#c9568a'], deco: 'grid', gestures: tx('Scratch + notes longues'), delay: .75, desc: 'Basse en doubles croches qui fonce, caisse claire années 80 géante, cuivre synthé sombre',
     song: {kick: 'kick', snare: 'gated', pump: true, bass: {kind: 'saw', line: [[0, 0, 1], [1, 0, 1], [2, 7, 1], [3, 0, 1], [4, 0, 1], [5, 0, 1], [6, 7, 1], [7, 0, 1], [8, 0, 1], [9, 0, 1], [10, 7, 1], [11, 0, 1], [12, 0, 1], [13, 0, 1], [14, 7, 1], [15, 0, 1]]},
       chords: {kind: 'strings', steps: [0], dur: 16}, lead: 'synthbrass', arp: {notes: [0, 2, 4, 7], every: 2, oct: 8},
       drums: {kick: 'x.......x.......', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.'},
       drums2: {kick: 'x...x...x...x...', snare: '....x.......x...', hat: 'xxxxxxxxxxxxxxxx', perc: '..............x.'},
       hook: [4, null, null, 3, null, null, 2, null,  0, null, null, null, null, null, -1, 0,  4, null, null, 3, null, null, 7, null,  6, null, 4, null, 3, null, 2, null]},
-    sections: plan(LL(), {newAct: 'SH', newName: tx('Mélange !'), all: 'CJSH'}) },
-  { id: 'garage', face: 'F', name: tx('Cri du garage'), style: 'punk', label: tx('Rock alternatif · 138 BPM'), ref: 'esprit Pixies', bpm: 138, root: 82.41, scale: MIX, prog: [0, 6, 3, 0], swing: 0, cost: 12,
+    sections: plan(LL(), {newAct: 'SH', newName: tx('Mélange !'), all: 'CJSHG'}) },
+  { id: 'garage', dens: 1.05, face: 'I', name: tx('Cri du garage'), style: 'punk', label: tx('Rock alternatif · 138 BPM'), ref: 'esprit Pixies', bpm: 138, root: 82.41, scale: MIX, prog: [0, 6, 3, 0], swing: 0, cost: 15,
     bg: ['#c8f04a', '#86b22a'], deco: 'scribble', gestures: tx('Tout, vite et fort'), delay: .5, desc: 'Couplet calme à la guitare claire, puis le refrain explose en guitares saturées',
     song: {kick: 'kickRock', snare: 'rock', bass: {kind: 'grit', line: [[0, 0, 2], [2, 0, 2], [4, 0, 2], [6, 0, 2], [8, 0, 2], [10, 0, 2], [12, 0, 2], [14, 0, 2]]},
       chords: {kind: 'cleangtr', steps: [0, 6, 12], dur: 4}, gtr: {steps: [0, 2, 4, 6, 8, 10, 12, 14], dur: 2, palm: [2, 6, 10, 14]}, lead: 'gtrlead', arp: {notes: [0, 4, 7, 4], every: 2, oct: 2, kind: 'cleangtr'},
       drums: {kick: 'x.......x.......', snare: '....x.......x...', hat: 'x.x.x.x.x.x.x.x.'},
       drums2: {kick: 'x.....x.x.x.....', snare: '....x.......x...', ride: 'x.x.x.x.x.x.x.x.', perc: 'x...............'},
       hook: [7, null, 6, null, 4, null, null, null,  3, null, 4, null, 6, null, 4, null,  7, null, 6, null, 4, null, 7, null,  8, null, 7, null, null, null, null, null]},
-    sections: plan([['kick','arp'], ['kick','snare','hat','bass','arp'], ['kick','snare','hat','bass','arp','lead'], ['chords','arp'], ['kick','snare','hat','bass','gtr','perc','lead'], ['kick','snare','hat','bass','gtr','perc','lead'], ['chords']], {all: 'CJSH'}) },
-  { id: 'collines', face: 'D', name: tx('Vent des collines'), style: 'dnb', label: tx('Orchestral · 92 BPM'), ref: 'esprit films de Miyazaki', bpm: 92, root: 65.41, scale: MAJ, prog: [5, 3, 4, 0], swing: 0, cost: 6,
-    bg: ['#8fce6a', '#3f8a4f'], deco: 'stripes', gestures: tx('Notes longues'), delay: .5, desc: 'Piano qui raconte, grandes cordes, carillon, et timbales au refrain',
+    sections: plan([['kick','arp'], ['kick','snare','hat','bass','arp'], ['kick','snare','hat','bass','arp','lead'], ['chords','arp'], ['kick','snare','hat','bass','gtr','perc','lead'], ['kick','snare','hat','bass','gtr','perc','lead'], ['chords']], {all: 'CJSHD'}) },
+  { id: 'collines', dens: 1.3, face: 'F', name: tx('Vent des collines'), style: 'dnb', label: tx('Orchestral · 92 BPM'), ref: 'esprit films de Miyazaki', bpm: 92, root: 65.41, scale: MAJ, prog: [5, 3, 4, 0], swing: 0, cost: 9,
+    bg: ['#8fce6a', '#3f8a4f'], deco: 'stripes', gestures: tx('Notes longues + diagonale'), delay: .5, desc: 'Piano qui raconte, grandes cordes, carillon, et timbales au refrain',
     song: {kick: 'kick808', snare: 'snap', bass: {kind: 'sub', line: [[0, 0, 8], [8, 4, 8]]},
       chords: {kind: 'strings', steps: [0], dur: 16}, lead: 'piano', perc: 'tom', arp: {notes: [0, 2, 4, 7, 9, 7, 4, 2], every: 2, oct: 8, kind: 'glock'},
       drums: {kick: 'x.......x.......', snare: '........x.......', perc: '................'},
       drums2: {kick: 'x.......x.....x.', snare: '....x.......x...', perc: '............x.x.', hat: '..x...x...x...x.'},
       hook: [2, null, 4, null, 7, null, 6, 4,  5, null, null, null, 4, null, 2, null,  2, null, 4, null, 7, null, 9, null,  7, null, null, null, null, null, null, null]},
-    sections: plan([['chords','lead'], ['kick','snare','bass','chords'], ['kick','snare','bass','chords','arp','lead'], ['chords','arp','lead'], ['kick','snare','hat','bass','chords','perc','lead'], ALL, ['chords']], {newAct: 'H', newName: tx('Tiens la note !'), all: 'CJH'}) },
-  { id: 'racines', face: 'C', name: tx('Racines'), style: 'reggae', label: tx('Reggae roots · 76 BPM'), ref: 'esprit Bob Marley', bpm: 76, root: 58.27, scale: MAJ, prog: [0, 3, 4, 3], swing: .15, cost: 4,
+    sections: plan([['chords','lead'], ['kick','snare','bass','chords'], ['kick','snare','bass','chords','arp','lead'], ['chords','arp','lead'], ['kick','snare','hat','bass','chords','perc','lead'], ALL, ['chords']], {newAct: 'H', newName: tx('Tiens la note !'), all: 'CJHG'}) },
+  { id: 'racines', dens: 1.25, face: 'D', name: tx('Racines'), style: 'reggae', label: tx('Reggae roots · 76 BPM'), ref: 'esprit Bob Marley', bpm: 76, root: 58.27, scale: MAJ, prog: [0, 3, 4, 3], swing: .15, cost: 5,
     bg: ['#8fce6a', '#3f8a4f'], deco: 'speakers', gestures: tx('+ Notes longues'), delay: .75, desc: 'One drop : tout tombe sur le 3e temps, guitare skank, orgue qui bulle, basse qui chante',
     song: {kick: 'kick', snare: 'rim', bass: {kind: 'dub', line: [[0, 0, 3], [4, 4, 2], [6, 2, 2], [8, 0, 3], [12, 4, 1], [13, 5, 1], [14, 4, 2]]},
       chords: {kind: 'cleangtr', steps: [4, 12], dur: 1}, organ: {steps: [2, 3, 6, 7, 10, 11, 14, 15]}, lead: 'melodica', perc: 'shaker',
@@ -90,7 +122,7 @@ const SONGS = [
       drums2: {kick: '........x.......', snare: '........x.....o.', hat: 'xoxoxoxoxoxoxoxo', perc: 'o.o.o.o.o.o.o.o.'},
       hook: [4, null, 4, null, 2, null, 0, null,  2, null, null, null, 4, null, null, null,  4, null, 4, null, 5, null, 4, 2,  0, null, null, null, null, null, null, null]},
     sections: plan(LL(), {newAct: 'H', newName: tx('Tiens la note !'), all: 'CJH'}) },
-  { id: 'lune', face: 'B', name: tx('Pas de lune'), style: 'disco', label: tx('Pop funk · 116 BPM'), ref: 'esprit Michael Jackson', bpm: 116, root: 65.41, scale: DOR, prog: [0, 0, 3, 3], swing: 0, cost: 2,
+  { id: 'lune', dens: 0.88, face: 'B', name: tx('Pas de lune'), style: 'disco', label: tx('Pop funk · 116 BPM'), ref: 'esprit Michael Jackson', bpm: 116, root: 65.41, scale: DOR, prog: [0, 0, 3, 3], swing: 0, cost: 2,
     bg: ['#f2cd4c', '#d6a93a'], deco: 'rays', gestures: tx('+ Scratch'), delay: .5, desc: 'Basse synthé en doubles croches, claquements de doigts, cuivres secs, batterie serrée',
     song: {kick: 'kick', snare: 'snareclap', bass: {kind: 'slap', line: [[0, 0, 1], [2, 0, 1], [3, 7, 1], [5, 0, 1], [7, 6, 1], [8, 0, 1], [10, 0, 1], [11, 7, 1], [13, 4, 1], [14, 3, 1]]},
       chords: {kind: 'brass', steps: [3, 6, 11], dur: 1, seventh: true}, lead: 'synthbrass', perc: 'snap',
@@ -101,7 +133,7 @@ const SONGS = [
 ];
 const byId = id => SONGS.find(t => t.id === id);
 // les cassettes du jeu, de la plus facile à la plus dure ; le labo garde le niveau test des nouvelles briques
-const TRACKS = ['robots', 'lune', 'racines', 'collines', 'autoroute', 'garage'].map(byId);
+const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
 const VERSION = '0.26.3';
@@ -701,7 +733,7 @@ G.trancheroute = { mount(stage, api){
       const tier = tier0 >= 2 && pr() > fast && !diff.boost ? tier0 - 1 : tier0; // en Roi, on ne soulage pas les morceaux rapides
       const A = pick(RHY[tier]), B = pick(RHY[Math.min(tier + 1, diff.cap ?? 3)]), mut = 4 + Math.floor(pr()*4);
       shp = Array.from({length: 8}, () => pr() < .5 ? 'wide' : 'tall');
-      const keep = Array.from({length: 8}, (_, i) => i === 0 || i === 4 || pr() < diff.dens), extra = Array.from({length: 8}, () => pr() < (diff.dens - 1)*.5*(tr.bpm >= 140 ? .4 : 1));
+      const dm = diff.dens*(tr.dens || 1); /* chaque morceau a sa densité : la difficulté monte d'une cassette à l'autre */ const keep = Array.from({length: 8}, (_, i) => i === 0 || i === 4 || pr() < dm), extra = Array.from({length: 8}, () => pr() < (dm - 1)*.5*(tr.bpm >= 140 ? .4 : 1));
       const longK = acts.includes('H') && (!acts.includes('S') || pr() < .5) ? 'H' : acts.includes('S') ? 'S' : null, longOn = longK && pr() < (sec.call ? 1 : diff.easy ? .3 : .55);
       const longS = [0, 2, 4][Math.floor(pr()*3)], longL = longK === 'H' ? 3 + Math.floor(pr()*3) : 2 + Math.floor(pr()*3);
       const pat = (k4 === 3 && !sec.call ? B : A).split('');
@@ -789,7 +821,7 @@ G.trancheroute = { mount(stage, api){
     const x = xOf(Math.min(o.beat, Math.max(o.beat, beatNow))), y = objY(o);
     if(g === 'miss'){
       if(trance >= 1) tapeStop(t); setTrance(0, t);
-      combo = 0; hurtT = .6; flashR = .6; bump = 1; missRun++; stemCut = t + 4*bpb; if(diff.ko && missRun >= diff.ko && !auto){ judges.push({txt: tx('LA BANDE A CASSÉ'), sub: tx('{n} ratés de suite', {n: diff.ko}), x: W/2, y: H*.22, t: 0, big: true}); api.after(400, fail); } if(missRun >= 2 && !slowed) loseThread(t);
+      combo = 0; hurtT = .6; flashR = .6; bump = 1; missRun++; stemCut = t + 4*bpb; if(diff.ko && missRun >= diff.ko && !auto){ judges.push({txt: tx('LA BANDE A CASSÉ'), sub: tx('{n} ratés de suite', {n: diff.ko}), x: W/2, y: H*.22, t: 0, big: true}); api.after(400, fail); } if(deathRun && !auto){ hearts--; deathHud(); if(hearts <= 0) api.after(400, fail); } if(missRun >= 2 && !slowed) loseThread(t);
       osc(master, 'sawtooth', 110, t, .3, .22, {glide: 50}); noise(master, t, .2, .3, 'lowpass', 900);
       api.vibe(120); api.shake(9); confetti(x, y, [INK, RED], 14, 1.1);
     } else {
@@ -936,7 +968,7 @@ G.trancheroute = { mount(stage, api){
   let gulp = 0, swallows = [];
   function collect(o, t){
     o.done = true; o.result = 'got'; swallows.push({x: xOf(o.beat), y: objY(o), t: 0, gold: o.k === 'A'});
-    if(o.k === 'L'){ hearts = Math.min(5, hearts + 1); judges.push({txt: tx('+1 VIE'), x: HXs + 20, y: Y0 - 100, t: 0}); I.bell(Math.max(t, o.time), freq(7, 4), .14); I.bell(Math.max(t, o.time) + .08, freq(11, 4), .12); }
+    if(o.k === 'L'){ hearts = Math.min(deathRun ? 3 : 5, hearts + 1); if(deathRun) deathHud(); judges.push({txt: tx('+1 VIE'), x: HXs + 20, y: Y0 - 100, t: 0}); I.bell(Math.max(t, o.time), freq(7, 4), .14); I.bell(Math.max(t, o.time) + .08, freq(11, 4), .12); }
     else { notesRun++; paintNote(o); const at = Math.max(t, o.time), fr = freq(chordOf(Math.floor(o.beat/4)) + (o.k === 'A' ? 4 : 0), 3); I.bell(at, freq(o.deg + 7, 4), .05); score += 10; }
     confetti(xOf(o.beat), objY(o), [PAPER, RED], 8, .6);
   }
@@ -1165,10 +1197,10 @@ G.trancheroute = { mount(stage, api){
       <div style="font-size:12px;opacity:.7;text-align:center">${tx('Chaque partie peint une toile unique. Rond net = pile · jets = en avance · coulures = en retard · gris = raté')}</div></div>`;
     stage.appendChild(el);
     const close = () => { alive = false; el.remove(); outroStop(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
-    el.querySelector('.again').onclick = () => { close(); startTrack(tr); };
-    const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => { close(); diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); startTrack(tr); };
+    el.querySelector('.again').onclick = () => { close(); briefing(tr, () => startTrack(tr)); };
+    const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => { close(); diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); briefing(tr, () => startTrack(tr)); };
     el.querySelector('.tomenu').onclick = () => { close(); showMenu(); };
-    const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); startTrack(R.nextT); };
+    const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); briefing(R.nextT, () => startTrack(R.nextT)); };
     el.querySelector('.keep').onclick = R.img ? R.keep : () => { close(); showMenu(); };
     outroMusic(at0, R.stars);
     if(useAudio && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; applause(actx.currentTime + delay + .1, R.stars/3, outroBus[0]); sendVia = sv; }
@@ -1193,6 +1225,7 @@ G.trancheroute = { mount(stage, api){
   function finishRun(won){
     if(auto){ auto = false; api.after(900, showLabo); return; }
     if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; }
+    if(deathRun){ if(won) deathNext(); else deathOver(); return; }
     api.save('runs', api.load('runs', 0) + 1); api.save('cue', cueN);
     const acc = rhythmPct() || 0, stars = diff.disc.filter(x => acc >= x).length, discsBefore = discs();
     const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + stars*5*diff.mult);
@@ -1408,7 +1441,7 @@ G.trancheroute = { mount(stage, api){
     CD: {verb: tx('GLISSE EN DIAGONALE ↗'), hint: tx('vers le haut et la droite à la fois'), need: 1, cue: tx('GLISSE ↗')},
     O: {verb: tx('FAIS UN CERCLE'), hint: tx('un tour complet avec le doigt'), need: 1, cue: tx('CERCLE')},
     W: {verb: tx('FAIS UNE VAGUELETTE'), hint: tx('zigzag rapide de gauche à droite'), need: 1, cue: tx('VAGUE')},
-    D: {verb: tx('TAPE À DEUX DOIGTS'), hint: tx('souris : clic droit'), need: 1, cue: tx('2 DOIGTS')}
+    D: {verb: tx('TAPE À DEUX DOIGTS'), hint: tx('deux doigts en même temps (souris : clic droit)'), need: 1, cue: tx('2 DOIGTS')}
   };
   const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : o.shape === 'diag' ? 'CD' : 'CV') : o.k;
   // aides au-dessus des formes : elles s'effacent à mesure que tu réussis ce geste, et reviennent si tu le rates
@@ -2088,7 +2121,7 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     sh.querySelector('#k7labo').onclick = () => { close(); showLabo(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
-    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','J','H','S'].forEach(k => api.save('tuto3.' + k, false)); e.target.textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','CD','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); e.target.textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
   };
 
   // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
@@ -2243,7 +2276,7 @@ G.trancheroute = { mount(stage, api){
   home.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div>
-      <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
+      <div style="display:flex;gap:10px"><button id="k7death" class="k7btn k7sq" aria-label="${tx('Cassette de la mort')}" style="background:${INK};color:#fff;font-size:24px">☠</button><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative">${TROPHY}<span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
     <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7hplay" class="k7plate big"><span class="lbl"></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
       <button id="k7hlvl" class="k7plate mid"><span class="ico">${CASS}</span><span class="lbl">${tx('CASSETTES')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -2263,7 +2296,7 @@ G.trancheroute = { mount(stage, api){
     const t = TRACKS[cur], open = unlocked(t), afford = !open && discs() >= t.cost;
     if(!open && !afford){ api.sfx.lose(); hSel = .4; return; }
     if(!open){ api.save('unlock.' + t.id, true); api.sfx.coin(); hSel = 0; refreshHome(); return; }
-    api.sfx.coin(); diff = DIFFS[dIdx]; homeOn = false; home.hidden = true; startTrack(t);
+    api.sfx.coin(); diff = DIFFS[dIdx]; briefing(t, () => { homeOn = false; home.hidden = true; startTrack(t); });
   }
   // la scène : glisser pour changer, toucher une voisine pour l'amener, toucher celle du centre pour la lancer
   let hDrag = null;
@@ -2291,6 +2324,102 @@ G.trancheroute = { mount(stage, api){
   home.querySelector('#k7hopt').onclick = () => { api.sfx.click(); ui.k7gear.onclick(); };
   home.querySelector('#k7hgear').onclick = () => { api.sfx.click(); ui.k7gear.onclick(); };
   home.querySelector('#k7hplay').onclick = playCur; // JOUER : la cassette du centre, au niveau choisi
+
+  /* ---------- avant chaque niveau : un petit chargement, la règle du jeu, et chaque brique de la cassette ---------- */
+  if(!document.getElementById('k7-brief-css')){ const st = document.createElement('style'); st.id = 'k7-brief-css'; st.textContent = `
+    .k7brief{position:absolute;inset:0;z-index:30;overflow-y:auto;background:rgba(28,27,25,.55);-webkit-overflow-scrolling:touch}
+    .k7brief .in{margin:14px auto 22px;width:calc(100% - 32px);max-width:420px;background:#f3ead7;border:4px solid ${INK};border-radius:18px;box-shadow:0 7px 0 ${INK};padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;color:${INK};animation:k7popin .35s cubic-bezier(.2,1.5,.4,1)}
+    .k7brief .hd{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+    .k7brief .hd .face{background:${INK};color:#ffd23f;font-family:${FONT};font-size:12px;padding:3px 8px;border-radius:6px;transform:rotate(-2deg)}
+    .k7brief .hd b{font-family:${MARKER};font-weight:400;font-size:30px;line-height:1.05}
+    .k7brief .hd small{font-size:13px;font-weight:700;opacity:.75}
+    .k7brief .sub{font-family:${FONT};font-size:13px;letter-spacing:.5px;margin-top:2px}
+    .k7brief .how{background:#fff;border:3px solid ${INK};border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.35}
+    .k7brief .how p{margin:4px 0}
+    .k7brief .bricks{display:flex;flex-direction:column;gap:7px}
+    .k7brief .br{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:10px;background:#fff;border:3px solid ${INK};border-radius:12px;padding:4px 10px 4px 4px}
+    .k7brief .br svg{width:52px;height:52px;display:block}
+    .k7brief .br b{display:block;font-family:${MARKER};font-weight:400;font-size:16px;line-height:1.1}.k7brief .br small{font-size:12px;opacity:.75}
+    .k7brief .br i{font-style:normal;font-family:${FONT};font-size:10px;background:#e8344f;color:#fff;padding:3px 6px;border-radius:6px;transform:rotate(4deg)}
+    .k7brief .bar{height:12px;border:3px solid ${INK};border-radius:8px;overflow:hidden;background:#fff}.k7brief .bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(45deg,#ffd23f 0 8px,#e8344f 8px 16px);transition:width .2s linear}
+    .k7brief .go{border:4px solid ${INK};border-radius:999px;background:#ff3d7f;color:#fff;font-family:${GRAF};font-size:28px;padding:8px 18px;-webkit-text-stroke:1.5px ${INK};paint-order:stroke fill;box-shadow:0 5px 0 ${INK};cursor:pointer}
+    .k7brief .go:disabled{filter:grayscale(1);opacity:.6}
+    .k7brief .lb{display:flex;flex-direction:column;gap:5px}
+    .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
+    .k7brief .lb div.me{background:#ffd23f}.k7brief .lb b{font-family:${FONT};font-size:12px}
+    .k7brief input{font:inherit;font-size:15px;border:3px solid ${INK};border-radius:10px;padding:8px 10px;width:100%;box-sizing:border-box}`; document.head.appendChild(st); }
+  const CHV = '<path d="M-7 19l7-8 7 8M-7 6l7-8 7 8M-7-7l7-8 7 8" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
+  const BTN = (x, y, r) => `<circle cx="${x}" cy="${y + 3}" r="${r + 3}" fill="${INK}"/><circle cx="${x}" cy="${y - 1}" r="${r}" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/>`;
+  const BRICK = {
+    CV: `<g transform="translate(30 30)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTCOL.tall}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    CH: `<g transform="translate(30 30) rotate(90)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTCOL.wide}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    CD: `<g transform="translate(30 30) rotate(45)"><rect x="-12" y="-25" width="24" height="50" rx="7" fill="${CUTCOL.diag}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    J: `<g transform="translate(30 29)">${BTN(0, 0, 14)}<path d="M0 4C-9-2-5-9 0-4.5 5-9 9-2 0 4z" fill="${RED}"/></g>`,
+    D: `<g transform="translate(30 32) scale(.82)"><rect x="-17" y="-3" width="34" height="11" rx="5" fill="${INK}"/>${BTN(-15, 0, 9.5)}${BTN(15, 0, 9.5)}<circle cx="-15" cy="-1" r="3.5" fill="${RED}"/><circle cx="15" cy="-1" r="3.5" fill="${RED}"/><text y="-17" text-anchor="middle" font-size="11" font-family="monospace" font-weight="bold" fill="${INK}">×2</text></g>`,
+    H: `<g transform="translate(30 30)"><rect x="-26" y="-7" width="52" height="14" rx="7" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/><path d="M-14 0H22" stroke="${RED}" stroke-width="3" stroke-dasharray="5 4"/><circle cx="-18" cy="0" r="9" fill="${RED}" stroke="${INK}" stroke-width="2.5"/></g>`,
+    S: `<g transform="translate(30 30)"><circle r="21" fill="${INK}"/><circle r="16" fill="none" stroke="#4a4640" stroke-width="1.5"/><circle r="12" fill="none" stroke="#4a4640" stroke-width="1.5"/><circle r="7" fill="${RED}"/><circle r="2" fill="${PAPER}"/><path d="M-5-26q5 4 0 8t0 8" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round" transform="translate(30 6)"/></g>`
+  };
+  // les briques d'une cassette, dans l'ordre où on les apprend
+  function brickKinds(list){ const a = new Set(list.map(t => t.sections.map(x => x.acts).join('')).join('')), ks = [];
+    if(a.has('C')) ks.push('CV', 'CH'); if(a.has('G')) ks.push('CD'); if(a.has('J')) ks.push('J'); if(a.has('D')) ks.push('D'); if(a.has('H')) ks.push('H'); if(a.has('S')) ks.push('S'); return ks; }
+  function briefing(t, go, death){
+    const old = stage.querySelector('.k7brief'); if(old) old.remove();
+    const el = document.createElement('div'); el.className = 'k7brief';
+    const ks = brickKinds(death ? TRACKS : [t]), d = death ? DIFFS[1] : DIFFS[dIdx];
+    const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
+    el.innerHTML = `<div class="in">
+      <div class="hd"><span class="face">${death ? '☠' : tx('FACE') + ' ' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b><small>${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</small></div>
+      <div class="how"><b class="sub">${tx('COMMENT ON JOUE')}</b>
+        <p>${tx('Les briques arrivent vers la ligne rouge. Fais leur geste au moment où elles la touchent, en rythme : chaque geste réussi joue ta partie du morceau.')}</p>
+        <p>${death ? tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !') : tx('Un raté ralentit la bande et casse ton combo. Enchaîne les réussites pour monter en transe et gagner des disques.')}</p></div>
+      <b class="sub">${tx('LES BRIQUES DE CETTE CASSETTE')}</b>
+      <div class="bricks">${rows}</div>
+      <div class="bar"><i></i></div>
+      <button class="go" disabled>${tx('Chargement…')}</button></div>`;
+    stage.appendChild(el);
+    // pendant qu'on lit : le son se prépare (enregistrements, piano), la barre se remplit
+    try{ muted = api.store.load('muted', false); audioInit(); loadRecs(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
+    const bar = el.querySelector('.bar i'), btn = el.querySelector('.go'), t0b = performance.now();
+    (function fill(){ if(!el.isConnected) return; const k = Math.min(1, (performance.now() - t0b)/1300), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || performance.now() - t0b > 4000);
+      bar.style.width = Math.round((ok ? 1 : Math.min(.95, k))*100) + '%';
+      if(ok){ btn.disabled = false; btn.textContent = tx('C\'EST PARTI') + ' ▶'; return; } requestAnimationFrame(fill); })();
+    btn.onclick = () => { api.sfx.coin(); el.remove(); go(); };
+  }
+
+  /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
+  let deathRun = null;
+  const deathTop = () => api.load('deathTop', []);
+  function deathHud(){ if(deathRun && tr) api.hud(`☠ ${'♥'.repeat(Math.max(0, hearts))}${'♡'.repeat(Math.max(0, 3 - hearts))}  ·  ${deathRun.songs + 1}  ·  ${tr.name.toUpperCase()}`); }
+  function deathStart(){ deathRun = {i: 0, lap: 0, order: TRACKS.slice().sort((a, b) => a.bpm - b.bpm), score: 0, hearts: 3, songs: 0}; homeOn = false; home.hidden = true; deathPlay(); }
+  function deathPlay(){ const R = deathRun; diff = DIFFS[Math.min(3, 1 + R.lap)]; startTrack(R.order[R.i]); hearts = R.hearts; score = R.score; deathHud(); }
+  function deathNext(){
+    const R = deathRun; R.score = score; R.hearts = hearts; R.songs++; R.i++; if(R.i >= R.order.length){ R.i = 0; R.lap++; }
+    const nt = R.order[R.i], el = document.createElement('div'); el.className = 'k7brief';
+    el.innerHTML = `<div class="in" style="margin-top:30vh;text-align:center;align-items:center"><div class="hd" style="align-items:center"><span class="face">☠ ${'♥'.repeat(hearts)}</span><b>${tx('MORCEAU TENU !')}</b><small>${tx('Suivant : {nom} · {n} BPM', {nom: nt.name, n: nt.bpm})}${R.i === 0 ? ' · ' + DIFFS[Math.min(3, 1 + R.lap)].name.toUpperCase() : ''}</small></div><div class="bar" style="width:100%"><i style="width:100%;transition:width 2.4s linear"></i></div></div>`;
+    stage.appendChild(el); requestAnimationFrame(() => { const b = el.querySelector('.bar i'); b.style.width = '0%'; });
+    api.after(2600, () => { el.remove(); if(deathRun === R) deathPlay(); });
+  }
+  function deathOver(){
+    const R = deathRun; deathRun = null; R.score = score;
+    const me = {name: api.load('pseudo', '') || tx('Moi'), score: R.score, songs: R.songs, at: Date.now()}, top = R.score > 0 ? deathTop().concat([me]).sort((a, b) => b.score - a.score).slice(0, 10) : deathTop(); if(R.score > 0) api.save('deathTop', top);
+    api.after(900, () => deathBoard(me, top));
+  }
+  function deathBoard(me, top){
+    const old = stage.querySelector('.k7brief'); if(old) old.remove(); top = top || deathTop();
+    const el = document.createElement('div'); el.className = 'k7brief';
+    const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')} · ${tx(e.songs > 1 ? '{n} morceaux' : '{n} morceau', {n: e.songs})}</span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
+    el.innerHTML = `<div class="in"><div class="hd"><span class="face">☠</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
+      ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
+      <b class="sub">${tx('CLASSEMENT')}</b><div class="lb">${list()}</div>
+      <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
+    stage.appendChild(el);
+    const inp = el.querySelector('input'); inp.onchange = () => { const v = inp.value.trim().slice(0, 14); api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); el.querySelector('.lb').innerHTML = list(); } };
+    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); el.remove(); briefing(null, deathStart, true); };
+    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me) showMenu(); };
+  }
+  home.querySelector('#k7death').onclick = () => { api.sfx.click(); deathBoard(null); };
+
   home.querySelector('#k7trophy').onclick = () => {
     api.sfx.click(); api.save('artNew', false); refreshHome(); { const bd = menu.querySelector('#k7bdot'); if(bd) bd.hidden = true; }
     const sh = document.createElement('div'); sh.className = 'k7sheet'; const b = bests();
@@ -2442,7 +2571,7 @@ G.trancheroute = { mount(stage, api){
     api.closeEnd(); state = 'menu'; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); } if(useAudio && music) music.gain.setValueAtTime(.8, actx.currentTime);
     api.hud(''); for(const k in imgCache) delete imgCache[k];
     mPos = mTarget = cur; mVel = 0; refreshUI(true);
-    menu.hidden = false; stopBtn.hidden = true; requestAnimationFrame(layoutMenu); showHome();
+    menu.hidden = false; stopBtn.hidden = true; requestAnimationFrame(layoutMenu); showHome(); deathRun = null;
   }
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; pauseEl.hidden = true; paused = false; }
   function showLabo(){
@@ -2478,7 +2607,7 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
     const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();
