@@ -4,7 +4,7 @@ Joue une cassette entière en envoyant de vrais gestes tactiles au jeu, avec une
 
 ```
 cd www && python3 -m http.server 8768 &
-python3 tests/run_bot.py <cassette 0-7> <imprécision en s, ex 0.04> <right|wrong|sloppy> <difficulté 0-3>
+python3 tests/run_bot.py <cassette 0-5> <imprécision en s, ex 0.04> <right|wrong|sloppy> <difficulté 0-3>
 ```
 
 - `right` : le bon geste (glisser sur les blocs, taper sur les pics)

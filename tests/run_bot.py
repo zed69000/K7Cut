@@ -14,6 +14,6 @@ async def main():
             st=await pg.evaluate("window.__k7.state")
             if st!='play': break
         res=await pg.evaluate("({state: window.__k7.state, stats: window.__k7.stats, rep: window.__rep})")
-        name=['Soleil','Bobine','Dub','Neon','Robot','Rush','Pogo','Riff'][TRACK]
+        name=['Robots','Lune','Racines','Collines','Autoroute','Garage'][TRACK]
         print(name, MODE, 'diff', DIFF, json.dumps(res, ensure_ascii=False), 'ERR', errs[:2]); await b.close()
 asyncio.run(main())

@@ -1,6 +1,6 @@
 # K7 CUT
 
-Jeu de rythme mobile en cassettes : on coupe, saute, maintient et scratche sur une bande, et chaque coupe réussie joue la mélodie du morceau. 4 faces (Soleil, Bobine, Néon, Rush) à débloquer avec les notes ramassées.
+Jeu de rythme mobile en cassettes : on coupe, saute, maintient et scratche sur une bande, et chaque coupe réussie joue la mélodie du morceau. 6 faces (Robots de minuit, Pas de lune, Racines, Vent des collines, Autoroute 86, Cri du garage) à débloquer avec les disques gagnés.
 
 Tout est en HTML, CSS et JavaScript, sans dépendance ni fichier audio : la musique est synthétisée en direct avec la Web Audio API.
 
@@ -44,10 +44,12 @@ Les polices viennent de Google Fonts : hors ligne, le jeu bascule sur des police
 
 | Je veux… | Dans `www/js/game.js` |
 | --- | --- |
-| Ajouter ou régler une cassette | le tableau `TRACKS` (tempo, tonalité, accords, couleurs, sections) |
-| Changer la difficulté d'une section | `tier` de la section : 0 à 3, ou `'rest'` pour une pause |
-| Changer les sons | l'objet `I` (instruments) et `scheduleStep` |
+| Ajouter ou régler une cassette | le tableau `SONGS` (tempo, gamme, accords, couleurs, sections, partition `song`), puis la liste `TRACKS` |
+| Écrire la musique d'une cassette | `song` : motifs de batterie sur 16 pas (`x` coup, `o` fantôme), ligne de basse, accords, guitares, arpège, et la mélodie `hook` (4 mesures de 8 croches) que le joueur joue en coupant |
+| Changer les sons | la batterie rendue au démarrage (`renderKit`), les instruments (`I`, `leadOf`, `pluckStr`, `pianoNote`) |
+| Changer les rythmes des obstacles | la bibliothèque `RHY` (phrases de 4 mesures A A A' B) |
 | Changer les fenêtres de timing | la fonction `grade` |
 | Changer les prix de déblocage | `cost` de chaque cassette |
+| Tester de nouvelles briques ou morceaux | le labo (`LAB`, Réglages → « LABO », ou `?labo` dans l'adresse) |
 
 Les motifs d'obstacles sont générés à partir d'une graine propre à chaque cassette : ils sont identiques à chaque partie.

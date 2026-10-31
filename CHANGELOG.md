@@ -1,5 +1,21 @@
 # Journal des versions
 
+## 0.22.0 — Les nouveaux morceaux deviennent les cassettes, et 4 nouvelles briques à tester
+- **Les 6 morceaux composés remplacent les anciennes cassettes**, de la plus facile à la plus dure : A Robots de minuit (couper, taper) · B Pas de lune (+ scratch) · C Racines (+ notes longues) · D Vent des collines · E Autoroute 86 (scratch + notes longues) · F Cri du garage (tout, vite et fort). L'ancien générateur de musique par styles est retiré : chaque cassette joue sa partition.
+- **Niveau test des nouvelles briques** dans le labo, une section et un tuto par brique, puis tout mélangé :
+  - **bloc en diagonale** ↗ : glisser vers le haut et la droite (le sens est vérifié plus finement) ;
+  - **cercle** : un tour complet du doigt, qui joue une envolée de 4 notes de la mélodie ;
+  - **vaguelette** : un zigzag rapide de gauche à droite, qui joue une trille ;
+  - **double rond** : deux doigts en même temps (à la souris : clic droit), qui joue un gros coup caisse + crash.
+- Le voile sombre du tuto est un peu plus marqué.
+
+## 0.21.0 — Son percutant (vraie batterie, cordes, piano) et labo musique
+- **Une vraie batterie.** Au démarrage, le jeu rend une fois pour toutes un kit complet (3 grosses caisses, 3 caisses claires dont une « années 80 », clap, claquement de doigts, rimshot, charleston ouvert/fermé métalliques, crash, ride, shaker, tom), saturé et passé dans une pièce, comme de vrais échantillons. Il passe dans un bus batterie (saturation + compresseur qui fait claquer) qui n'est plus écrasé par la pompe de la grosse caisse. Toutes les cassettes en profitent.
+- **Vrais instruments** : guitare en cordes pincées (claire, ou saturée en power chord sur deux prises gauche/droite, étouffée ou ouverte), piano acoustique calculé note par note, section de cordes, orgue, et des basses avec des harmoniques pour s'entendre même sur un haut-parleur de téléphone.
+- **Labo musique** (Réglages → « LABO », ou `?labo` dans l'adresse) : ▶ ÉCOUTER (le jeu joue tout seul), 🎮 JOUER (en Apprenti), ♥ pour garder. 6 morceaux composés, chacun dans l'esprit d'une référence, avec une mélodie originale que tu joues en coupant :
+  1. Robots de minuit — French house filtrée (esprit Daft Punk) · 2. Autoroute 86 — synthwave de nuit (esprit Kavinsky) · 3. Cri du garage — rock alternatif calme/fort (esprit Pixies) · 4. Vent des collines — orchestral piano et cordes (esprit films de Miyazaki) · 5. Racines — reggae one drop (esprit Bob Marley) · 6. Pas de lune — pop funk (esprit Michael Jackson)
+- Partitions dans le tableau `LAB` : motifs de batterie sur 16 pas, ligne de basse, accords (avec balayage de filtre), guitares, arpège et mélodie écrite.
+
 ## 0.20.0 — Vrai scratch de la musique, écran stable
 - **Le scratch scratche vraiment le morceau.** Le jeu garde en continu les 3 dernières secondes de musique. Au premier geste d'un scratch, il pose « l'aiguille » sur l'attaque du dernier temps (batterie + accord) : chaque aller lit ce bout de disque à l'endroit, chaque retour le relit à l'envers, avec une vitesse qui monte puis retombe comme une main sur la platine. Même chose pour l'appel du scratch et pour le tuto.
 - **L'écran ne bouge plus pendant le scratch** : chaque aller-retour déclenchait un petit zoom de toute la scène.
