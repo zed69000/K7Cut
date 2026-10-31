@@ -2044,11 +2044,11 @@ G.trancheroute = { mount(stage, api){
     .k7tape{display:inline-block;background:rgba(232,217,168,.95);padding:6px 18px;transform:rotate(-2deg);clip-path:polygon(0 8%,4% 0,8% 10%,12% 0,100% 0,97% 12%,100% 25%,96% 40%,100% 55%,97% 70%,100% 85%,96% 100%,0 100%,3% 85%,0 70%,4% 55%,0 40%,3% 25%);box-shadow:0 3px 6px rgba(0,0,0,.2)}
     .k7pop{animation:k7popin .45s cubic-bezier(.2,1.6,.4,1)}
     @keyframes k7popin{from{transform:scale(.7) rotate(-3deg);opacity:0}}
-    .k7sheet{position:absolute;inset:0;z-index:6;background:rgba(28,27,25,.45);display:flex;align-items:flex-end;justify-content:center}
-    .k7sheet > div{width:100%;max-width:420px;background:${PAPERBG};border:3px solid ${INK};border-bottom:0;border-radius:22px 22px 0 0;padding:18px 18px 26px;display:flex;flex-direction:column;gap:12px;animation:k7up .35s cubic-bezier(.2,1.3,.4,1)}
-    @keyframes k7up{from{transform:translateY(100%)}}
+    .k7sheet{position:absolute;inset:0;z-index:6;background:rgba(28,27,25,.6);display:flex;align-items:center;justify-content:center;padding:22px 0}
+    .k7sheet > div{position:relative;width:calc(100% - 40px);max-width:420px;background:radial-gradient(rgba(28,27,25,.06) 1px,transparent 1.4px) 0 0/7px 7px,#f6eedb;border:4px solid ${INK};border-radius:6px;box-shadow:8px 9px 0 ${INK};padding:18px 18px 22px;display:flex;flex-direction:column;gap:12px;animation:k7up .35s cubic-bezier(.2,1.3,.4,1)}
+    @keyframes k7up{from{transform:scale(.85) rotate(-2deg);opacity:0}}
     .k7langs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.k7langs .k7btn{padding:8px 2px;font-size:12px}.k7langs .k7btn.on{background:#ffd23f}
-    .k7sheet > div{max-height:92%;overflow-y:auto}
+    .k7sheet > div{max-height:88%;overflow-y:auto}
     @media (prefers-reduced-motion:reduce){.k7play{animation:none}.k7pop,.k7sheet > div{animation:none}}`; document.head.appendChild(st); }
   const menu = document.createElement('div'); menu.className = 'k7m'; stage.appendChild(menu);
   const mcv = document.createElement('canvas'), mdpr = Math.min(window.devicePixelRatio || 1, 2); mcv.width = W*mdpr; mcv.height = H*mdpr; menu.appendChild(mcv);
@@ -2252,6 +2252,12 @@ G.trancheroute = { mount(stage, api){
     .k7plate.mid,.k7plate.opt{--paper:#f3ead7;height:60px;font-size:27px;width:90%;margin:0 auto}
     .k7plate.mid{transform:rotate(.8deg)}.k7plate.opt{transform:rotate(-.7deg);--paper:#ffd23f}
     .k7plate.mid::after{background:#29c4ff;transform:translate(-5px,7px)}
+    @keyframes k7bob{0%,100%{translate:0 0}50%{translate:0 -4px}}
+    @keyframes k7kick{0%,100%{scale:1}12%{scale:1.045}40%{scale:1}}
+    .k7hbtns .k7plate,.k7tbtns .k7plate{animation:k7bob ${(120/MBPM).toFixed(3)}s ease-in-out infinite}
+    .k7hbtns .k7plate:nth-child(2),.k7tbtns .k7plate:nth-child(2){animation-delay:-.25s}.k7hbtns .k7plate:nth-child(3),.k7tbtns .k7plate:nth-child(3){animation-delay:-.5s}.k7tbtns .k7plate:nth-child(4){animation-delay:-.75s}
+    .k7hbtns .k7plate.big,.k7tbtns .k7plate.big{animation:k7kick ${(60/MBPM).toFixed(3)}s ease-out infinite}
+    @media (prefers-reduced-motion:reduce){.k7hbtns .k7plate,.k7tbtns .k7plate{animation:none !important}}
     .k7plate.death{--paper:${INK};color:#fff}.k7plate.death::after{background:#e8344f}.k7plate .lbl{white-space:nowrap}
     .k7tbtns .k7plate.mid,.k7tbtns .k7plate.opt{height:54px;font-size:24px}.k7tbtns .k7plate.death{font-size:21px}
     .k7home.short .k7tbtns .k7plate.mid,.k7home.short .k7tbtns .k7plate.opt{height:42px;font-size:19px}.k7home.short .k7tbtns .k7plate.death{font-size:17px}
@@ -2279,6 +2285,7 @@ G.trancheroute = { mount(stage, api){
   const TROPHY = `<svg width="26" height="26" viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="${INK}"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="${INK}" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="${INK}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></svg>`;
   const CASS = `<svg width="42" height="28" viewBox="0 0 42 28"><rect x="2" y="2" width="38" height="24" rx="4" fill="${INK}"/><rect x="7" y="7" width="28" height="10" rx="2" fill="#f3ead7"/><circle cx="14" cy="12" r="3" fill="${INK}"/><circle cx="28" cy="12" r="3" fill="${INK}"/><path d="M11 26l3-5h14l3 5" fill="#f3ead7"/></svg>`;
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
+  const SKULL_HOME = `<svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="#fff"/><circle cx="8.7" cy="10.6" r="2.4" fill="${INK}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${INK}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${INK}"/></svg>`;
   home.insertAdjacentHTML('beforeend', `
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq" aria-label="${tx('Retour')}" hidden><svg width="22" height="22" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
@@ -2289,7 +2296,7 @@ G.trancheroute = { mount(stage, api){
       <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     <div class="ui k7tbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7tcamp" class="k7plate big"><span class="lbl">${tx('CAMPAGNE')}<small id="k7tcsub"></small></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
-      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="font-size:28px">☠</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="color:#fff">${SKULL_HOME}</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="k7trec" class="k7plate mid"><span class="ico">${TROPHY}</span><span class="lbl">${tx('RECORDS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="k7topt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`);
   const hb = home.querySelector('.k7hbtns'), tb = home.querySelector('.k7tbtns'); const shortH = H < 740; if(shortH) home.classList.add('short'); /* petit écran : tout se resserre pour laisser voir la scène */
@@ -2339,10 +2346,13 @@ G.trancheroute = { mount(stage, api){
 
   /* ---------- avant chaque niveau : un petit chargement, la règle du jeu, et chaque brique de la cassette ---------- */
   if(!document.getElementById('k7-brief-css')){ const st = document.createElement('style'); st.id = 'k7-brief-css'; st.textContent = `
-    .k7brief{position:absolute;inset:0;z-index:30;overflow-y:auto;background:rgba(28,27,25,.55);-webkit-overflow-scrolling:touch}
-    .k7brief .in{margin:14px auto 22px;width:calc(100% - 32px);max-width:420px;background:#f3ead7;border:4px solid ${INK};border-radius:18px;box-shadow:0 7px 0 ${INK};padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;color:${INK};animation:k7popin .35s cubic-bezier(.2,1.5,.4,1)}
-    .k7brief .hd{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
-    .k7brief .hd .face{background:${INK};color:#ffd23f;font-family:${FONT};font-size:12px;padding:3px 8px;border-radius:6px;transform:rotate(-2deg)}
+    .k7brief{position:absolute;inset:0;z-index:30;overflow-y:auto;background:rgba(28,27,25,.6);-webkit-overflow-scrolling:touch;display:grid;place-items:center;padding:22px 0}
+    .k7brief .in{position:relative;margin:auto;width:calc(100% - 40px);max-width:420px;background:radial-gradient(rgba(28,27,25,.06) 1px,transparent 1.4px) 0 0/7px 7px,#f6eedb;border:4px solid ${INK};border-radius:6px;box-shadow:8px 9px 0 ${INK};transform:rotate(-.6deg);padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;color:${INK};animation:k7popin .35s cubic-bezier(.2,1.5,.4,1)}
+    .k7brief .in::before{content:"";position:absolute;top:-15px;left:50%;width:120px;height:28px;margin-left:-60px;background:rgba(255,210,63,.88);transform:rotate(-3deg);box-shadow:0 2px 3px rgba(0,0,0,.18);clip-path:polygon(3% 0,97% 4%,100% 50%,96% 100%,2% 96%,0 50%)}
+    .k7brief .in::after{content:"";position:absolute;right:-10px;top:30px;width:46px;height:46px;border-radius:50%;background:#ff3d7f;opacity:.85;clip-path:polygon(50% 0,62% 30%,98% 22%,72% 50%,100% 78%,62% 70%,50% 100%,38% 70%,2% 80%,28% 50%,0 20%,38% 30%);z-index:-1}
+    .k7brief .hd{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding-top:4px}
+    .k7brief .hd b{text-decoration:underline;text-decoration-color:#ffd23f;text-decoration-thickness:.32em;text-underline-offset:-.12em;text-decoration-skip-ink:none}
+    .k7brief .hd .face{display:inline-flex;align-items:center;gap:6px;background:${INK};color:#ffd23f;font-family:${FONT};font-size:12px;padding:5px 10px;border-radius:4px;transform:rotate(-2deg)}.k7brief .hd .face svg{width:20px;height:20px;display:block}
     .k7brief .hd b{font-family:${MARKER};font-weight:400;font-size:30px;line-height:1.05}
     .k7brief .hd small{font-size:13px;font-weight:700;opacity:.75}
     .k7brief .sub{font-family:${FONT};font-size:13px;letter-spacing:.5px;margin-top:2px}
@@ -2361,6 +2371,8 @@ G.trancheroute = { mount(stage, api){
     .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
     .k7brief .lb div.me{background:#ffd23f}.k7brief .lb b{font-family:${FONT};font-size:12px}
     .k7brief input{font:inherit;font-size:15px;border:3px solid ${INK};border-radius:10px;padding:8px 10px;width:100%;box-sizing:border-box}`; document.head.appendChild(st); }
+  const SKULL = (eye) => `<svg viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="currentColor"/><circle cx="8.7" cy="10.6" r="2.4" fill="${eye}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${eye}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${eye}"/></svg>`;
+  const CUP = `<svg viewBox="0 0 24 24"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="currentColor"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
   const CHV = '<path d="M-7 19l7-8 7 8M-7 6l7-8 7 8M-7-7l7-8 7 8" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
   const BTN = (x, y, r) => `<circle cx="${x}" cy="${y + 3}" r="${r + 3}" fill="${INK}"/><circle cx="${x}" cy="${y - 1}" r="${r}" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/>`;
   const BRICK = {
@@ -2381,7 +2393,7 @@ G.trancheroute = { mount(stage, api){
     const ks = brickKinds(death ? TRACKS : [t]), d = death ? DIFFS[1] : DIFFS[dIdx];
     const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
     el.innerHTML = `<div class="in">
-      <div class="hd"><span class="face">${death ? '☠' : tx('FACE') + ' ' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b><small>${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</small></div>
+      <div class="hd"><span class="face">${death ? SKULL(INK) : tx('FACE') + ' ' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b><small>${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</small></div>
       <div class="how"><b class="sub">${tx('COMMENT ON JOUE')}</b>
         <p>${tx('Les briques arrivent vers la ligne rouge. Fais leur geste au moment où elles la touchent, en rythme : chaque geste réussi joue ta partie du morceau.')}</p>
         <p>${death ? tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !') : tx('Un raté ralentit la bande et casse ton combo. Enchaîne les réussites pour monter en transe et gagner des disques.')}</p></div>
@@ -2430,7 +2442,7 @@ G.trancheroute = { mount(stage, api){
   function deathNext(){
     const R = deathRun; R.score = score; R.hearts = hearts; R.songs++; R.i++; if(R.i >= R.order.length){ R.i = 0; R.lap++; }
     const nt = R.order[R.i], el = document.createElement('div'); el.className = 'k7brief';
-    el.innerHTML = `<div class="in" style="margin-top:30vh;text-align:center;align-items:center"><div class="hd" style="align-items:center"><span class="face">☠ ${'♥'.repeat(hearts)}</span><b>${tx('MORCEAU TENU !')}</b><small>${tx('Suivant : {nom} · {n} BPM', {nom: nt.name, n: nt.bpm})}${R.i === 0 ? ' · ' + DIFFS[Math.min(3, 1 + R.lap)].name.toUpperCase() : ''}</small></div><div class="bar" style="width:100%"><i style="width:100%;transition:width 2.4s linear"></i></div></div>`;
+    el.innerHTML = `<div class="in" style="text-align:center;align-items:center"><div class="hd" style="align-items:center"><span class="face">${SKULL(INK)} ${'♥'.repeat(hearts)}</span><b>${tx('MORCEAU TENU !')}</b><small>${tx('Suivant : {nom} · {n} BPM', {nom: nt.name, n: nt.bpm})}${R.i === 0 ? ' · ' + DIFFS[Math.min(3, 1 + R.lap)].name.toUpperCase() : ''}</small></div><div class="bar" style="width:100%"><i style="width:100%;transition:width 2.4s linear"></i></div></div>`;
     stage.appendChild(el); requestAnimationFrame(() => { const b = el.querySelector('.bar i'); b.style.width = '0%'; });
     api.after(2600, () => { el.remove(); if(deathRun === R) deathPlay(); });
   }
@@ -2443,9 +2455,9 @@ G.trancheroute = { mount(stage, api){
     const old = stage.querySelector('.k7brief'); if(old) old.remove(); top = top || deathTop();
     const el = document.createElement('div'); el.className = 'k7brief';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')} · ${tx(e.songs > 1 ? '{n} morceaux' : '{n} morceau', {n: e.songs})}</span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
-    el.innerHTML = `<div class="in"><div class="hd"><span class="face">☠</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
+    el.innerHTML = `<div class="in"><div class="hd"><span class="face">${SKULL(INK)}</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
       ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
-      <b class="sub">🏆 ${tx('RECORDS')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
+      <b class="sub" style="display:flex;align-items:center;gap:6px"><span style="width:20px;height:20px;display:inline-block">${CUP}</span>${tx('RECORDS')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
       <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
@@ -2551,14 +2563,14 @@ G.trancheroute = { mount(stage, api){
     // giclées rouges
     for(const [x, y, R] of [[w*.9, h*.3, 16], [w*.15, h*.93, 12], [w*.6, h*.88, 10]]){ crisp(g, r, x, y, R, '#e8344f', 2); }
     return c; }
-  function crowd(g, y, t, kick){ g.fillStyle = INK; for(let i=0;i<18;i++){ const x = i*W/16 - 10 + (i % 2)*8, h = 26 + ((i*37) % 14), jump = Math.max(0, Math.sin(t*MBPM/60*Math.PI + i))*6*(.4 + kick); g.beginPath(); g.arc(x, y - h - jump, 12, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(x, y - h*.35 - jump, 18, h*.6, 0, Math.PI, 0); g.fill(); g.fillRect(x - 18, y - h*.35 - jump, 36, 60); if(i % 3 === 0){ g.lineWidth = 6; g.strokeStyle = INK; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y - h - jump + 6); g.lineTo(x + 18, y - h - 28 - jump); g.stroke(); } } }
+  function crowd(g, y, t, kick){ g.fillStyle = INK; for(let i=0;i<18;i++){ const x = i*W/16 - 10 + (i % 2)*8, h = 26 + ((i*37) % 14), jump = 0; g.beginPath(); g.arc(x, y - h - jump, 12, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(x, y - h*.35 - jump, 18, h*.6, 0, Math.PI, 0); g.fill(); g.fillRect(x - 18, y - h*.35 - jump, 36, 60); if(i % 3 === 0){ g.lineWidth = 6; g.strokeStyle = INK; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y - h - jump + 6); g.lineTo(x + 18 + Math.sin(t*MBPM/60*Math.PI*.5 + i)*4, y - h - 28 - jump); g.stroke(); } } }
   function reel(g, x, y, R, t){ g.fillStyle = INK; g.beginPath(); g.arc(x, y, R, 0, 6.283); g.fill(); g.fillStyle = '#f3ead7'; g.beginPath(); g.arc(x, y, R*.55, 0, 6.283); g.fill(); g.lineWidth = 3; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y, R*.4, 0, 6.283); g.fill(); g.save(); g.translate(x, y); g.rotate(t*1.2); g.fillStyle = '#f3ead7'; for(let i=0;i<6;i++){ g.rotate(1.047); g.fillRect(-R*.06, -R*.42, R*.12, R*.12); } g.restore(); }
   function homeFrame(dt){
     hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*MBPM/60, kick = Math.max(0, 1 - (beat % 1)*4);
     g.clearRect(0, 0, W, H); if(!homeBg) homeBg = makeHomeBg(); g.drawImage(homeBg, 0, 0, W, H);
     { const sz = Math.min(96, W*.74/4.1, H*(H < 740 ? .078 : .1)); drawHomeTitle(g, W/2, (H < 740 ? 70 : 84) + sz*1.6, hTime); }
     // éclairs jaunes autour de la cassette, qui claquent sur le temps
-    const room = H - 40 - hbBottom, sc = Math.max(.26, Math.min(.6, W/640, room/330)), jump = Math.abs(Math.sin(beat*Math.PI*.5))*26, mx2 = W*.5, my2 = hbBottom + 40 + 130*sc;
+    const room = H - 40 - hbBottom, sc = Math.max(.26, Math.min(.6, W/640, room/330)), jump = Math.sin(beat*Math.PI*.5)*3, mx2 = W*.5, my2 = hbBottom + 40 + 130*sc;
     g.save(); g.fillStyle = '#ffd23f'; g.strokeStyle = INK; g.lineWidth = 2.5; g.globalAlpha = .6 + kick*.4;
     for(const [ax, ay, ar] of [[mx2 - 150*sc, my2 - 120*sc, -.6], [mx2 + 160*sc, my2 - 140*sc, .5], [mx2 + 190*sc, my2 + 10*sc, 1.2]]){ g.save(); g.translate(ax, ay); g.rotate(ar); g.scale(1 + kick*.2, 1 + kick*.2); g.beginPath(); g.moveTo(-5, -22); g.lineTo(6, -22); g.lineTo(2, 22); g.closePath(); g.fill(); g.stroke(); g.restore(); }
     g.restore();
@@ -2566,12 +2578,13 @@ G.trancheroute = { mount(stage, api){
     g.save(); g.globalAlpha = .9; reel(g, -W*.06, H*.56, W*.2, hTime); reel(g, W*1.05, H*.38, W*.17, -hTime); g.restore();
     // les voisines dansent sur les enceintes : on les touche pour les amener au centre
     const isOpen = t => unlocked(t) || discs() >= t.cost, iL = wrapI(cur - 1), iR = wrapI(cur + 1);
-    const j1 = Math.abs(Math.sin(beat*Math.PI))*14, j2 = Math.abs(Math.sin(beat*Math.PI + 1.6))*14, s2 = sc*.45;
-    g.save(); g.translate(W*.12, H*.84 - 6 - j1); g.rotate(-.25 + Math.sin(beat*Math.PI)*.08); g.scale(s2, s2); mascot(g, TRACKS[iL], iL, isOpen(TRACKS[iL]), true, hTime + 1, {x: .6, y: -.3}); g.restore();
-    g.save(); g.translate(W*.88, H*.86 - 6 - j2); g.rotate(.22 - Math.sin(beat*Math.PI)*.08); g.scale(s2, s2); mascot(g, TRACKS[iR], iR, isOpen(TRACKS[iR]), true, hTime + 2, {x: -.6, y: -.3}); g.restore();
+    // en campagne seulement : les voisines posées sur les enceintes, immobiles (on les touche pour les amener au centre)
+    if(homeMode === 'camp'){ const s2 = sc*.45;
+      g.save(); g.translate(W*.12, H*.84 - 6); g.rotate(-.18); g.scale(s2, s2); mascot(g, TRACKS[iL], iL, isOpen(TRACKS[iL]), false, 0, {x: .6, y: -.3}); g.restore();
+      g.save(); g.translate(W*.88, H*.86 - 6); g.rotate(.16); g.scale(s2, s2); mascot(g, TRACKS[iR], iR, isOpen(TRACKS[iR]), false, 0, {x: -.6, y: -.3}); g.restore(); }
     // la grande cassette qui saute au milieu : celle qu'on va jouer ; elle arrive en rebondissant quand on en change
     hSel = Math.min(1, hSel + dt*3); const e2 = 1 - Math.pow(1 - hSel, 3), pop = 1 + Math.sin(hSel*Math.PI)*.12, slide = (1 - e2)*hDir*W*.5;
-    g.save(); g.translate(mx2 + slide, my2 - jump); g.rotate(-.12 + Math.sin(beat*Math.PI*.5)*.06 + (1 - e2)*hDir*.4); g.scale(sc*pop, sc*pop); mascot(g, TRACKS[cur], cur, isOpen(TRACKS[cur]), true, hTime, {x: .4, y: -.4});
+    g.save(); g.translate(mx2 + slide, my2 - jump); g.rotate(-.08 + Math.sin(beat*Math.PI*.5)*.025 + (1 - e2)*hDir*.4); g.scale(sc*pop, sc*pop); mascot(g, TRACKS[cur], cur, isOpen(TRACKS[cur]), false, hTime, {x: .4, y: -.4});
     // couronne jaune posée dessus
     g.save(); g.translate(-118, -96); g.rotate(-.45 + Math.sin(hTime*3)*.06); const cw = 70; g.beginPath(); g.moveTo(-cw/2, 0); g.lineTo(-cw/2, -cw*.55); g.lineTo(-cw/4, -cw*.2); g.lineTo(0, -cw*.7); g.lineTo(cw/4, -cw*.2); g.lineTo(cw/2, -cw*.55); g.lineTo(cw/2, 0); g.closePath(); g.lineJoin = 'round'; g.lineWidth = 8; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.fill(); g.restore();
     g.restore();
