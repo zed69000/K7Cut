@@ -279,5 +279,15 @@ BSi18n.add("ja", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "ブロックが赤いラインに触れた瞬間にスワイプ。",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "成功をつなげてトランス状態になり、ディスクを獲得しよう。",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "判定が遅れるならオプションでタイミングを調整しよう。",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "ロングノートは最後まで指を離さないで。"
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "ロングノートは最後まで指を離さないで。",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "下にスワイプ",
+  "brique bleue : le geste descend": "青いブロック：下向きの操作",
+  "GLISSE VERS LA GAUCHE": "左にスワイプ",
+  "brique violette : le geste recule": "紫のブロック：戻る向きの操作",
+  "GLISSE EN DIAGONALE ↙": "斜めにスワイプ ↙",
+  "vers le bas et la gauche à la fois": "下と左に同時に",
+  "GLISSE ↓": "スワイプ ↓",
+  "GLISSE ←": "スワイプ ←",
+  "GLISSE ↙": "スワイプ ↙"
 });

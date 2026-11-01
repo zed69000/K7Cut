@@ -160,7 +160,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.30.0';
+const VERSION = '0.31.0';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -787,7 +787,7 @@ G.trancheroute = { mount(stage, api){
         if('CJOWD'.includes(q.k) && tq - lastT < diff.gap*('OW'.includes(lastK) ? 2 : 1)){ slots[i] = rng() < .5 ? {k: 'N'} : null; continue; }
         if(diff.easy && (q.k === 'C' || q.k === 'J') && lastK && (lastK === 'C' || lastK === 'J') && lastK !== q.k && tq - lastT < .7) q.k = lastK;
         lastT = tq + (q.len || 0)*bpb/2; lastK = q.k; } }
-    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'C' && s.diag) s.shape = 'diag'; else if(s.k === 'C') s.shape = i < 7 && !(slots[i - 1] && slots[i - 1].shape === 'wide') && (shp ? shp[i] === 'wide' : rng() < .5) ? 'wide' : 'tall'; } });
+    slots.forEach((s, i) => { if(s){ s.deg = mdeg(i); if(s.k === 'C' && s.diag) s.shape = 'diag'; else if(s.k === 'C') s.shape = i < 7 && !(slots[i - 1] && slots[i - 1].shape === 'wide') && (shp ? shp[i] === 'wide' : rng() < .5) ? 'wide' : 'tall'; if(s.k === 'C' && revOK(tr) && rng() < .25) s.rev = true; } });
     return barCache[bar] = slots;
   }
   function spawnBar(bar){
@@ -810,7 +810,7 @@ G.trancheroute = { mount(stage, api){
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; loadRecs();
     if(useAudio){ actx.resume(); master.gain.cancelScheduledValues(actx.currentTime); master.gain.setValueAtTime(.85, actx.currentTime); pump.gain.cancelScheduledValues(actx.currentTime); pump.gain.setValueAtTime(1, actx.currentTime); }
     if(useAudio){ dly.delayTime.setValueAtTime(tr.delay*bpb, actx.currentTime); tone.frequency.cancelScheduledValues(actx.currentTime); tone.frequency.setValueAtTime(20000, actx.currentTime); shelf.gain.setValueAtTime(0, actx.currentTime); }
-    trance = 0; lastRec = null; voiceFrom = voiceUntil = 0; stemCut = -9; paused = false; pauseEl.hidden = true; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
+    trance = 0; aliveReset(); lastRec = null; voiceFrom = voiceUntil = 0; stemCut = -9; paused = false; pauseEl.hidden = true; if(useAudio && vduck){ vduck.gain.cancelScheduledValues(actx.currentTime); vduck.gain.setValueAtTime(1, actx.currentTime); } rings = []; celeb = null; tutoOpen = false; tutoObj = null; holdHint = 0; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); }
     if(t.song && useAudio && (t.song.lead === 'piano' || (t.song.chords && t.song.chords.kind === 'piano'))) for(let d=-3;d<=16;d++){ pianoBuf(freq(d, 4)); }
     lat = (useAudio ? (actx.outputLatency || actx.baseLatency || 0) : 0) + api.load('offset', 0)/1000;
     resetRate(); t0 = (useAudio ? actx.currentTime : performance.now()/1000) + .25;
@@ -979,8 +979,11 @@ G.trancheroute = { mount(stage, api){
     const o = firstOf(t, q => q.k === 'J');
     if(o) jumpObj(o, t); else { jumpT = 0; if(firstOf(t, q => q.k === 'D')) judges.push({txt: tx('DEUX DOIGTS !'), x: HXs + 30, y: Y0 - 74, t: 0}); }
   }
-  const CUTCOL = {tall: '#7cf05a', diag: '#ffd23f', wide: '#29c4ff'};
-  const wantDir = o => o.shape === 'tall' ? {x: 0, y: -1} : o.shape === 'wide' ? {x: 1, y: 0} : o.shape === 'diag' ? {x: .7071, y: -.7071} : null;
+  const CUTCOL = {tall: '#ff8a2b', diag: '#ffd23f', wide: '#ff3d7f'}, CUTREV = {tall: '#29c4ff', diag: '#3ff0b0', wide: '#a35cff'};
+  const cutCol = o => (o.rev ? CUTREV : CUTCOL)[o.shape];
+  // les coupes « à l'envers » (vers le bas, la gauche, en diagonale vers le bas) : à partir de la 6e cassette, jamais en Apprenti
+  const revOK = t => TRACKS.indexOf(t) >= 5 && !diff.easy;
+  const wantDir = o => { const w = o.shape === 'tall' ? {x: 0, y: -1} : o.shape === 'wide' ? {x: 1, y: 0} : o.shape === 'diag' ? {x: .7071, y: -.7071} : null; return w && o.rev ? {x: -w.x, y: -w.y} : w; };
   function rightWay(o, dir){ const w = wantDir(o); if(!w) return true; const l = Math.hypot(dir.x, dir.y) || 1; return (dir.x*w.x + dir.y*w.y)/l > (o.shape === 'diag' ? .84 : .5); }
   function cutObj(o, t, dir){ o.dt = t - o.time; let g = grade(o.dt); if(!rightWay(o, dir)){ g = 'miss'; o.wrongWay = true; } resolve(o, g, t, dir); }
   function jumpObj(o, t){ jumpT = 0; o.dt = t - o.time; resolve(o, grade(o.dt), t); }
@@ -1487,11 +1490,14 @@ G.trancheroute = { mount(stage, api){
     H: {verb: tx('POSE LE DOIGT ET TIENS'), hint: tx('jusqu\'au bout du ruban'), need: 1, cue: tx('TIENS')},
     S: {verb: tx('GRATTE'), hint: tx('allers-retours de haut en bas'), need: 4, cue: tx('GRATTE')},
     CD: {verb: tx('GLISSE EN DIAGONALE ↗'), hint: tx('vers le haut et la droite à la fois'), need: 1, cue: tx('GLISSE ↗')},
+    CVR: {verb: tx('GLISSE VERS LE BAS'), hint: tx('brique bleue : le geste descend'), need: 1, cue: tx('GLISSE ↓')},
+    CHR: {verb: tx('GLISSE VERS LA GAUCHE'), hint: tx('brique violette : le geste recule'), need: 1, cue: tx('GLISSE ←')},
+    CDR: {verb: tx('GLISSE EN DIAGONALE ↙'), hint: tx('vers le bas et la gauche à la fois'), need: 1, cue: tx('GLISSE ↙')},
     O: {verb: tx('FAIS UN CERCLE'), hint: tx('un tour complet avec le doigt'), need: 1, cue: tx('CERCLE')},
     W: {verb: tx('FAIS UNE VAGUELETTE'), hint: tx('zigzag rapide de gauche à droite'), need: 1, cue: tx('VAGUE')},
     D: {verb: tx('TAPE À DEUX DOIGTS'), hint: tx('deux doigts en même temps (souris : clic droit)'), need: 1, cue: tx('2 DOIGTS')}
   };
-  const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : o.shape === 'diag' ? 'CD' : 'CV') : o.k;
+  const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : o.shape === 'diag' ? 'CD' : 'CV') + (o.rev ? 'R' : '') : o.k;
   // aides au-dessus des formes : elles s'effacent à mesure que tu réussis ce geste, et reviennent si tu le rates
   let cueN = {};
   function cueLearn(o, g){ if(!'CJOWD'.includes(o.k)) return; const k = tk(o); cueN[k] = Math.max(0, Math.min(10, (cueN[k] || 0) + (g === 'miss' ? -2 : 1))); }
@@ -1661,8 +1667,8 @@ G.trancheroute = { mount(stage, api){
     shadow(true, 10, 5);
     if(o.k === 'C'){
       // debout = coupe de bas en haut, couché = coupe de gauche à droite : les chevrons montrent le sens
-      if(o.shape === 'tall' || o.shape === 'wide' || o.shape === 'diag'){ const v = o.shape === 'tall'; ctx.save(); if(o.shape === 'wide') ctx.rotate(Math.PI/2); if(o.shape === 'diag') ctx.rotate(Math.PI/4);
-        ctx.fillStyle = CUTCOL[o.shape]; rrect(-12, -27, 24, 54, 7); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
+      if(o.shape === 'tall' || o.shape === 'wide' || o.shape === 'diag'){ const v = o.shape === 'tall'; ctx.save(); if(o.shape === 'wide') ctx.rotate(Math.PI/2); if(o.shape === 'diag') ctx.rotate(Math.PI/4); if(o.rev) ctx.rotate(Math.PI);
+        ctx.fillStyle = cutCol(o); rrect(-12, -27, 24, 54, 7); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 2.5; ctx.stroke();
         ctx.save(); rrect(-12, -27, 24, 54, 7); ctx.clip(); ctx.fillStyle = 'rgba(28,27,25,.12)'; ctx.fillRect(-12, -27, 7, 54); ctx.restore();
         const ph = (beatNow*2) % 1, chv = TH().chev; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         for(let i=0;i<3;i++){ const yy = 14 - i*13 - ph*5; ctx.strokeStyle = INK; ctx.globalAlpha = .7 + i*.15; ctx.beginPath(); ctx.moveTo(-7, yy + 5); ctx.lineTo(0, yy - 3); ctx.lineTo(7, yy + 5); ctx.stroke(); }
@@ -1719,14 +1725,55 @@ G.trancheroute = { mount(stage, api){
     if(d === 'stripes'){ ctx.rotate(-.35); ctx.fillStyle = `rgba(255,255,255,${.1 + k*.08})`; const off = (beatNow*40) % 60; for(let x=-H; x<W + H; x+=60){ ctx.fillRect(x - off, -H, 26, H*3); } }
     ctx.restore();
   }
+  /* le décor vivant : particules, traits de vitesse et ondes sur le tempo, de plus en plus fort avec le combo
+     (EN RYTHME 10, TRANSE 25, HYPNOSE 50, NIRVANA 100). Coupé si le téléphone demande moins d'animations. */
+  const alive = {parts: [], lines: [], waves: [], beat: -1, last: 0};
+  function aliveReset(){ alive.parts.length = 0; alive.lines.length = 0; alive.waves.length = 0; alive.beat = -1; }
+  function drawAlive(rt, ek){
+    const A = alive, dt = Math.min(.05, Math.max(0, rt - A.last)); A.last = rt;
+    if(api.reduced) return;
+    const th = TH(), ink = th.dark ? '#ffffff' : INK, cols = th.acc.concat([ink]), heat = Math.min(1, combo/100), bi = Math.floor(beatNow);
+    // sur chaque temps : une volée de particules qui montent ; une onde sur chaque mesure (sur chaque temps dès la TRANSE)
+    if(bi !== A.beat && beatNow >= 0){ A.beat = bi; const barB = ((bi % 4) + 4) % 4 === 0;
+      if(barB || trance >= 2) A.waves.push({r: 24, a: barB ? .6 : .35, c: cols[((bi % cols.length) + cols.length) % cols.length], w: barB ? 7 : 3});
+      const n = Math.round(1 + trance*2.5 + heat*5);
+      for(let i=0;i<n;i++) A.parts.push({x: Math.random()*W, y: H*(.55 + Math.random()*.4), vx: (Math.random() - .5)*30, vy: -(50 + Math.random()*80)*(1 + trance*.3), s: 3 + Math.random()*4*(1 + trance*.25), c: cols[Math.floor(Math.random()*cols.length)], k: Math.floor(Math.random()*4), r: Math.random()*6.283, vr: (Math.random() - .5)*4, life: 1, g: 0});
+      // NIRVANA : une gerbe qui explose au centre à chaque mesure
+      if(trance >= 4 && barB) for(let i=0;i<26;i++){ const a = Math.random()*6.283, sp = 140 + Math.random()*260; A.parts.push({x: W/2, y: H*.28, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, s: 4 + Math.random()*6, c: cols[i % cols.length], k: i % 4, r: 0, vr: 7, life: 1, g: 260}); }
+      if(A.parts.length > 240) A.parts.splice(0, A.parts.length - 240);
+    }
+    ctx.save();
+    // les ondes
+    for(const w of A.waves){ w.r += dt*(280 + trance*70); w.a -= dt*(.75 - trance*.06); if(w.a <= 0) continue; ctx.globalAlpha = w.a; ctx.strokeStyle = w.c; ctx.lineWidth = w.w; ctx.beginPath(); ctx.arc(W/2, H*.28, w.r, 0, 6.283); ctx.stroke(); }
+    A.waves = A.waves.filter(w => w.a > 0);
+    // les traits de vitesse : plus nombreux, plus rapides et en couleur avec le combo
+    const want = 4 + trance*3; while(A.lines.length < want) A.lines.push({x: Math.random()*W*1.4 - W*.4, y: Math.random()*H*1.2, l: 30 + Math.random()*70, sp: .6 + Math.random(), c: Math.floor(Math.random()*cols.length)});
+    if(A.lines.length > want) A.lines.length = want;
+    ctx.lineCap = 'round';
+    for(const L of A.lines){ const v = (90 + trance*80 + ek*240)*L.sp; L.x += v*.8*dt; L.y -= v*.6*dt;
+      if(L.x > W + 60 || L.y < -60){ L.x = Math.random()*W*.9 - W*.4; L.y = H*(.4 + Math.random()*.8); }
+      ctx.globalAlpha = trance >= 1 ? .55 : .3; ctx.strokeStyle = trance >= 1 ? cols[L.c] : ink; ctx.lineWidth = 1.5 + trance*.6; ctx.beginPath(); ctx.moveTo(L.x, L.y); ctx.lineTo(L.x + L.l*.8, L.y - L.l*.6); ctx.stroke(); }
+    // les particules : points, étoiles, notes, confettis
+    for(const q of A.parts){ q.vy += q.g*dt; q.x += (q.vx + Math.sin(rt*2 + q.r)*14)*dt; q.y += q.vy*dt; q.r += q.vr*dt; q.life -= dt*(q.g ? .7 : .3);
+      if(q.life <= 0 || q.y < -20) continue; ctx.globalAlpha = Math.min(1, q.life*1.6)*.8; ctx.fillStyle = q.c; ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.r); const z2 = q.s*(1 + ek*.3);
+      if(q.k === 0){ ctx.beginPath(); ctx.arc(0, 0, z2*.6, 0, 6.283); ctx.fill(); }
+      else if(q.k === 1){ ctx.beginPath(); for(let i=0;i<10;i++){ const a = i*Math.PI/5, rr = i % 2 ? z2*.45 : z2; ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } ctx.closePath(); ctx.fill(); }
+      else if(q.k === 2){ ctx.beginPath(); ctx.ellipse(0, z2*.5, z2*.55, z2*.4, -.4, 0, 6.283); ctx.fill(); ctx.fillRect(z2*.35, -z2*1.2, z2*.22, z2*1.7); }
+      else ctx.fillRect(-z2*.7, -z2*.35, z2*1.4, z2*.7);
+      ctx.restore(); }
+    A.parts = A.parts.filter(q => q.life > 0 && q.y >= -20);
+    ctx.restore();
+  }
   function draw(rt){
     const bar = Math.floor(beatNow/4), sec = sectionOf(bar), ek = energy.kick;
     const z = 1 + bump*.025 + ek*.008;
     ctx.save(); ctx.translate(W/2, H/2); ctx.scale(z, z); ctx.translate(-W/2, -H/2);
     if(backdropFor !== tr.id){ backdrop = makeBackdrop(tr, W + 40, H + 40, tr.id); backdropFor = tr.id; }
-    { const bz = 1 + ek*.012; ctx.save(); ctx.translate(W/2, H/2); ctx.scale(bz, bz); ctx.translate(-W/2, -H/2); ctx.drawImage(backdrop, -20, -20, W + 40, H + 40); ctx.restore(); }
+    { const sw = api.reduced ? 0 : 1, bz = 1 + sw*(.05 + ek*(.015 + trance*.01)), sh = trance >= 4 ? sw*ek*5 : 0, tilt = trance >= 3 ? Math.sin(beatNow*Math.PI/2)*.012 : 0;
+      ctx.save(); ctx.translate(W/2 + sw*Math.sin(rt*.23)*9 + (Math.random() - .5)*sh, H/2 + sw*Math.cos(rt*.17)*7 + (Math.random() - .5)*sh); ctx.rotate(sw*(Math.sin(rt*.11)*.015 + tilt)); ctx.scale(bz, bz); ctx.translate(-W/2, -H/2); ctx.drawImage(backdrop, -20, -20, W + 40, H + 40); ctx.restore(); }
     drawDeco(rt);
     if(fresco && !window.__nofresco){ ctx.save(); ctx.globalAlpha = .8; ctx.drawImage(fresco, 0, 0, W, FH); ctx.restore(); }
+    drawAlive(rt, ek);
     if(trance >= 1){
       ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = `hsl(${(rt*50) % 360},90%,60%)`; ctx.globalAlpha = .25 + trance*.12; ctx.fillRect(-20, -20, W + 40, H + 40); ctx.restore();
       if(trance >= 3){ ctx.save(); ctx.translate(W/2, H*.22); ctx.rotate(rt*.6); const R = W*.75*(1 + ek*.1); for(let i=0;i<14;i++){ ctx.rotate(6.283/14); ctx.fillStyle = i % 2 ? 'rgba(244,240,230,.16)' : 'rgba(28,27,25,.1)'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(R, -R*.22); ctx.lineTo(R, R*.22); ctx.closePath(); ctx.fill(); } ctx.restore(); }
@@ -2184,7 +2231,7 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7labo').onclick = () => { close(); showLabo(); };
     sh.querySelector('#k7all').onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
-    sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','CVR','CHR','CDR','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
   };
 
   // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
@@ -2466,6 +2513,9 @@ G.trancheroute = { mount(stage, api){
     CV: `<g transform="translate(30 30)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTCOL.tall}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
     CH: `<g transform="translate(30 30) rotate(90)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTCOL.wide}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
     CD: `<g transform="translate(30 30) rotate(45)"><rect x="-12" y="-25" width="24" height="50" rx="7" fill="${CUTCOL.diag}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    CVR: `<g transform="translate(30 30) rotate(180)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTREV.tall}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    CHR: `<g transform="translate(30 30) rotate(270)"><rect x="-12" y="-27" width="24" height="54" rx="7" fill="${CUTREV.wide}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
+    CDR: `<g transform="translate(30 30) rotate(225)"><rect x="-12" y="-25" width="24" height="50" rx="7" fill="${CUTREV.diag}" stroke="${INK}" stroke-width="2.5"/>${CHV}</g>`,
     J: `<g transform="translate(30 29)">${BTN(0, 0, 14)}<path d="M0 4C-9-2-5-9 0-4.5 5-9 9-2 0 4z" fill="${RED}"/></g>`,
     D: `<g transform="translate(30 32) scale(.82)"><rect x="-17" y="-3" width="34" height="11" rx="5" fill="${INK}"/>${BTN(-15, 0, 9.5)}${BTN(15, 0, 9.5)}<circle cx="-15" cy="-1" r="3.5" fill="${RED}"/><circle cx="15" cy="-1" r="3.5" fill="${RED}"/><text y="-17" text-anchor="middle" font-size="11" font-family="monospace" font-weight="bold" fill="${INK}">×2</text></g>`,
     H: `<g transform="translate(30 30)"><rect x="-26" y="-7" width="52" height="14" rx="7" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/><path d="M-14 0H22" stroke="${RED}" stroke-width="3" stroke-dasharray="5 4"/><circle cx="-18" cy="0" r="9" fill="${RED}" stroke="${INK}" stroke-width="2.5"/></g>`,
@@ -2473,7 +2523,8 @@ G.trancheroute = { mount(stage, api){
   };
   // les briques d'une cassette, dans l'ordre où on les apprend
   function brickKinds(list){ const a = new Set(list.map(t => t.sections.map(x => x.acts).join('')).join('')), ks = [];
-    if(a.has('C')) ks.push('CV', 'CH'); if(a.has('G')) ks.push('CD'); if(a.has('J')) ks.push('J'); if(a.has('D')) ks.push('D'); if(a.has('H')) ks.push('H'); if(a.has('S')) ks.push('S'); return ks; }
+    const rv = list.some(t => revOK(t));
+    if(a.has('C')) ks.push('CV', 'CH'); if(a.has('G')) ks.push('CD'); if(a.has('C') && rv) ks.push('CVR', 'CHR'); if(a.has('G') && rv) ks.push('CDR'); if(a.has('J')) ks.push('J'); if(a.has('D')) ks.push('D'); if(a.has('H')) ks.push('H'); if(a.has('S')) ks.push('S'); return ks; }
   // une page s'en va en glissant vers la droite ; une page remplacée par une autre reste dessous le temps que la nouvelle arrive
   function pageOut(el){ if(!el || !el.isConnected) return; el.classList.add('k7out'); setTimeout(() => el.remove(), 320); }
   function pageUnder(sel){ for(const o of stage.querySelectorAll(sel)){ o.style.zIndex = '29'; setTimeout(() => o.remove(), 450); } }
@@ -2793,7 +2844,7 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get trance(){ return trance; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
     const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();

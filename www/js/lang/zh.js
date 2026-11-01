@@ -279,5 +279,15 @@ BSi18n.add("zh", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "在方块碰到红线的那一刻滑动。",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "连续命中进入狂热并赢得唱片。",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "如果切得偏晚，请在选项中调整校准。",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "长音符要一直按住到结束。"
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "长音符要一直按住到结束。",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "向下滑",
+  "brique bleue : le geste descend": "蓝色方块：手势向下",
+  "GLISSE VERS LA GAUCHE": "向左滑",
+  "brique violette : le geste recule": "紫色方块：手势向后",
+  "GLISSE EN DIAGONALE ↙": "斜向滑动 ↙",
+  "vers le bas et la gauche à la fois": "同时向下和向左",
+  "GLISSE ↓": "滑动 ↓",
+  "GLISSE ←": "滑动 ←",
+  "GLISSE ↙": "滑动 ↙"
 });

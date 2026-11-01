@@ -279,5 +279,15 @@ BSi18n.add("ko", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "블록이 빨간 선에 닿는 순간 스와이프하세요.",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "연속으로 성공해 트랜스에 들어가고 디스크를 얻으세요.",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "판정이 늦다면 옵션에서 싱크를 조정하세요.",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "롱 노트는 끝까지 손가락을 떼지 마세요."
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "롱 노트는 끝까지 손가락을 떼지 마세요.",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "아래로 스와이프",
+  "brique bleue : le geste descend": "파란 블록: 아래로 내리는 동작",
+  "GLISSE VERS LA GAUCHE": "왼쪽으로 스와이프",
+  "brique violette : le geste recule": "보라 블록: 뒤로 미는 동작",
+  "GLISSE EN DIAGONALE ↙": "대각선 스와이프 ↙",
+  "vers le bas et la gauche à la fois": "아래와 왼쪽으로 동시에",
+  "GLISSE ↓": "스와이프 ↓",
+  "GLISSE ←": "스와이프 ←",
+  "GLISSE ↙": "스와이프 ↙"
 });

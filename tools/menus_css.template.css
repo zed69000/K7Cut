@@ -244,3 +244,41 @@
 .bs-go span{white-space:nowrap;font-size:min(20px,5.2vw)}
 .bs-steps{padding:10px 16px 12px;gap:7px}
 @media (max-height:800px){.bs-load .bs-logo{display:none}.bs-load{padding-top:16px}}
+
+/* --- écran de fin : tout tient sur une page (la toile s'adapte), dans le style des menus --- */
+#stage .k7rw{overflow:hidden;background:var(--bs-clouds) left bottom/190px 48px repeat-x,var(--bs-dark);color:#fff}
+#stage .k7rw .in{height:100%;min-height:0;padding:10px 14px 12px;gap:9px;box-sizing:border-box}
+#stage .k7rw .in > *{flex:none}
+#stage .k7rw .in > .artw{flex:1 1 0;min-height:60px;display:flex;justify-content:center;align-items:stretch}
+#stage .k7rw .art{height:100%;width:auto;max-width:86%;aspect-ratio:720/770;margin:0 auto;padding:6px 6px 34px;box-sizing:border-box;display:flex;flex-direction:column;border:3px solid #fff;box-shadow:0 0 0 3px var(--bs-ink),0 6px 0 3px var(--bs-ink);transform:rotate(-2deg)}
+#stage .k7rw .art img{flex:1 1 auto;min-height:0;width:100%;object-fit:cover}
+#stage .k7rw .art .cap{color:var(--bs-ink);bottom:5px}#stage .k7rw .art .cap b{font:italic 900 min(15px,4vw)/1.1 "Rubik",sans-serif}
+#stage .k7rw h2{font:italic 900 min(34px,8.8vw)/1 "Rubik",sans-serif;text-transform:uppercase;color:#fff;-webkit-text-stroke:6px var(--bs-ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--bs-ink);transform:rotate(-3deg);background:var(--bs-burst) center/108% 90% no-repeat;padding:8px 6px;text-align:center}
+#stage .k7rw .top{justify-content:center}#stage .k7rw .ttl{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;align-items:center}
+#stage .k7rw .band{margin:0;background:var(--bs-yellow);color:var(--bs-ink);font:italic 900 min(15px,3.9vw)/1.1 "Rubik",sans-serif;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);padding:6px 14px}
+#stage .k7rw .pct{margin:0;background:var(--bs-cream);color:var(--bs-ink);font:italic 900 min(15px,3.9vw)/1.1 "Rubik",sans-serif;border-radius:999px;padding:6px 12px;box-shadow:none}
+#stage .k7rw .panel{background:%HALF% 0 0/10px 10px,var(--bs-panel);border:3px solid #fff;border-radius:22px;padding:26px 12px 10px;box-shadow:none;transform:none;margin-top:12px}
+#stage .k7rw .ribbon{background:%PINKBG%;border:3px solid #fff;border-radius:999px;font:italic 900 min(21px,5.4vw)/1 "Rubik",sans-serif;text-transform:uppercase;-webkit-text-stroke:5px var(--bs-ink);paint-order:stroke fill;text-shadow:0 3px 0 var(--bs-ink);padding:8px 10px;top:-20px;box-shadow:0 4px 0 #a8004a}
+#stage .k7rw .discs{gap:6%}#stage .k7rw .disc{width:19%}
+#stage .k7rw .next{margin-top:8px;background:var(--bs-cream);color:var(--bs-ink);border:0;border-radius:999px;font:italic 900 12.5px/1 "Rubik",sans-serif;padding:6px 14px;transform:none}
+#stage .k7rw .card{background:var(--bs-cream);border:3px solid #fff;border-radius:18px;box-shadow:0 5px 0 var(--bs-cyan);color:var(--bs-ink)}
+#stage .k7rw .cell{padding:7px 10px;gap:8px}#stage .k7rw .ic{width:34px;height:34px;font-size:16px}
+#stage .k7rw .vl{font:italic 900 min(22px,5.6vw)/1.05 "Rubik",sans-serif}
+#stage .k7rw .harder{border:4px solid #fff;border-radius:20px;background:var(--bs-yellow);box-shadow:0 6px 0 #b38f00;animation:none;padding:6px 14px}
+#stage .k7rw .harder b{font:italic 900 min(22px,5.6vw)/1 "Rubik",sans-serif}
+#stage .k7rw .btns{gap:10px;margin-top:2px}
+#stage .k7rw .btns button{min-height:56px;border:4px solid #fff;border-radius:20px;font:italic 900 min(23px,5.8vw)/1 "Rubik",sans-serif;text-transform:uppercase}
+#stage .k7rw .again{background:%PINKBG%;color:#fff;-webkit-text-stroke:5px var(--bs-ink);paint-order:stroke fill;text-shadow:0 3px 0 var(--bs-ink);box-shadow:0 6px 0 #a8004a}
+#stage .k7rw .keep{background:var(--bs-cream);color:var(--bs-ink);box-shadow:0 6px 0 var(--bs-cyan);font-size:min(15px,3.8vw)!important}
+#stage .k7rw .links{gap:8px}#stage .k7rw .links button{background:#16151c;border:3px solid var(--bs-pink);border-radius:16px;font:italic 900 13px/1.1 "Rubik",sans-serif;text-transform:uppercase;color:#fff;padding:10px 8px;min-height:44px}
+#stage .k7rw .in > div:last-child{display:none}
+@media (max-height:780px){#stage .k7rw .in > [style*="--n:8"]{display:none}}
+@media (max-height:680px){#stage .k7rw .cell.row2{display:none}#stage .k7rw .disc{width:15%}#stage .k7rw .panel{padding-top:22px}#stage .k7rw .next{display:none}}
+/* écran de fin : la toile d'abord ; seulement score et combo, disques plus petits */
+#stage .k7rw .in > [style*="--n:8"],#stage .k7rw .cell.row2{display:none}
+#stage .k7rw .in > .artw{min-height:150px}
+#stage .k7rw .disc{width:15%}#stage .k7rw .panel{padding:22px 10px 8px}
+#stage .k7rw .disc.on .burst{inset:-14%}
+@media (max-height:680px){#stage .k7rw .in > .artw{min-height:110px}#stage .k7rw .disc{width:13%}}
+#stage .k7rw .art{padding:6px}#stage .k7rw .art .cap{display:none}
+@media (max-height:680px){#stage .k7rw .in > .top{display:none}#stage .k7rw h2{font-size:min(28px,7.6vw);padding:4px 6px}#stage .k7rw .in{gap:7px}#stage .k7rw .btns button{min-height:50px}#stage .k7rw .harder{padding:4px 12px}#stage .k7rw .links button{min-height:40px;padding:8px}}

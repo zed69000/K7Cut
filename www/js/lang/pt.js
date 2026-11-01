@@ -279,5 +279,15 @@ BSi18n.add("pt", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "deslize na hora em que o bloco toca a linha vermelha.",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "encadeie acertos para entrar em transe e ganhar discos.",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "se seus cortes chegam atrasados, ajuste a sincronia nas opções.",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "numa nota longa, mantenha o dedo até o fim."
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "numa nota longa, mantenha o dedo até o fim.",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "DESLIZE PARA BAIXO",
+  "brique bleue : le geste descend": "bloco azul: o gesto desce",
+  "GLISSE VERS LA GAUCHE": "DESLIZE PARA A ESQUERDA",
+  "brique violette : le geste recule": "bloco roxo: o gesto recua",
+  "GLISSE EN DIAGONALE ↙": "DESLIZE NA DIAGONAL ↙",
+  "vers le bas et la gauche à la fois": "para baixo e para a esquerda ao mesmo tempo",
+  "GLISSE ↓": "DESLIZE ↓",
+  "GLISSE ←": "DESLIZE ←",
+  "GLISSE ↙": "DESLIZE ↙"
 });

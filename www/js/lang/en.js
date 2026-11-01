@@ -279,5 +279,15 @@ BSi18n.add("en", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "swipe just as the brick hits the red line.",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "chain your hits to go into trance and win discs.",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "if your cuts land late, adjust the timing in the options.",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "on a long note, keep your finger down until the end."
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "on a long note, keep your finger down until the end.",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "SWIPE DOWN",
+  "brique bleue : le geste descend": "blue brick: the gesture goes down",
+  "GLISSE VERS LA GAUCHE": "SWIPE LEFT",
+  "brique violette : le geste recule": "purple brick: the gesture goes back",
+  "GLISSE EN DIAGONALE ↙": "SWIPE DIAGONALLY ↙",
+  "vers le bas et la gauche à la fois": "down and to the left at once",
+  "GLISSE ↓": "SWIPE ↓",
+  "GLISSE ←": "SWIPE ←",
+  "GLISSE ↙": "SWIPE ↙"
 });

@@ -1,4 +1,4 @@
-["C","CV","CH","CD","J","D","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); localStorage.setItem("k7cut.tuto3." + k, "true"); });
+["C","CV","CH","CD","CVR","CHR","CDR","J","D","H","S"].forEach(k => { localStorage.setItem("k7cut.tuto." + k, "true"); localStorage.setItem("k7cut.tuto2." + k, "true"); localStorage.setItem("k7cut.tuto3." + k, "true"); });
 window.__bot = function(sigma, mode){
   const k = window.__k7, cv = k.cv; const r = cv.getBoundingClientRect(); const cx = r.left + r.width*.6, cy = r.top + r.height*.3;
   const seen = new Set(), plan = []; let pid = 10;
@@ -21,7 +21,7 @@ window.__bot = function(sigma, mode){
           let style = mode === 'wrong' ? (o.k === 'C' ? 'tap' : (o.bomb ? 'tap' : 'swipe')) : mode === 'lose' ? (o.k === 'C' ? 'swipe' : 'tap') : mode === 'backward' ? (o.k === 'C' ? 'swipe' : 'tap') : mode === 'sloppy' ? (o.bomb ? 'tap' : (Math.random() < .5 ? 'tap' : 'swipe')) : (o.k === 'C' ? 'swipe' : 'tap');
           if(o.k === 'C' || o.k === 'J'){
             const cutsB = k.objs.filter(q => q.k === 'C' && q.done && q.result !== 'miss').length, jt = k.jumpT;
-            if(style === 'swipe'){ const v = o.shape === 'wide' ? [1, .25] : o.shape === 'tall' ? [.25, -1] : [1, -1]; /* diagonale : vers le haut et la droite */ const w = mode === 'backward' ? -1 : 1; fire('pointermove', cx + v[0]*28*w, cy + v[1]*28*w, a.id); fire('pointerup', cx + v[0]*36*w, cy + v[1]*36*w, a.id); }
+            if(style === 'swipe'){ const v = o.shape === 'wide' ? [1, .25] : o.shape === 'tall' ? [.25, -1] : [1, -1]; /* diagonale : vers le haut et la droite */ const w = (mode === 'backward' ? -1 : 1)*(o.rev ? -1 : 1); fire('pointermove', cx + v[0]*28*w, cy + v[1]*28*w, a.id); fire('pointerup', cx + v[0]*36*w, cy + v[1]*36*w, a.id); }
             else { fire('pointermove', cx + 4, cy + 5, a.id); fire('pointerup', cx + 5, cy + 6, a.id); }
             a.fin = true; a.check = t;
             const cutsA = k.objs.filter(q => q.k === 'C' && q.done && q.result !== 'miss').length;

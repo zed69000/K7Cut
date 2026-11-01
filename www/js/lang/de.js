@@ -279,5 +279,15 @@ BSi18n.add("de", {
   "glisse au bon moment quand la brique touche la ligne rouge.": "wische genau dann, wenn der Block die rote Linie berührt.",
   "enchaîne les réussites pour monter en transe et gagner des disques.": "reihe Treffer aneinander, um in Trance zu kommen und Discs zu gewinnen.",
   "si tes coupes arrivent en retard, règle le calage dans les options.": "kommen deine Schnitte zu spät, stell das Timing in den Optionen ein.",
-  "sur une note longue, garde le doigt posé jusqu'au bout.": "bei einer langen Note den Finger bis zum Ende liegen lassen."
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "bei einer langen Note den Finger bis zum Ende liegen lassen.",
+  // briques à glisser dans l'autre sens
+  "GLISSE VERS LE BAS": "NACH UNTEN WISCHEN",
+  "brique bleue : le geste descend": "blauer Block: die Geste geht nach unten",
+  "GLISSE VERS LA GAUCHE": "NACH LINKS WISCHEN",
+  "brique violette : le geste recule": "violetter Block: die Geste geht zurück",
+  "GLISSE EN DIAGONALE ↙": "DIAGONAL WISCHEN ↙",
+  "vers le bas et la gauche à la fois": "nach unten und links zugleich",
+  "GLISSE ↓": "WISCHEN ↓",
+  "GLISSE ←": "WISCHEN ←",
+  "GLISSE ↙": "WISCHEN ↙"
 });
