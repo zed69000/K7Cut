@@ -247,5 +247,26 @@ BSi18n.add("pt", {
   "Classement mondial : {t} joueurs": "Ranking mundial: {t} jogadores",
   "Hors ligne : classement de ce téléphone": "Offline: ranking deste celular",
   "Cassette de la mort · classement mondial": "Fita da morte · ranking mundial",
-  "Classement mondial : {t} joueur": "Ranking mundial: {t} jogador"
+  "Classement mondial : {t} joueur": "Ranking mundial: {t} jogador",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "Publicidade",
+  "fausse pub de test": "anúncio de teste",
+  "Votre pub ici": "Seu anúncio aqui",
+  "Reprise dans": "Volta em",
+  "Passer": "Pular",
+  "Interstitiel": "Intersticial",
+  "Encart plein écran entre deux morceaux.": "Anúncio em tela cheia entre duas músicas.",
+  "Un autre jeu du même studio": "Outro jogo do mesmo estúdio",
+  "Découvrir le jeu": "Conhecer o jogo",
+  "Plus tard": "Mais tarde",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "Jogar sem anúncios?",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "Vire Premium: nunca mais anúncios. O resto do jogo não muda.",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM SEM ANÚNCIOS · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM ATIVADO ✓",
+  "Restaurer mes achats": "Restaurar compras",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "O Premium é comprado no app BEAT SPLASH.",
+  "Premium activé. Merci !": "Premium ativado. Obrigado!",
+  "Aucun achat à restaurer.": "Nenhuma compra para restaurar."
 });

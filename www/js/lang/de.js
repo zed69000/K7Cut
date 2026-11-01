@@ -247,5 +247,26 @@ BSi18n.add("de", {
   "Classement mondial : {t} joueurs": "Weltrangliste: {t} Spieler",
   "Hors ligne : classement de ce téléphone": "Offline: Rangliste dieses Handys",
   "Cassette de la mort · classement mondial": "Kassette des Todes · Weltrangliste",
-  "Classement mondial : {t} joueur": "Weltrangliste: {t} Spieler"
+  "Classement mondial : {t} joueur": "Weltrangliste: {t} Spieler",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "Werbung",
+  "fausse pub de test": "Testanzeige",
+  "Votre pub ici": "Deine Werbung hier",
+  "Reprise dans": "Weiter in",
+  "Passer": "Überspringen",
+  "Interstitiel": "Interstitial",
+  "Encart plein écran entre deux morceaux.": "Vollbildanzeige zwischen zwei Songs.",
+  "Un autre jeu du même studio": "Ein weiteres Spiel vom selben Studio",
+  "Découvrir le jeu": "Spiel entdecken",
+  "Plus tard": "Später",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "Ohne Werbung spielen?",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "Hol dir Premium: nie wieder Werbung. Sonst ändert sich nichts am Spiel.",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM OHNE WERBUNG · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM AKTIV ✓",
+  "Restaurer mes achats": "Käufe wiederherstellen",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium kaufst du in der BEAT SPLASH App.",
+  "Premium activé. Merci !": "Premium aktiviert. Danke!",
+  "Aucun achat à restaurer.": "Kein Kauf zum Wiederherstellen."
 });

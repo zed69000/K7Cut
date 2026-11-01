@@ -247,5 +247,26 @@ BSi18n.add("en", {
   "Classement mondial : {t} joueurs": "World ranking: {t} players",
   "Hors ligne : classement de ce téléphone": "Offline: this phone's ranking",
   "Cassette de la mort · classement mondial": "Cassette of Death · world ranking",
-  "Classement mondial : {t} joueur": "World ranking: {t} player"
+  "Classement mondial : {t} joueur": "World ranking: {t} player",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "Advertisement",
+  "fausse pub de test": "test ad",
+  "Votre pub ici": "Your ad here",
+  "Reprise dans": "Back in",
+  "Passer": "Skip",
+  "Interstitiel": "Interstitial",
+  "Encart plein écran entre deux morceaux.": "Full-screen ad between two songs.",
+  "Un autre jeu du même studio": "Another game from the same studio",
+  "Découvrir le jeu": "Discover the game",
+  "Plus tard": "Later",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "Play without ads?",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "Go Premium: no more ads, ever. Nothing else in the game changes.",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM, NO ADS · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM ACTIVE ✓",
+  "Restaurer mes achats": "Restore purchases",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium is bought in the BEAT SPLASH app.",
+  "Premium activé. Merci !": "Premium activated. Thank you!",
+  "Aucun achat à restaurer.": "No purchase to restore."
 });

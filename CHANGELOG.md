@@ -1,5 +1,14 @@
 # Journal des versions
 
+## 0.29.0 — Pub entre deux parties, Premium sans pub
+- **Pub entre deux morceaux**, même système que Date Gravity : seulement en quittant l'écran de fin (ou les records après une cassette de la mort), **jamais pendant une partie**. Rien sur les 2 premières cassettes, au plus une pub tous les 3 morceaux et jamais deux à moins de 3 minutes. Le son est coupé pendant la pub puis remis. Une pub sur trois présente nos autres jeux. Pas de vidéo récompensée : rien ne s'obtient avec une pub, le classement reste le même pour tous.
+- **Premium sans pub** : achat unique dans les réglages (« Restaurer mes achats » en dessous), proposé aussi une fois sur trois juste après une pub.
+- Version de test : pubs de test de Google dans l'appli, achat simulé sur le site.
+- **Classement mondial** : petit drapeau du pays de chaque joueur.
+- **Records sur une page** : seule la liste défile, ta ligne au milieu, les boutons toujours visibles.
+- **Nouvelle icône** de l'appli : la cassette mascotte.
+- Politique de confidentialité à jour (pub, achats, classement mondial).
+
 ## 0.28.1 — Records réparés, nouveau look street art
 - **Records et cassette de la mort sur le même écran** : les règles, le classement mondial, ton pseudo et LANCER. Le bouton RECORDS ouvre bien cet écran. « Mes œuvres » a maintenant une icône de tableau, pour ne plus la confondre avec le trophée des records.
 - **Bouton retour avant chaque niveau** : on peut toujours revenir au menu, y compris depuis la cassette de la mort.

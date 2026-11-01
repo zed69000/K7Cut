@@ -136,7 +136,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.28.1';
+const VERSION = '0.29.0';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -1198,11 +1198,12 @@ G.trancheroute = { mount(stage, api){
       <div style="font-size:12px;opacity:.7;text-align:center">${tx('Chaque partie peint une toile unique. Rond net = pile · jets = en avance · coulures = en retard · gris = raté')}</div></div>`;
     stage.appendChild(el);
     const close = () => { alive = false; el.remove(); outroStop(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
-    el.querySelector('.again').onclick = () => { close(); briefing(tr, () => startTrack(tr)); };
-    const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => { close(); diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); briefing(tr, () => startTrack(tr)); };
-    el.querySelector('.tomenu').onclick = () => { close(); showMenu(); };
-    const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => { close(); briefing(R.nextT, () => startTrack(R.nextT)); };
-    el.querySelector('.keep').onclick = R.img ? R.keep : () => { close(); showMenu(); };
+    const leave = go => { close(); adBreak(TRACKS.indexOf(tr)).then(go); };
+    el.querySelector('.again').onclick = () => leave(() => briefing(tr, () => startTrack(tr)));
+    const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => leave(() => { diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); briefing(tr, () => startTrack(tr)); });
+    el.querySelector('.tomenu').onclick = () => leave(showMenu);
+    const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => leave(() => briefing(R.nextT, () => startTrack(R.nextT)));
+    el.querySelector('.keep').onclick = R.img ? R.keep : () => leave(showMenu);
     outroMusic(at0, R.stars);
     if(useAudio && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; applause(actx.currentTime + delay + .1, R.stars/3, outroBus[0]); sendVia = sv; }
     // compteurs qui défilent pendant les temps 2 à 4, confettis à chaque disque, foule qui saute sur le tempo
@@ -1223,6 +1224,28 @@ G.trancheroute = { mount(stage, api){
       const dt = 1/60; for(const p of parts){ p.vy += 700*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.l -= dt; p.r += .2; g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = Math.max(0, p.l); g.fillStyle = p.c; g.fillRect(-4, -2.5, 8, 5); g.restore(); } parts = parts.filter(p => p.l > 0);
       requestAnimationFrame(loop); })();
   }
+  // pub entre deux morceaux (js/ads.js) : seulement quand on quitte un écran de fin, jamais pendant un morceau.
+  // Le son est coupé pendant la pub, puis le moteur audio repart pour que le morceau suivant reste calé.
+  // Garde-fou : une partie en cours (morceau, tuto, pause, Cassette de la mort) n'est jamais coupée par une pub.
+  function adBreak(ti){ if(['play', 'tuto', 'pause'].includes(state) || paused || deathRun) return Promise.resolve(false); return window.BSAds ? BSAds.maybeInterstitial({trackIndex: ti}).then(shown => shown ? premiumOffer() : null).catch(() => false) : Promise.resolve(false); }
+  // Premium (js/premium.js) : proposé juste après une pub, une fois sur trois, jamais plus. C'est le moment où le joueur
+  // sait exactement ce qu'il achète. La promesse est résolue quand la fenêtre se ferme, pour reprendre le jeu.
+  function premiumOffer(){
+    if(!window.BSPremium || BSPremium.isOn() || !BSPremium.canBuy) return Promise.resolve();
+    const n = api.load('offerN', 0) + 1; api.save('offerN', n); if(n % 3 !== 1) return Promise.resolve();
+    return new Promise(resolve => {
+      const sh = document.createElement('div'); sh.className = 'k7sheet';
+      sh.innerHTML = `<div style="text-align:center"><b style="font-family:${GRAF};font-weight:400;font-size:30px;color:#ffd23f;-webkit-text-stroke:2px ${INK};paint-order:stroke fill;text-shadow:3px 3px 0 ${INK}">${tx('Jouer sans pub ?')}</b>
+        <div style="font-size:14px">${tx('Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.')}</div>
+        <button class="k7btn" data-a="buy" style="padding:14px;font-size:15px;background:#ffd23f">${tx('PREMIUM · {price}', {price: BSPremium.price()})}</button>
+        <button class="k7btn" data-a="later" style="padding:11px;font-size:13px">${tx('Plus tard')}</button></div>`;
+      stage.appendChild(sh);
+      const close = () => { sh.remove(); resolve(); };
+      sh.querySelector('[data-a=buy]').onclick = () => { api.sfx.click(); BSPremium.buy().then(close); };
+      sh.querySelector('[data-a=later]').onclick = () => { api.sfx.click(); close(); };
+    });
+  }
+  if(window.BSAds){ BSAds.onStart = () => { if(actx) actx.suspend(); }; BSAds.onEnd = () => { if(actx) actx.resume(); }; }
   function finishRun(won){
     if(auto){ auto = false; api.after(900, showLabo); return; }
     if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; }
@@ -2103,6 +2126,7 @@ G.trancheroute = { mount(stage, api){
   ui.k7gear.onclick = () => {
     const sh = document.createElement('div'); sh.className = 'k7sheet';
     sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">${tx('RÉGLAGES')}</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Fermer')}">✕</button></div>
+      ${window.BSPremium ? `<button class="k7btn" id="k7prem" style="padding:12px;font-size:13px;background:#ffd23f"></button><button id="k7rest" style="background:none;border:0;padding:0 0 4px;margin-top:-6px;font:700 12.5px Rubik,sans-serif;color:${INK};text-decoration:underline;cursor:pointer">${tx('Restaurer mes achats')}</button>` : ''}
       <button class="k7btn" id="k7mute" style="padding:12px;font-size:13px">${tx(api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ')}</button>
       <button class="k7btn" id="k7voice" style="padding:12px;font-size:13px">${tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE')}</button>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px">${tx('Calage du rythme')} <span style="display:flex;gap:8px;align-items:center"><button class="k7btn" id="k7offm" style="width:40px;height:38px;padding:0">−</button><b id="k7off" style="font-family:${FONT};min-width:62px;text-align:center">${api.load('offset', 0)} ms</b><button class="k7btn" id="k7offp" style="width:40px;height:38px;padding:0">+</button></span></div>
@@ -2114,8 +2138,18 @@ G.trancheroute = { mount(stage, api){
       <div class="k7langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="k7btn${c === BSi18n.lang ? ' on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
       <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">BEAT SPLASH · version ${VERSION}</div></div>`;
     menu.appendChild(sh);
-    const close = () => sh.remove();
+    const close = () => { sh.remove(); if(window.BSPremium) BSPremium.onChange = null; };
     sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
+    // Premium : un achat unique qui retire les pubs. Le bouton montre le prix (celui du magasin), puis « activé ».
+    if(window.BSPremium){
+      const prem = sh.querySelector('#k7prem'), rest = sh.querySelector('#k7rest');
+      const showPrem = msg => { const on = BSPremium.isOn(); prem.textContent = msg || tx(on ? 'PREMIUM ACTIVÉ ✓' : 'PREMIUM SANS PUB · {price}', {price: BSPremium.price()}); prem.disabled = on; rest.hidden = on; };
+      showPrem(); BSPremium.onChange = () => showPrem(); // le prix local arrive du magasin après le lancement
+      prem.onclick = async () => { if(BSPremium.isOn()) return; api.sfx.click();
+        if(!BSPremium.canBuy){ showPrem(tx("Le Premium s'achète dans l'application BEAT SPLASH.")); return; }
+        showPrem(await BSPremium.buy() ? tx('Premium activé. Merci !') : ''); };
+      rest.onclick = async () => { api.sfx.click(); const ok = await BSPremium.restore(); showPrem(ok ? tx('Premium activé. Merci !') : tx('Aucun achat à restaurer.')); };
+    }
     sh.querySelector('#k7voice').onclick = e => { api.save('voice', !api.load('voice', true)); e.target.textContent = tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE'); };
     sh.querySelector('#k7mute').onclick = e => { api.store.save('muted', !api.store.load('muted', false)); e.target.textContent = tx(api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'); };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
@@ -2475,8 +2509,9 @@ G.trancheroute = { mount(stage, api){
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
     const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
-    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); el.remove(); briefing(null, deathStart, true); };
-    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me){ showMenu(); showHome('title'); } };
+    const after = go => me ? adBreak(TRACKS.length).then(go) : go(); // après une Cassette de la mort, comme après un morceau
+    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); el.remove(); after(() => briefing(null, deathStart, true)); };
+    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me) after(() => { showMenu(); showHome('title'); }); };
   }
   home.querySelector('#k7tdeath').onclick = () => { api.sfx.click(); deathBoard(null); };
   home.querySelector('#k7tcamp').onclick = () => { api.sfx.click(); showHome('camp'); };

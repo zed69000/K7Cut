@@ -247,5 +247,26 @@ BSi18n.add("ja", {
   "Classement mondial : {t} joueurs": "世界ランキング：{t} 人",
   "Hors ligne : classement de ce téléphone": "オフライン：この端末のランキング",
   "Cassette de la mort · classement mondial": "死のカセット · 世界ランキング",
-  "Classement mondial : {t} joueur": "世界ランキング：{t} 人"
+  "Classement mondial : {t} joueur": "世界ランキング：{t} 人",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "広告",
+  "fausse pub de test": "テスト広告",
+  "Votre pub ici": "ここに広告",
+  "Reprise dans": "再開まで",
+  "Passer": "スキップ",
+  "Interstitiel": "インタースティシャル",
+  "Encart plein écran entre deux morceaux.": "曲と曲の間の全画面広告。",
+  "Un autre jeu du même studio": "同じスタジオの別のゲーム",
+  "Découvrir le jeu": "ゲームを見る",
+  "Plus tard": "あとで",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "広告なしで遊ぶ？",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "Premium にすると広告は二度と出ません。ゲームのほかの部分は変わりません。",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM 広告なし · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM 有効 ✓",
+  "Restaurer mes achats": "購入を復元",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium は BEAT SPLASH アプリで購入できます。",
+  "Premium activé. Merci !": "Premium が有効になりました。ありがとう！",
+  "Aucun achat à restaurer.": "復元できる購入はありません。"
 });

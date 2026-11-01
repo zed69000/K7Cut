@@ -9,13 +9,19 @@
 //   - signature de release avec la clé d'envoi, décrite dans keystore.properties à la racine du dépôt
 //     (jamais commité) ou dans les variables BS_STORE_FILE, BS_STORE_PASSWORD, BS_KEY_ALIAS, BS_KEY_PASSWORD.
 //     Sans clé, l'App Bundle sort non signé : c'est le cas sur GitHub, où game-pipeline le signe ensuite ;
-//   - icône : tools/app/android-res (dessinée par le jeu, voir tests/store_art.py).
+//   - icône : tools/app/android-res (dessinée par le jeu, voir tests/store_art.py) ;
+//   - AdMob : identifiant d'application (les blocs d'annonces sont dans www/js/ads.js).
 import { cpSync, readFileSync, writeFileSync } from "node:fs";
 
 const m = readFileSync("www/js/game.js", "utf8").match(/const VERSION = '(\d+)\.(\d+)\.(\d+)'/);
 if (!m) throw new Error("www/js/game.js : VERSION 'a.b.c' introuvable");
 const [major, minor, patch] = m.slice(1).map(Number);
 if (minor > 99 || patch > 99) throw new Error("VERSION : b et c doivent rester sous 100");
+// les applications BEAT SPLASH du compte AdMob de Date Gravity (une par plateforme ; iOS servira à l'appli iPhone)
+const ADMOB_APP_ID = {
+  ios: "ca-app-pub-9972694417557701~2852798468",
+  android: "ca-app-pub-9972694417557701~4952348195",
+};
 const VERSION = major + "." + minor + "." + patch;
 const BUILD = major * 10000 + minor * 100 + patch;
 
@@ -25,9 +31,18 @@ function edit(path, fn) {
   if (after !== before) writeFileSync(path, after);
 }
 
-edit("android/app/src/main/AndroidManifest.xml", s => s.includes("android:screenOrientation") ? s
-  : s.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"'));
-console.log("AndroidManifest.xml prêt : portrait");
+edit("android/app/src/main/AndroidManifest.xml", s => {
+  if (!s.includes("com.google.android.gms.ads.APPLICATION_ID")) {
+    const end = s.lastIndexOf("</application>");
+    if (end < 0) throw new Error("AndroidManifest.xml inattendu");
+    s = s.slice(0, end) + '    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="' + ADMOB_APP_ID.android + '"/>\n    ' + s.slice(end);
+  }
+  if (!s.includes("android:screenOrientation")) {
+    s = s.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:screenOrientation="portrait"');
+  }
+  return s;
+});
+console.log("AndroidManifest.xml prêt : AdMob, portrait");
 
 edit("android/app/build.gradle", s => {
   s = s.replace(/versionCode \d+/, "versionCode " + BUILD).replace(/versionName "[^"]*"/, 'versionName "' + VERSION + '"');

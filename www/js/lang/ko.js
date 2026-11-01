@@ -247,5 +247,26 @@ BSi18n.add("ko", {
   "Classement mondial : {t} joueurs": "세계 순위: {t}명",
   "Hors ligne : classement de ce téléphone": "오프라인: 이 휴대폰의 순위",
   "Cassette de la mort · classement mondial": "죽음의 카세트 · 세계 순위",
-  "Classement mondial : {t} joueur": "세계 순위: {t}명"
+  "Classement mondial : {t} joueur": "세계 순위: {t}명",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "광고",
+  "fausse pub de test": "테스트 광고",
+  "Votre pub ici": "여기에 광고",
+  "Reprise dans": "다시 시작까지",
+  "Passer": "건너뛰기",
+  "Interstitiel": "전면 광고",
+  "Encart plein écran entre deux morceaux.": "두 곡 사이의 전면 광고.",
+  "Un autre jeu du même studio": "같은 스튜디오의 다른 게임",
+  "Découvrir le jeu": "게임 보기",
+  "Plus tard": "나중에",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "광고 없이 플레이할까요?",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "Premium으로 광고를 영원히 없애세요. 게임의 나머지는 그대로예요.",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM 광고 없음 · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM 활성화됨 ✓",
+  "Restaurer mes achats": "구매 복원",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium은 BEAT SPLASH 앱에서 구매할 수 있어요.",
+  "Premium activé. Merci !": "Premium이 활성화됐어요. 고마워요!",
+  "Aucun achat à restaurer.": "복원할 구매가 없어요."
 });

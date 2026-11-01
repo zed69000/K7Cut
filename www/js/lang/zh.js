@@ -247,5 +247,26 @@ BSi18n.add("zh", {
   "Classement mondial : {t} joueurs": "全球排行榜：{t} 名玩家",
   "Hors ligne : classement de ce téléphone": "离线：本机排行榜",
   "Cassette de la mort · classement mondial": "死亡磁带 · 全球排行榜",
-  "Classement mondial : {t} joueur": "全球排行榜：{t} 名玩家"
+  "Classement mondial : {t} joueur": "全球排行榜：{t} 名玩家",
+  // pub (js/ads.js, js/promo.js)
+  "Publicité": "广告",
+  "fausse pub de test": "测试广告",
+  "Votre pub ici": "你的广告位",
+  "Reprise dans": "返回倒计时",
+  "Passer": "跳过",
+  "Interstitiel": "插页广告",
+  "Encart plein écran entre deux morceaux.": "两首歌之间的全屏广告。",
+  "Un autre jeu du même studio": "同一工作室的另一款游戏",
+  "Découvrir le jeu": "了解游戏",
+  "Plus tard": "以后再说",
+  // Premium (js/premium.js)
+  "Jouer sans pub ?": "无广告游玩？",
+  "Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.": "升级 Premium：永久去除广告，游戏其他内容不变。",
+  "PREMIUM · {price}": "PREMIUM · {price}",
+  "PREMIUM SANS PUB · {price}": "PREMIUM 无广告 · {price}",
+  "PREMIUM ACTIVÉ ✓": "PREMIUM 已激活 ✓",
+  "Restaurer mes achats": "恢复购买",
+  "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium 需在 BEAT SPLASH 应用内购买。",
+  "Premium activé. Merci !": "Premium 已激活，谢谢！",
+  "Aucun achat à restaurer.": "没有可恢复的购买。"
 });
