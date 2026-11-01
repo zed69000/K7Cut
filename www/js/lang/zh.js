@@ -268,5 +268,16 @@ BSi18n.add("zh", {
   "Restaurer mes achats": "恢复购买",
   "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium 需在 BEAT SPLASH 应用内购买。",
   "Premium activé. Merci !": "Premium 已激活，谢谢！",
-  "Aucun achat à restaurer.": "没有可恢复的购买。"
+  "Aucun achat à restaurer.": "没有可恢复的购买。",
+  // écran de chargement
+  "PRÉPARATION DE LA CASSETTE": "正在准备磁带",
+  "Synchronisation du rythme": "同步节奏",
+  "Préparation des briques": "准备方块",
+  "Montage du morceau": "混合歌曲",
+  "ASTUCE :": "提示：",
+  "LE NIVEAU DÉMARRE…": "关卡即将开始…",
+  "glisse au bon moment quand la brique touche la ligne rouge.": "在方块碰到红线的那一刻滑动。",
+  "enchaîne les réussites pour monter en transe et gagner des disques.": "连续命中进入狂热并赢得唱片。",
+  "si tes coupes arrivent en retard, règle le calage dans les options.": "如果切得偏晚，请在选项中调整校准。",
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "长音符要一直按住到结束。"
 });

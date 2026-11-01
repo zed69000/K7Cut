@@ -268,5 +268,16 @@ BSi18n.add("ko", {
   "Restaurer mes achats": "구매 복원",
   "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium은 BEAT SPLASH 앱에서 구매할 수 있어요.",
   "Premium activé. Merci !": "Premium이 활성화됐어요. 고마워요!",
-  "Aucun achat à restaurer.": "복원할 구매가 없어요."
+  "Aucun achat à restaurer.": "복원할 구매가 없어요.",
+  // écran de chargement
+  "PRÉPARATION DE LA CASSETTE": "카세트 준비 중",
+  "Synchronisation du rythme": "리듬 동기화",
+  "Préparation des briques": "블록 준비",
+  "Montage du morceau": "곡 믹싱",
+  "ASTUCE :": "팁:",
+  "LE NIVEAU DÉMARRE…": "곧 레벨이 시작돼요…",
+  "glisse au bon moment quand la brique touche la ligne rouge.": "블록이 빨간 선에 닿는 순간 스와이프하세요.",
+  "enchaîne les réussites pour monter en transe et gagner des disques.": "연속으로 성공해 트랜스에 들어가고 디스크를 얻으세요.",
+  "si tes coupes arrivent en retard, règle le calage dans les options.": "판정이 늦다면 옵션에서 싱크를 조정하세요.",
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "롱 노트는 끝까지 손가락을 떼지 마세요."
 });

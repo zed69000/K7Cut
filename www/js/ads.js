@@ -50,15 +50,15 @@
     st.textContent =
       '#bsAdOverlay{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:calc(18px + var(--sat,0px)) 18px calc(18px + var(--sab,0px));background:rgba(28,27,25,.82);font-family:Rubik,Arial,sans-serif;color:#1c1b19;animation:bsAdIn .18s ease both}' +
       '@keyframes bsAdIn{from{opacity:0}to{opacity:1}}' +
-      '.bsAdCard{width:min(92vw,360px);border-radius:14px;overflow:hidden;background:#efe5cf;border:4px solid #1c1b19;box-shadow:0 6px 0 #1c1b19}' +
+      '.bsAdCard{width:min(92vw,360px);border-radius:26px;overflow:hidden;background:#1b1a22;color:#fff;border:3px solid #fff;box-shadow:0 0 0 3px #15141a,0 14px 30px rgba(0,0,0,.5)}' +
       '.bsAdTop{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;font-size:11px;font-weight:800;letter-spacing:.06em;opacity:.8}' +
-      '.bsAdTag{padding:3px 7px;border-radius:5px;background:#ffd23f;border:2px solid #1c1b19}' +
-      '.bsAdCreative{aspect-ratio:6/5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px;background:repeating-linear-gradient(135deg,#29c4ff 0 14px,#5fd3ff 14px 28px);border-block:3px solid #1c1b19}' +
+      '.bsAdTag{padding:3px 7px;border-radius:5px;background:#ffd60a;color:#15141a}' +
+      '.bsAdCreative{color:#15141a;aspect-ratio:6/5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px;background:repeating-linear-gradient(135deg,#29c4ff 0 14px,#5fd3ff 14px 28px);border-block:3px solid #1c1b19}' +
       '.bsAdCreative b{font:900 24px/1 Rubik,Arial,sans-serif;text-transform:uppercase}' +
       '.bsAdCreative span{font-size:12.5px;font-weight:700;line-height:1.35}' +
       '.bsAdBottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px}' +
       '.bsAdInfo{font-size:12.5px;font-weight:800;opacity:.75}' +
-      '.bsAdBtn{appearance:none;border:3px solid #1c1b19;border-radius:999px;padding:10px 16px;font:800 14px/1 Rubik,Arial,sans-serif;color:#1c1b19;background:#ffd23f;cursor:pointer;touch-action:manipulation}' +
+      '.bsAdBtn{appearance:none;border:3px solid #fff;border-radius:999px;padding:10px 16px;font:italic 900 14px/1 Rubik,Arial,sans-serif;color:#15141a;background:#ffd60a;cursor:pointer;touch-action:manipulation}' +
       '.bsAdBtn:disabled{opacity:.45;cursor:default}' +
       '.bsAdBar{height:5px;background:#d8d2c6}' +
       '.bsAdBar i{display:block;height:100%;width:0;background:#e8344f;transition:width .25s linear}';

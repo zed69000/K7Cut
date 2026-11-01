@@ -268,5 +268,16 @@ BSi18n.add("ja", {
   "Restaurer mes achats": "購入を復元",
   "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium は BEAT SPLASH アプリで購入できます。",
   "Premium activé. Merci !": "Premium が有効になりました。ありがとう！",
-  "Aucun achat à restaurer.": "復元できる購入はありません。"
+  "Aucun achat à restaurer.": "復元できる購入はありません。",
+  // écran de chargement
+  "PRÉPARATION DE LA CASSETTE": "カセットを準備中",
+  "Synchronisation du rythme": "リズムを同期中",
+  "Préparation des briques": "ブロックを準備中",
+  "Montage du morceau": "曲をミックス中",
+  "ASTUCE :": "ヒント：",
+  "LE NIVEAU DÉMARRE…": "まもなくスタート…",
+  "glisse au bon moment quand la brique touche la ligne rouge.": "ブロックが赤いラインに触れた瞬間にスワイプ。",
+  "enchaîne les réussites pour monter en transe et gagner des disques.": "成功をつなげてトランス状態になり、ディスクを獲得しよう。",
+  "si tes coupes arrivent en retard, règle le calage dans les options.": "判定が遅れるならオプションでタイミングを調整しよう。",
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "ロングノートは最後まで指を離さないで。"
 });

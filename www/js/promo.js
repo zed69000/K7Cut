@@ -91,18 +91,18 @@
     st.textContent=
       "#bsPromo{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:calc(18px + var(--sat,0px)) 18px calc(18px + var(--sab,0px));background:rgba(28,27,25,.82);font-family:Rubik,Arial,sans-serif;color:#1c1b19;animation:bsPromoIn .2s ease both}"+
       "@keyframes bsPromoIn{from{opacity:0}to{opacity:1}}"+
-      "#bsPromo .card{width:min(92vw,380px);border-radius:14px;overflow:hidden;background:#efe5cf;border:4px solid #1c1b19;box-shadow:0 6px 0 #1c1b19}"+
+      "#bsPromo .card{width:min(92vw,380px);border-radius:26px;overflow:hidden;background:#1b1a22;border:3px solid #fff;box-shadow:0 0 0 3px #15141a,0 14px 30px rgba(0,0,0,.5);color:#fff}"+
       "#bsPromo .top{padding:12px 16px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.75}"+
       "#bsPromo img.art{display:block;width:100%;aspect-ratio:768/375;object-fit:cover;background:#1c1b19}"+
       "#bsPromo .body{padding:14px 16px 16px;text-align:center}"+
-      "#bsPromo h4{margin:0 0 6px;font:900 20px/1.1 Rubik,Arial,sans-serif;text-transform:uppercase}"+
+      "#bsPromo h4{margin:0 0 6px;font:italic 900 22px/1.1 Rubik,Arial,sans-serif;text-transform:uppercase}"+
       "#bsPromo p{margin:0 0 14px;font-size:13.5px;line-height:1.4;opacity:.8}"+
       "#bsPromo button{appearance:none;border:0;display:block;width:100%;border-radius:999px;font:900 15px/1 Rubik,Arial,sans-serif;cursor:pointer;touch-action:manipulation}"+
-      "#bsPromo .go{padding:14px;background:#ffd23f;color:#1c1b19;border:3px solid #1c1b19!important;box-shadow:0 4px 0 #1c1b19}"+
+      "#bsPromo .go{padding:14px;background:#ff1f7a;color:#fff;border:3px solid #fff!important;box-shadow:0 5px 0 #a8004a;font-style:italic;text-transform:uppercase}"+
       "#bsPromo.vid .card{width:min(92vw,calc((100dvh - 190px - var(--sat,0px) - var(--sab,0px))*9/16),380px)}"+
       "#bsPromo video{display:block;width:100%;aspect-ratio:9/16;object-fit:cover;background:#1c1b19}"+
       "#bsPromo.vid .body{padding:12px 14px 14px}#bsPromo.vid h4,#bsPromo.vid p{display:none}"+
-      "#bsPromo .later{margin-top:8px;padding:11px;background:#1c1b19;color:#fff;font-weight:800;font-size:14px}";
+      "#bsPromo .later{margin-top:8px;padding:11px;background:#f7f1e6;color:#15141a;box-shadow:0 5px 0 #22e3ff;font-style:italic;text-transform:uppercase;font-weight:800;font-size:14px}";
     document.head.appendChild(st);
   }
 

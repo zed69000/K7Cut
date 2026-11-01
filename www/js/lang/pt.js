@@ -268,5 +268,16 @@ BSi18n.add("pt", {
   "Restaurer mes achats": "Restaurar compras",
   "Le Premium s'achète dans l'application BEAT SPLASH.": "O Premium é comprado no app BEAT SPLASH.",
   "Premium activé. Merci !": "Premium ativado. Obrigado!",
-  "Aucun achat à restaurer.": "Nenhuma compra para restaurar."
+  "Aucun achat à restaurer.": "Nenhuma compra para restaurar.",
+  // écran de chargement
+  "PRÉPARATION DE LA CASSETTE": "PREPARANDO A FITA",
+  "Synchronisation du rythme": "Sincronizando o ritmo",
+  "Préparation des briques": "Preparando os blocos",
+  "Montage du morceau": "Montando a música",
+  "ASTUCE :": "DICA:",
+  "LE NIVEAU DÉMARRE…": "O NÍVEL VAI COMEÇAR…",
+  "glisse au bon moment quand la brique touche la ligne rouge.": "deslize na hora em que o bloco toca a linha vermelha.",
+  "enchaîne les réussites pour monter en transe et gagner des disques.": "encadeie acertos para entrar em transe e ganhar discos.",
+  "si tes coupes arrivent en retard, règle le calage dans les options.": "se seus cortes chegam atrasados, ajuste a sincronia nas opções.",
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "numa nota longa, mantenha o dedo até o fim."
 });

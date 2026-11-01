@@ -1,5 +1,11 @@
 # Journal des versions
 
+## 0.30.0 — Nouvelle direction artistique des menus
+- **Menus refaits d'après les maquettes** : fond anthracite avec scène, enceintes et nuages cyan ; logo BEAT / SPLASH sur une traînée cyan avec éclair et ruban jaune ; boutons à bord blanc (icône | libellé) en rose, noir, crème et jaune ; titres en Rubik Black italique.
+- Accueil, Records, Réglages, avant-niveau, pause, Campagne, Cassettes, Mes œuvres, proposition Premium et pubs dans ce style.
+- **Nouvel écran de chargement** après « C'EST PARTI » : la cassette danse sous les projecteurs, la barre avance avec ses étapes et une astuce, le niveau démarre tout seul.
+- Les libellés trop longs pour leur bouton rétrécissent pour tenir sur une ligne, dans toutes les langues ; les petits écrans masquent les éléments secondaires.
+
 ## 0.29.1 — Des pages à la place des fenêtres
 - **Plus de fenêtres par-dessus l'accueil** : Réglages, Mes œuvres, Cassettes, Records, avant-niveau et proposition Premium sont de vraies pages qui remplacent l'écran en glissant depuis la droite, bord d'encre jaune et noir devant ; le bouton ◀ les renvoie vers la droite.
 - **Mes œuvres réparées** : les toiles s'affichaient écrasées en fines bandes ; elles sont maintenant entières, deux par ligne, la page défile.

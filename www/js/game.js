@@ -6,7 +6,31 @@ const G = window.GAMES = window.GAMES || {};
    BEAT SPLASH — un runner rythmique en cassettes
    ========================================================= */
 const INK = '#1c1b19', PAPER = '#f4f0e6', RED = '#d7263d';
-const FONT = '"Bungee", "Rubik", sans-serif'; // titres, boutons, chiffres : Bungee (lisible, enseigne de rue) ; le texte courant est en Rubik
+const FONT = '"Bungee", "Rubik", sans-serif';
+// icônes des menus (direction artistique de novembre 2026) : c = couleur du trait
+const BSI = {
+  spk: c => `<svg viewBox="0 0 32 28" width="32" height="28"><path d="M3 10h6l8-7v22l-8-7H3z" fill="${c}"/><path d="M21 9a6 6 0 0 1 0 10M24.5 5.5a11 11 0 0 1 0 17" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
+  mute: c => `<svg viewBox="0 0 32 28" width="32" height="28"><path d="M3 10h6l8-7v22l-8-7H3z" fill="${c}"/><path d="M21 9l8 10M29 9l-8 10" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
+  mic: c => `<svg viewBox="0 0 24 30" width="22" height="28"><rect x="7" y="2" width="10" height="16" rx="5" fill="${c}"/><path d="M3 14a9 9 0 0 0 18 0M12 23v5M7 28h10" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
+  play: c => `<svg viewBox="0 0 30 32" width="28" height="30"><path d="M5 3l22 13L5 29z" fill="#fff" stroke="${c}" stroke-width="3.5" stroke-linejoin="round"/></svg>`,
+  cap: c => `<svg viewBox="0 0 40 30" width="38" height="28"><path d="M20 3 38 11 20 19 2 11z" fill="${c}"/><path d="M9 15v7c0 3 5 5 11 5s11-2 11-5v-7l-11 5z" fill="${c}"/><path d="M36 12v9" stroke="${c}" stroke-width="2.5"/><circle cx="36" cy="22" r="2.4" fill="${c}"/></svg>`,
+  lock: c => `<svg viewBox="0 0 26 30" width="24" height="28"><path d="M7 13V9a6 6 0 0 1 12 0v4" fill="none" stroke="${c}" stroke-width="3.6"/><rect x="3" y="12" width="20" height="16" rx="3" fill="${c}"/><circle cx="13" cy="19.5" r="2.4" fill="#16151c"/></svg>`,
+  phones: c => `<svg viewBox="0 0 34 30" width="34" height="30"><path d="M4 20v-4a13 13 0 0 1 26 0v4" fill="none" stroke="${c}" stroke-width="3.6"/><rect x="2" y="17" width="8" height="12" rx="3" fill="${c}"/><rect x="24" y="17" width="8" height="12" rx="3" fill="${c}"/></svg>`,
+  crown: c => `<svg viewBox="0 0 40 30" width="36" height="27"><path d="M3 26V8l9 8 8-13 8 13 9-8v18z" fill="#ffd60a" stroke="${c}" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  redo: c => `<svg viewBox="0 0 30 30" width="30" height="30"><path d="M24 15a9 9 0 1 1-3-6.7" fill="none" stroke="${c}" stroke-width="4.2" stroke-linecap="round"/><path d="M16.5 3.5h8v8z" fill="${c}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  back: c => `<svg viewBox="0 0 28 30" width="26" height="28"><path d="M22 4 5 15l17 11z" fill="${c}" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+  close: c => `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M5 5l14 14M19 5 5 19" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`,
+  cup: c => `<svg viewBox="0 0 24 24" width="30" height="30"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="${c}"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="${c}" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="${c}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  gal: c => `<svg width="30" height="30" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${c}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#ff1f7a"/></svg>`,
+  gear: c => `<svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M10.3 2.5h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.6.5v3.4l-2.6.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9-2.6-.5v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+  bars: c => `<svg width="22" height="18" viewBox="0 0 30 26"><g fill="${c}"><rect x="1" y="16" width="6" height="9" rx="1"/><rect x="11" y="9" width="6" height="16" rx="1"/><rect x="21" y="2" width="6" height="23" rx="1"/></g></svg>`,
+  vinyl: () => `<svg class="vn" viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="#16151c" stroke="#fff" stroke-width="3"/><circle cx="30" cy="30" r="19" fill="none" stroke="#3a3944" stroke-width="2"/><circle cx="30" cy="30" r="10" fill="#ffd60a"/><circle cx="30" cy="30" r="3" fill="#16151c"/><path d="M45 12a24 24 0 0 1 6 9M49 7a30 30 0 0 1 8 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  bulb: () => `<svg viewBox="0 0 40 44" width="38" height="42"><g stroke="#16151c" stroke-width="2.6" stroke-linecap="round"><path d="M20 2v5M6 8l3.5 3.5M34 8l-3.5 3.5M2 22h5M33 22h5"/></g><path d="M20 11a10 10 0 0 0-6 18v4h12v-4a10 10 0 0 0-6-18z" fill="#ffd60a" stroke="#16151c" stroke-width="2.6"/><path d="M15 37h10M16 41h8" stroke="#16151c" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  ch: () => `<svg class="ch" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  dch: () => `<svg class="chev" viewBox="0 0 30 30" style="width:32px"><path d="M4 5l10 10-10 10M15 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+};
+// un bouton des menus : icône | libellé (classes : pink, yellow, dark, cta, pill)
+const bsBtn = (cls, id, ic, label, extra = '') => `<button class="bs-btn ${cls}"${id ? ` id="${id}"` : ''} ${extra}>${ic ? `<span class="ic">${ic}</span><span class="sep"></span>` : ''}<span class="bl">${label}</span></button>`; // titres, boutons, chiffres : Bungee (lisible, enseigne de rue) ; le texte courant est en Rubik
 const MAJ = [0, 2, 4, 5, 7, 9, 11], MIN = [0, 2, 3, 5, 7, 8, 10];
 const ALL = ['kick','snare','hat','bass','chords','arp','perc','lead','gtr'];
 
@@ -136,7 +160,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.29.1';
+const VERSION = '0.30.0';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -1235,10 +1259,10 @@ G.trancheroute = { mount(stage, api){
     const n = api.load('offerN', 0) + 1; api.save('offerN', n); if(n % 3 !== 1) return Promise.resolve();
     return new Promise(resolve => {
       const sh = document.createElement('div'); sh.className = 'k7sheet';
-      sh.innerHTML = `<div style="text-align:center"><b style="font-family:${GRAF};font-weight:400;font-size:30px;color:#ffd23f;-webkit-text-stroke:2px ${INK};paint-order:stroke fill;text-shadow:3px 3px 0 ${INK}">${tx('Jouer sans pub ?')}</b>
-        <div style="font-size:14px">${tx('Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.')}</div>
-        <button class="k7btn" data-a="buy" style="padding:14px;font-size:15px;background:#ffd23f">${tx('PREMIUM · {price}', {price: BSPremium.price()})}</button>
-        <button class="k7btn" data-a="later" style="padding:11px;font-size:13px">${tx('Plus tard')}</button></div>`;
+      sh.innerHTML = `<div style="justify-content:center"><div class="bs-panel" style="text-align:center;gap:16px"><div class="bs-title bolt">${tx('Jouer sans pub ?')}</div>
+        <div class="bs-card">${tx('Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.')}</div>
+        ${bsBtn('pink cta bs-sparks', '', '', BSI.crown(INK) + tx('PREMIUM · {price}', {price: BSPremium.price()}), 'data-a="buy" style="font-size:min(26px,6.4vw)"')}
+        ${bsBtn('pill', '', '', tx('Plus tard'), 'data-a="later"')}</div></div>`;
       stage.appendChild(sh);
       const close = () => { pageOut(sh); resolve(); };
       sh.querySelector('[data-a=buy]').onclick = () => { api.sfx.click(); BSPremium.buy().then(close); };
@@ -1844,7 +1868,7 @@ G.trancheroute = { mount(stage, api){
   // la pause fige tout : l'horloge du jeu est celle de l'audio, on suspend l'audio
   let paused = false, pausedFrom = 'play', pauseAt = 0;
   const pauseEl = document.createElement('div'); pauseEl.className = 'k7pause'; pauseEl.hidden = true;
-  pauseEl.innerHTML = `<div class="k7pcard"><div class="k7ptitle">${tx('PAUSE')}</div><div class="k7psub"></div><button class="k7pb go">${tx('REPRENDRE')} ▶</button><button class="k7pb re">${tx('RECOMMENCER')} ↺</button><button class="k7pb out">${tx('QUITTER')} ◀</button></div>`;
+  pauseEl.innerHTML = `<div class="k7pcard"><div class="k7ptitle">${tx('PAUSE')}</div><div class="k7psub"></div><button class="k7pb go bs-sparks">${tx('REPRENDRE')} ${BSI.play(INK)}</button><button class="k7pb re">${BSI.redo(INK)}<span class="sep"></span>${tx('RECOMMENCER')}</button><button class="k7pb out">${BSI.back(INK)}<span class="sep"></span>${tx('QUITTER')}</button></div>`;
   // le style de la pause est posé au premier appui (les polices sont définies plus bas)
   const pauseCss = () => { if(!document.getElementById('k7-pause-css')){ const st = document.createElement('style'); st.id = 'k7-pause-css'; st.textContent = `
     .k7pause{position:absolute;inset:0;z-index:8;background:rgba(28,27,25,.72);display:grid;place-items:center;padding:20px;animation:fade .2s}
@@ -2125,40 +2149,42 @@ G.trancheroute = { mount(stage, api){
   };
   ui.k7gear.onclick = () => {
     const sh = document.createElement('div'); sh.className = 'k7sheet';
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('RÉGLAGES')}</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
-      ${window.BSPremium ? `<button class="k7btn" id="k7prem" style="padding:12px;font-size:13px;background:#ffd23f"></button><button id="k7rest" style="background:none;border:0;padding:0 0 4px;margin-top:-6px;font:700 12.5px Rubik,sans-serif;color:${INK};text-decoration:underline;cursor:pointer">${tx('Restaurer mes achats')}</button>` : ''}
-      <button class="k7btn" id="k7mute" style="padding:12px;font-size:13px">${tx(api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ')}</button>
-      <button class="k7btn" id="k7voice" style="padding:12px;font-size:13px">${tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE')}</button>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px">${tx('Calage du rythme')} <span style="display:flex;gap:8px;align-items:center"><button class="k7btn" id="k7offm" style="width:40px;height:38px;padding:0">−</button><b id="k7off" style="font-family:${FONT};min-width:62px;text-align:center">${api.load('offset', 0)} ms</b><button class="k7btn" id="k7offp" style="width:40px;height:38px;padding:0">+</button></span></div>
-      <div style="font-size:12.5px;opacity:.8;margin-top:-6px">${tx('Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage.')}</div>
-      <button class="k7btn" id="k7intro" style="padding:12px;font-size:13px">${tx('REJOUER L\'INTRO')}</button>
-      <button class="k7btn" id="k7tuto" style="padding:12px;font-size:13px">${tx('REVOIR LES TUTOS')}</button>
-      <button class="k7btn" id="k7all" style="padding:12px;font-size:13px">${tx(api.load('allOpen', false) ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER')}</button>
-      <button class="k7btn" id="k7labo" style="padding:12px;font-size:13px;background:#ffd23f">🎧 ${tx('LABO : ÉCOUTER DE NOUVEAUX MORCEAUX')}</button>
-      <div class="k7langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="k7btn${c === BSi18n.lang ? ' on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
-      <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">BEAT SPLASH · version ${VERSION}</div></div>`;
+    const muted0 = api.store.load('muted', false);
+    sh.innerHTML = `<div><div class="bs-top"><div class="k7badge">${home.querySelector('#k7htal').innerHTML}</div><div class="bs-r"><button class="k7sq" data-a="gal" aria-label="${tx('Mes œuvres')}">${BSI.gal(INK)}</button><button class="k7sq" data-a="x" aria-label="${tx('Fermer')}">${BSI.gear(INK)}</button></div></div>
+      <div class="bs-panel bs-set"><button class="x" id="k7x" aria-label="${tx('Fermer')}">${BSI.close(INK)}</button><div class="bs-title">${tx('RÉGLAGES')}</div>
+      ${bsBtn('', 'k7mute', (muted0 ? BSI.mute : BSI.spk)(INK), tx(muted0 ? 'SON : COUPÉ' : 'SON : ACTIVÉ'))}
+      ${bsBtn('', 'k7voice', BSI.mic(INK), tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE'))}
+      <div class="bs-cal"><div class="row"><b>${tx('Calage du rythme')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage.')}</p></div>
+      ${bsBtn('pink', 'k7intro', BSI.play(INK), tx('REJOUER L\'INTRO'))}
+      ${bsBtn('', 'k7tuto', BSI.cap(INK), tx('REVOIR LES TUTOS'))}
+      ${bsBtn('dark', 'k7all', BSI.lock('#fff'), tx(api.load('allOpen', false) ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'))}
+      ${bsBtn('yellow', 'k7labo', BSI.phones(INK), tx('LABO : ÉCOUTER DE NOUVEAUX MORCEAUX'))}
+      <div class="bs-langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="${c === BSi18n.lang ? 'on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
+      ${window.BSPremium ? bsBtn('pink pill', 'k7prem', BSI.crown(INK), '') + `<button class="bs-link" id="k7rest">${tx('Restaurer mes achats')}</button>` : ''}
+      <div class="bs-ver">BEAT SPLASH · version ${VERSION}</div></div></div>`;
     menu.appendChild(sh);
     const close = () => { pageOut(sh); if(window.BSPremium) BSPremium.onChange = null; };
-    sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
+    sh.querySelector('#k7x').onclick = close; sh.querySelector('[data-a=x]').onclick = close;
+    sh.querySelector('[data-a=gal]').onclick = () => { close(); home.querySelector('#k7trophy').onclick(); };
     // Premium : un achat unique qui retire les pubs. Le bouton montre le prix (celui du magasin), puis « activé ».
     if(window.BSPremium){
       const prem = sh.querySelector('#k7prem'), rest = sh.querySelector('#k7rest');
-      const showPrem = msg => { const on = BSPremium.isOn(); prem.textContent = msg || tx(on ? 'PREMIUM ACTIVÉ ✓' : 'PREMIUM SANS PUB · {price}', {price: BSPremium.price()}); prem.disabled = on; rest.hidden = on; };
+      const showPrem = msg => { const on = BSPremium.isOn(); prem.querySelector('.bl').textContent = msg || tx(on ? 'PREMIUM ACTIVÉ ✓' : 'PREMIUM SANS PUB · {price}', {price: BSPremium.price()}); prem.disabled = on; rest.hidden = on; };
       showPrem(); BSPremium.onChange = () => showPrem(); // le prix local arrive du magasin après le lancement
       prem.onclick = async () => { if(BSPremium.isOn()) return; api.sfx.click();
         if(!BSPremium.canBuy){ showPrem(tx("Le Premium s'achète dans l'application BEAT SPLASH.")); return; }
         showPrem(await BSPremium.buy() ? tx('Premium activé. Merci !') : ''); };
       rest.onclick = async () => { api.sfx.click(); const ok = await BSPremium.restore(); showPrem(ok ? tx('Premium activé. Merci !') : tx('Aucun achat à restaurer.')); };
     }
-    sh.querySelector('#k7voice').onclick = e => { api.save('voice', !api.load('voice', true)); e.target.textContent = tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE'); };
-    sh.querySelector('#k7mute').onclick = e => { api.store.save('muted', !api.store.load('muted', false)); e.target.textContent = tx(api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ'); };
+    sh.querySelector('#k7voice').onclick = () => { api.save('voice', !api.load('voice', true)); sh.querySelector('#k7voice .bl').textContent = tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE'); };
+    sh.querySelector('#k7mute').onclick = () => { const m = !api.store.load('muted', false); api.store.save('muted', m); sh.querySelector('#k7mute .bl').textContent = tx(m ? 'SON : COUPÉ' : 'SON : ACTIVÉ'); sh.querySelector('#k7mute .ic').innerHTML = (m ? BSI.mute : BSI.spk)(INK); };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     sh.querySelector('#k7labo').onclick = () => { close(); showLabo(); };
-    sh.querySelector('#k7all').onclick = e => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); e.target.textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
+    sh.querySelector('#k7all').onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
-    sh.querySelector('#k7tuto').onclick = e => { ['CV','CH','CD','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); e.target.textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
   };
 
   // glisser : la cassette suit le doigt, l'élan décide où elle se pose, un ressort la cale
@@ -2322,6 +2348,7 @@ G.trancheroute = { mount(stage, api){
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
   const SKULL_HOME = `<svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="#fff"/><circle cx="8.7" cy="10.6" r="2.4" fill="${INK}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${INK}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${INK}"/></svg>`;
   home.insertAdjacentHTML('beforeend', `
+    <div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div><span class="bs-tape case">${tx('TOUCHE POUR LANCER LA CASSETTE')}</span><span class="bs-line"></span></div>
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq" aria-label="${tx('Retour')}" hidden><svg width="22" height="22" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
       <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${INK}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${INK}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#e8344f"/></svg><span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
@@ -2331,12 +2358,15 @@ G.trancheroute = { mount(stage, api){
       <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     <div class="ui k7tbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7tcamp" class="k7plate big"><span class="lbl">${tx('CAMPAGNE')}<small id="k7tcsub"></small></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
-      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="color:#fff">${SKULL_HOME}</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="color:#fff">${SKULL_HOME}</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span>${BSI.dch()}</button>
       <button id="k7trec" class="k7plate mid"><span class="ico">${TROPHY}</span><span class="lbl">${tx('RECORDS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button id="k7topt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`);
   const hb = home.querySelector('.k7hbtns'), tb = home.querySelector('.k7tbtns'); const shortH = H < 740; if(shortH) home.classList.add('short'); /* petit écran : tout se resserre pour laisser voir la scène */
-  for(const b of [hb, tb]){ b.style.top = Math.round(shortH ? Math.max(H*.355, 220) : Math.max(H*.4, 300)) + 'px'; b.style.gap = shortH ? '11px' : '16px'; } let hbBottom = H*.62;
-  const layoutHome = () => { const r = (homeMode === 'camp' ? hb : tb).getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
+  for(const b of [hb, tb]){ b.style.top = Math.round(shortH ? Math.max(H*.39, 236) : Math.max(H*.4, 300)) + 'px'; b.style.gap = shortH ? '11px' : '16px'; } let hbBottom = H*.62;
+  home.querySelector('.bs-logo').style.top = (shortH ? 74 : 76) + 'px';
+  // un libellé trop long pour son bouton (selon la langue) : la police rétrécit jusqu'à ce qu'il tienne sur une ligne
+  const fitLabels = root => root.querySelectorAll('.k7plate:not(.big) .lbl').forEach(l => { l.style.fontSize = ''; let fs = parseFloat(getComputedStyle(l).fontSize); while(l.scrollWidth > l.clientWidth + 1 && fs > 11){ fs -= .5; l.style.fontSize = fs + 'px'; } });
+  const layoutHome = () => { fitLabels(home); const r = (homeMode === 'camp' ? hb : tb).getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
   let homeOn = false, hTime = 0, homeMode = 'title'; home.hidden = true;
   const showHome = mode => { if(mode) homeMode = mode; homeOn = true; home.hidden = false; hb.hidden = homeMode !== 'camp'; tb.hidden = homeMode === 'camp'; home.querySelector('#k7hback').hidden = homeMode !== 'camp'; refreshHome(); };
   function refreshHome(){ requestAnimationFrame(layoutHome); home.querySelector('#k7tcsub').textContent = tx('{n} cassettes', {n: TRACKS.length}) + ' · ' + discs() + ' ◉'; home.querySelector('#k7htal').innerHTML = `◉ ${discs()} &nbsp;♪ ${bank()}<small>${titleOf(bank())}</small>`; home.querySelector('.k7dot').hidden = !api.load('artNew', false);
@@ -2366,7 +2396,7 @@ G.trancheroute = { mount(stage, api){
     const rows = () => TRACKS.map((t, i) => { const open = unlocked(t), bk = bests()[t.id + '.' + DIFFS[dIdx].id];
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `🔒 ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${SPRAY[i % SPRAY.length]}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('CASSETTES')}</b><button class="k7btn" id="k7cx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CASSETTES')}</b><button class="bs-back" id="k7cx" aria-label="${tx('Retour')}">◀</button></div>
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="k7clist"></div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh);
@@ -2412,15 +2442,14 @@ G.trancheroute = { mount(stage, api){
     @media (max-height:660px){.k7brief.fit .how{display:none}}
     /* pages : chaque écran du menu remplace l'accueil en glissant depuis la droite, bord d'encre en biais devant
        (plus de fenêtre par-dessus) ; au retour il repart vers la droite */
-    #stage .k7sheet,#stage .k7brief{padding:0;display:block;overflow:visible;background:radial-gradient(rgba(28,27,25,.07) 1px,transparent 1.4px) 0 0/7px 7px,#f1e8d2;animation:k7pgin .42s cubic-bezier(.2,.85,.25,1) both}
+    #stage .k7sheet,#stage .k7brief{padding:0;display:block;overflow:visible;animation:k7pgin .42s cubic-bezier(.2,.85,.25,1) both}
     #stage .k7sheet::before,#stage .k7brief::before{content:"";position:absolute;top:0;bottom:0;left:-46px;width:46px;background:linear-gradient(90deg,#ffd23f 0 9px,${INK} 9px);clip-path:polygon(0 0,62% 0,100% 100%,38% 100%);pointer-events:none}
     #stage .k7out{animation:k7pgout .3s cubic-bezier(.5,0,.75,.3) both;pointer-events:none}
     @keyframes k7pgin{from{transform:translateX(calc(100% + 40px))}}
     @keyframes k7pgout{to{transform:translateX(calc(100% + 40px))}}
-    #stage .k7sheet > div,#stage .k7brief .in{width:100%;max-width:480px;height:100%;max-height:none;margin:0 auto;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;transform:none;background:none;animation:none;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 18px 22px}
+    #stage .k7sheet > div,#stage .k7brief .in{width:100%;max-width:480px;height:100%;max-height:none;margin:0 auto;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;transform:none;background:none;animation:none;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
     #stage .k7sheet > div > *{flex:none}
     #stage .k7brief .in::before,#stage .k7brief .in::after{display:none}
-    #stage .k7brief .acts{margin:auto -18px -22px;border-radius:0}
     #stage .k7gal figcaption{font-size:12px;line-height:1.25}
     #stage .k7gal{max-height:none;overflow:visible;grid-auto-rows:max-content}
     @media (prefers-reduced-motion:reduce){#stage .k7sheet,#stage .k7brief,#stage .k7out{animation:none}}
@@ -2448,28 +2477,57 @@ G.trancheroute = { mount(stage, api){
   // une page s'en va en glissant vers la droite ; une page remplacée par une autre reste dessous le temps que la nouvelle arrive
   function pageOut(el){ if(!el || !el.isConnected) return; el.classList.add('k7out'); setTimeout(() => el.remove(), 320); }
   function pageUnder(sel){ for(const o of stage.querySelectorAll(sel)){ o.style.zIndex = '29'; setTimeout(() => o.remove(), 450); } }
+  const twoTone = txt => { const w = String(txt).toUpperCase().split(' '), last = w.pop(); return `${w.join(' ')}${w.length ? ' ' : ''}<span class="p">${last}</span>`; };
+  // les astuces de l'écran de chargement
+  const TIPS = [tx('glisse au bon moment quand la brique touche la ligne rouge.'), tx('enchaîne les réussites pour monter en transe et gagner des disques.'), tx('si tes coupes arrivent en retard, règle le calage dans les options.'), tx('sur une note longue, garde le doigt posé jusqu\'au bout.')];
+  /* écran de chargement : la cassette danse sur scène pendant que le son se prépare, puis le niveau démarre tout seul */
+  function loadingScreen(t, d, death, go){
+    const el = document.createElement('div'), mt = t || TRACKS[cur], mi = TRACKS.indexOf(mt); el.className = 'bs-load';
+    el.innerHTML = `<div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div></div>
+      <div class="bs-trk">${BSI.vinyl()}<span class="sep"></span><div class="t"><b>${death ? tx('Cassette de la mort') : tx('FACE') + ' ' + t.face + ' · ' + t.name}</b><span>${BSI.bars(INK)} ${d.name}</span></div></div>
+      <div><span class="bs-tape case">${tx('PRÉPARATION DE LA CASSETTE')}</span><span class="bs-line"></span></div>
+      <canvas></canvas>
+      <div class="bs-lcard"><div class="hd"><b>${tx('Chargement…')}</b><div class="bs-bar"><i></i><em>0%</em></div></div><ul class="bs-steps"><li>${tx('Synchronisation du rythme')}</li><li>${tx('Préparation des briques')}</li><li>${tx('Montage du morceau')}</li></ul></div>
+      <div class="bs-tip"><span class="ic">${BSI.bulb()}</span><p><b>${tx('ASTUCE :')}</b> ${TIPS[Math.floor(Math.random()*TIPS.length)]}</p></div>
+      <div class="bs-go"><i>»</i><span>${tx('LE NIVEAU DÉMARRE…')}</span><i>»</i></div>`;
+    stage.appendChild(el);
+    const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bs-bar i'), pc = el.querySelector('.bs-bar em'), li = el.querySelectorAll('.bs-steps li'), t0l = performance.now();
+    let done = false;
+    (function frame(){ if(!el.isConnected) return; const now2 = performance.now(), el2 = now2 - t0l, tt = el2/1000;
+      // la cassette mascotte sur sa scène, deux projecteurs roses
+      const w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+      for(const sd of [-1, 1]){ const gx = w/2 + sd*w*.42; const gr = g.createLinearGradient(gx, 0, w/2, h); gr.addColorStop(0, 'rgba(255,31,122,.55)'); gr.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(gx - 10, 4); g.lineTo(gx + 10, 4); g.lineTo(w/2 + sd*w*.05 - sd*60, h); g.lineTo(w/2 + sd*w*.05 + sd*40, h); g.closePath(); g.fill(); g.fillStyle = '#2c2b36'; g.beginPath(); g.arc(gx, 8, 10, 0, 6.283); g.fill(); g.fillStyle = '#ff7ab0'; g.beginPath(); g.arc(gx, 10, 5, 0, 6.283); g.fill(); }
+      const sc = Math.min(w/340, (h - 18)/330), fy = h - 14;
+      const gl = g.createRadialGradient(w/2, fy, 2, w/2, fy, 150*sc + 20); gl.addColorStop(0, 'rgba(255,31,122,.6)'); gl.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(w/2, fy, 170*sc + 20, 26*sc + 8, 0, 0, 6.283); g.fill();
+      g.strokeStyle = 'rgba(255,31,122,.9)'; g.lineWidth = 3; g.beginPath(); g.ellipse(w/2, fy, 130*sc + 10, 16*sc + 5, 0, 0, 6.283); g.stroke();
+      g.save(); g.translate(w/2, fy - 166*sc); g.scale(sc, sc); mascot(g, mt, Math.max(0, mi), true, true, tt, {x: Math.sin(tt*1.3)*.5, y: -.3}); g.restore();
+      // la barre et les trois étapes
+      const k = Math.min(1, el2/1700), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || el2 > 4500), pct = ok ? 100 : Math.round(Math.min(95, k*100));
+      bar.style.width = `calc(${pct}% - 6px)`; pc.textContent = pct + '%';
+      li.forEach((n, i) => { const at = [34, 68, 100][i], prev = i ? [34, 68, 100][i - 1] : 0; n.className = pct >= at ? 'ok' : pct >= prev ? 'on' : ''; n.insertAdjacentHTML && !n.firstElementChild && n.insertAdjacentHTML('afterbegin', '<i></i>'); });
+      if(ok && !done){ done = true; api.after(450, () => { if(!el.isConnected) return; el.remove(); go(); }); }
+      requestAnimationFrame(frame); })();
+  }
   function briefing(t, go, death){
     pageUnder('.k7brief');
     const el = document.createElement('div'); el.className = 'k7brief';
     const ks = brickKinds(death ? TRACKS : [t]), d = death ? DIFFS[1] : DIFFS[dIdx];
-    const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
+    const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span class="sep"></span><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
     el.innerHTML = `<div class="in">
-      <div class="hd"><span class="face">${death ? SKULL(INK) : tx('FACE') + ' ' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b><small>${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</small></div>
-      <div class="how"><b class="sub">${tx('COMMENT ON JOUE')}</b>
+      <div class="bs-head"><span class="bs-badge pk${death ? '' : ' face'}" style="color:#fff">${death ? SKULL('#16151c') : tx('FACE') + '<br>' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b></div>
+      <span class="bs-tape">${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</span>
+      <div class="bs-howbox"><span class="bs-tab">${tx('COMMENT ON JOUE')}</span>
         <p>${tx('Les briques arrivent vers la ligne rouge. Fais leur geste au moment où elles la touchent, en rythme : chaque geste réussi joue ta partie du morceau.')}</p>
         <p>${death ? tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !') : tx('Un raté ralentit la bande et casse ton combo. Enchaîne les réussites pour monter en transe et gagner des disques.')}</p></div>
-      <b class="sub">${tx('LES BRIQUES DE CETTE CASSETTE')}</b>
+      <span class="bs-sub bs-sparks l">${tx('LES BRIQUES DE CETTE CASSETTE')}</span>
       <div class="bricks">${rows}</div>
-      <div class="bar"><i></i></div>
-      <div class="acts"><button class="go back" aria-label="${tx('Retour')}" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0;font-size:22px;padding:8px 16px">◀</button><button class="go" data-go disabled>${tx('Chargement…')}</button></div></div>`;
+      <div class="acts">${bsBtn('sq back', '', '', BSI.back(INK), `aria-label="${tx('Retour')}"`)}${bsBtn('pink cta bs-sparks', '', '', tx('C\'EST PARTI') + ' ' + BSI.play(INK), 'data-go')}</div></div>`;
     stage.appendChild(el);
     // pendant qu'on lit : le son se prépare (enregistrements, piano), la barre se remplit
     try{ muted = api.store.load('muted', false); audioInit(); loadRecs(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
-    const bar = el.querySelector('.bar i'), btn = el.querySelector('[data-go]'), t0b = performance.now();
-    (function fill(){ if(!el.isConnected) return; const k = Math.min(1, (performance.now() - t0b)/1300), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || performance.now() - t0b > 4000);
-      bar.style.width = Math.round((ok ? 1 : Math.min(.95, k))*100) + '%';
-      if(ok){ btn.disabled = false; btn.textContent = tx('C\'EST PARTI') + ' ▶'; return; } requestAnimationFrame(fill); })();
-    btn.onclick = () => { api.sfx.coin(); el.remove(); go(); };
+    // C'EST PARTI : l'écran de chargement prend le relais, le niveau démarre quand le son est prêt
+    el.querySelector('[data-go]').onclick = () => { api.sfx.coin(); loadingScreen(t, d, death, go); pageUnder('.k7brief'); };
     el.querySelector('.back').onclick = () => { api.sfx.click(); if(menu.hidden){ pageOut(el); showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); else pageOut(el); };
   }
 
@@ -2517,13 +2575,15 @@ G.trancheroute = { mount(stage, api){
   }
   function deathBoard(me, top){
     pageUnder('.k7brief'); top = top || deathTop();
-    const el = document.createElement('div'); el.className = 'k7brief fit';
+    const el = document.createElement('div'); el.className = 'k7brief fit bs-spk';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
-    el.innerHTML = `<div class="in"><div class="hd"><span class="face">${SKULL(INK)}</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
-      ${me ? '' : `<div class="how">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
-      <b class="sub" style="display:flex;align-items:center;gap:6px"><span style="width:20px;height:20px;display:inline-block">${CUP}</span>${tx('RECORDS')}</b><small class="nt" style="font-weight:700"></small><div class="lb">${list()}</div>
-      <input maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="go" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ▶</button><button class="go" data-a="x" style="background:#f3ead7;color:${INK};-webkit-text-stroke:0">${tx('ACCUEIL')}</button></div></div>`;
+    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
+      <div class="bs-title">${twoTone(me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort'))}</div>
+      <div><span class="bs-tape">${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</span><span class="bs-line"></span></div>
+      ${me ? '' : `<div class="bs-card">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
+      <div class="bs-tab bs-sparks">${BSI.cup('#fff')}<span class="sep"></span>${tx('RECORDS')}</div><div class="nt bs-rank"></div><div class="lb">${list()}</div>
+      <input class="bs-input" maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
+      <div class="acts2">${bsBtn('pink cta bs-sparks l', '', '', tx(me ? 'REJOUER' : 'LANCER') + ' ' + BSI.play(INK), 'data-a="go"')}${bsBtn('pill', '', '', tx('ACCUEIL'), 'data-a="x"')}</div></div></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
     const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
     const after = go => me ? adBreak(TRACKS.length).then(go) : go(); // après une Cassette de la mort, comme après un morceau
@@ -2542,8 +2602,8 @@ G.trancheroute = { mount(stage, api){
     const cells = TRACKS.map(t => { const arts = artsOf(t.id), n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0)), cap = `<span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span>`;
       if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div><figcaption>${cap}</figcaption></figure>`;
       return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('MES ŒUVRES')}</b><button class="k7btn" id="k7gx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
-      <div style="font-size:13px;opacity:.8;margin-top:-4px">${tx('Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.')}</div><div class="k7gal">${cells}</div></div>`;
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('MES ŒUVRES')}</b><button class="bs-back" id="k7gx" aria-label="${tx('Retour')}">◀</button></div>
+      <div class="bs-desc">${tx('Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.')}</div><div class="k7gal">${cells}</div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
     sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;
       if(window.claude && window.claude.use){ try{ const dl = await window.claude.use('downloads'); if(dl){ await dl.save({filename: name, data: await (await fetch(im.src)).blob()}); return; } }catch(e){ return; } }
@@ -2632,15 +2692,12 @@ G.trancheroute = { mount(stage, api){
   function reel(g, x, y, R, t){ g.fillStyle = INK; g.beginPath(); g.arc(x, y, R, 0, 6.283); g.fill(); g.fillStyle = '#f3ead7'; g.beginPath(); g.arc(x, y, R*.55, 0, 6.283); g.fill(); g.lineWidth = 3; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y, R*.4, 0, 6.283); g.fill(); g.save(); g.translate(x, y); g.rotate(t*1.2); g.fillStyle = '#f3ead7'; for(let i=0;i<6;i++){ g.rotate(1.047); g.fillRect(-R*.06, -R*.42, R*.12, R*.12); } g.restore(); }
   function homeFrame(dt){
     hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*MBPM/60, kick = Math.max(0, 1 - (beat % 1)*4);
-    g.clearRect(0, 0, W, H); if(!homeBg) homeBg = makeHomeBg(); g.drawImage(homeBg, 0, 0, W, H);
-    { const sz = Math.min(96, W*.74/4.1, H*(H < 740 ? .078 : .1)); drawHomeTitle(g, W/2, (H < 740 ? 70 : 84) + sz*1.6, hTime); }
+    g.clearRect(0, 0, W, H); // le décor (fond sombre, enceintes, nuages) et le logo sont en HTML/CSS : menus.css
     // éclairs jaunes autour de la cassette, qui claquent sur le temps
     const room = H - 40 - hbBottom, sc = Math.max(.26, Math.min(.6, W/640, room/330)), jump = Math.sin(beat*Math.PI*.5)*3, mx2 = W*.5, my2 = hbBottom + 40 + 130*sc;
-    g.save(); g.fillStyle = '#ffd23f'; g.strokeStyle = INK; g.lineWidth = 2.5; g.globalAlpha = .6 + kick*.4;
+    g.save(); g.fillStyle = '#ffd60a'; g.strokeStyle = INK; g.lineWidth = 2.5; g.globalAlpha = .9 + kick*.1;
     for(const [ax, ay, ar] of [[mx2 - 150*sc, my2 - 120*sc, -.6], [mx2 + 160*sc, my2 - 140*sc, .5], [mx2 + 190*sc, my2 + 10*sc, 1.2]]){ g.save(); g.translate(ax, ay); g.rotate(ar); g.scale(1 + kick*.2, 1 + kick*.2); g.beginPath(); g.moveTo(-5, -22); g.lineTo(6, -22); g.lineTo(2, 22); g.closePath(); g.fill(); g.stroke(); g.restore(); }
     g.restore();
-    // des bobines géantes qui tournent sur les bords
-    g.save(); g.globalAlpha = .9; reel(g, -W*.06, H*.56, W*.2, hTime); reel(g, W*1.05, H*.38, W*.17, -hTime); g.restore();
     // les voisines dansent sur les enceintes : on les touche pour les amener au centre
     const isOpen = t => unlocked(t) || discs() >= t.cost, iL = wrapI(cur - 1), iR = wrapI(cur + 1);
     // en campagne seulement : les voisines posées sur les enceintes, immobiles (on les touche pour les amener au centre)
@@ -2648,14 +2705,13 @@ G.trancheroute = { mount(stage, api){
       g.save(); g.translate(W*.12, H*.84 - 6); g.rotate(-.18); g.scale(s2, s2); mascot(g, TRACKS[iL], iL, isOpen(TRACKS[iL]), false, 0, {x: .6, y: -.3}); g.restore();
       g.save(); g.translate(W*.88, H*.86 - 6); g.rotate(.16); g.scale(s2, s2); mascot(g, TRACKS[iR], iR, isOpen(TRACKS[iR]), false, 0, {x: -.6, y: -.3}); g.restore(); }
     // la grande cassette qui saute au milieu : celle qu'on va jouer ; elle arrive en rebondissant quand on en change
+    { const gl = g.createRadialGradient(mx2, my2 + 150*sc, 4, mx2, my2 + 150*sc, 170*sc); gl.addColorStop(0, 'rgba(255,31,122,.55)'); gl.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(mx2, my2 + 150*sc, 190*sc, 40*sc, 0, 0, 6.283); g.fill();
+      g.strokeStyle = 'rgba(255,31,122,.85)'; g.lineWidth = 3; g.beginPath(); g.ellipse(mx2, my2 + 158*sc, 150*sc, 22*sc, 0, 0, 6.283); g.stroke(); }
     hSel = Math.min(1, hSel + dt*3); const e2 = 1 - Math.pow(1 - hSel, 3), pop = 1 + Math.sin(hSel*Math.PI)*.12, slide = (1 - e2)*hDir*W*.5;
     g.save(); g.translate(mx2 + slide, my2 - jump); g.rotate(-.08 + Math.sin(beat*Math.PI*.5)*.025 + (1 - e2)*hDir*.4); g.scale(sc*pop, sc*pop); mascot(g, TRACKS[cur], cur, isOpen(TRACKS[cur]), false, hTime, {x: .4, y: -.4});
     // couronne jaune posée dessus
     g.save(); g.translate(-118, -96); g.rotate(-.45 + Math.sin(hTime*3)*.06); const cw = 70; g.beginPath(); g.moveTo(-cw/2, 0); g.lineTo(-cw/2, -cw*.55); g.lineTo(-cw/4, -cw*.2); g.lineTo(0, -cw*.7); g.lineTo(cw/4, -cw*.2); g.lineTo(cw/2, -cw*.55); g.lineTo(cw/2, 0); g.closePath(); g.lineJoin = 'round'; g.lineWidth = 8; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.fill(); g.restore();
     g.restore();
-    // notes qui flottent
-    g.fillStyle = INK; for(let i=0;i<4;i++){ const nx = W*(.12 + i*.26), ny = hbBottom + 30 + ((hTime*20 + i*60) % 120); g.save(); g.translate(nx, ny); g.rotate(Math.sin(hTime*2 + i)*.3); g.globalAlpha = .75; g.beginPath(); g.ellipse(-3, 6, 6, 4.5, -.4, 0, 6.283); g.fill(); g.fillRect(1.5, -14, 3, 20); g.beginPath(); g.moveTo(4.5, -14); g.quadraticCurveTo(14, -10, 10, 0); g.quadraticCurveTo(11, -7, 4.5, -7); g.fill(); g.restore(); }
-    crowd(g, H + 30, hTime, kick);
   }
   let mLast = performance.now();
   /* ---------- musique des menus : de la french house filtrée, 118 BPM ---------- */

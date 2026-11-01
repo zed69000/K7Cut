@@ -268,5 +268,16 @@ BSi18n.add("en", {
   "Restaurer mes achats": "Restore purchases",
   "Le Premium s'achète dans l'application BEAT SPLASH.": "Premium is bought in the BEAT SPLASH app.",
   "Premium activé. Merci !": "Premium activated. Thank you!",
-  "Aucun achat à restaurer.": "No purchase to restore."
+  "Aucun achat à restaurer.": "No purchase to restore.",
+  // écran de chargement
+  "PRÉPARATION DE LA CASSETTE": "PREPARING THE TAPE",
+  "Synchronisation du rythme": "Syncing the rhythm",
+  "Préparation des briques": "Setting up the bricks",
+  "Montage du morceau": "Mixing the track",
+  "ASTUCE :": "TIP:",
+  "LE NIVEAU DÉMARRE…": "LEVEL STARTING…",
+  "glisse au bon moment quand la brique touche la ligne rouge.": "swipe just as the brick hits the red line.",
+  "enchaîne les réussites pour monter en transe et gagner des disques.": "chain your hits to go into trance and win discs.",
+  "si tes coupes arrivent en retard, règle le calage dans les options.": "if your cuts land late, adjust the timing in the options.",
+  "sur une note longue, garde le doigt posé jusqu'au bout.": "on a long note, keep your finger down until the end."
 });
