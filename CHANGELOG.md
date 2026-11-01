@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.29.1 — Des pages à la place des fenêtres
+- **Plus de fenêtres par-dessus l'accueil** : Réglages, Mes œuvres, Cassettes, Records, avant-niveau et proposition Premium sont de vraies pages qui remplacent l'écran en glissant depuis la droite, bord d'encre jaune et noir devant ; le bouton ◀ les renvoie vers la droite.
+- **Mes œuvres réparées** : les toiles s'affichaient écrasées en fines bandes ; elles sont maintenant entières, deux par ligne, la page défile.
+- Avant-niveau : les boutons restent collés en bas de l'écran.
+
 ## 0.29.0 — Pub entre deux parties, Premium sans pub
 - **Pub entre deux morceaux**, même système que Date Gravity : seulement en quittant l'écran de fin (ou les records après une cassette de la mort), **jamais pendant une partie**. Rien sur les 2 premières cassettes, au plus une pub tous les 3 morceaux et jamais deux à moins de 3 minutes. Le son est coupé pendant la pub puis remis. Une pub sur trois présente nos autres jeux. Pas de vidéo récompensée : rien ne s'obtient avec une pub, le classement reste le même pour tous.
 - **Premium sans pub** : achat unique dans les réglages (« Restaurer mes achats » en dessous), proposé aussi une fois sur trois juste après une pub.

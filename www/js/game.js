@@ -136,7 +136,7 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.29.0';
+const VERSION = '0.29.1';
 const DIFFS = [
   {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
   {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
@@ -1240,7 +1240,7 @@ G.trancheroute = { mount(stage, api){
         <button class="k7btn" data-a="buy" style="padding:14px;font-size:15px;background:#ffd23f">${tx('PREMIUM · {price}', {price: BSPremium.price()})}</button>
         <button class="k7btn" data-a="later" style="padding:11px;font-size:13px">${tx('Plus tard')}</button></div>`;
       stage.appendChild(sh);
-      const close = () => { sh.remove(); resolve(); };
+      const close = () => { pageOut(sh); resolve(); };
       sh.querySelector('[data-a=buy]').onclick = () => { api.sfx.click(); BSPremium.buy().then(close); };
       sh.querySelector('[data-a=later]').onclick = () => { api.sfx.click(); close(); };
     });
@@ -2125,7 +2125,7 @@ G.trancheroute = { mount(stage, api){
   };
   ui.k7gear.onclick = () => {
     const sh = document.createElement('div'); sh.className = 'k7sheet';
-    sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">${tx('RÉGLAGES')}</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Fermer')}">✕</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('RÉGLAGES')}</b><button class="k7btn" id="k7x" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
       ${window.BSPremium ? `<button class="k7btn" id="k7prem" style="padding:12px;font-size:13px;background:#ffd23f"></button><button id="k7rest" style="background:none;border:0;padding:0 0 4px;margin-top:-6px;font:700 12.5px Rubik,sans-serif;color:${INK};text-decoration:underline;cursor:pointer">${tx('Restaurer mes achats')}</button>` : ''}
       <button class="k7btn" id="k7mute" style="padding:12px;font-size:13px">${tx(api.store.load('muted', false) ? 'SON : COUPÉ' : 'SON : ACTIVÉ')}</button>
       <button class="k7btn" id="k7voice" style="padding:12px;font-size:13px">${tx(api.load('voice', true) ? 'VOIX : SUR LES COMBOS' : 'VOIX : COUPÉE')}</button>
@@ -2138,7 +2138,7 @@ G.trancheroute = { mount(stage, api){
       <div class="k7langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="k7btn${c === BSi18n.lang ? ' on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
       <div style="text-align:center;font-family:${FONT};font-size:11px;opacity:.6">BEAT SPLASH · version ${VERSION}</div></div>`;
     menu.appendChild(sh);
-    const close = () => { sh.remove(); if(window.BSPremium) BSPremium.onChange = null; };
+    const close = () => { pageOut(sh); if(window.BSPremium) BSPremium.onChange = null; };
     sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7x').onclick = close;
     // Premium : un achat unique qui retire les pubs. Le bouton montre le prix (celui du magasin), puis « activé ».
     if(window.BSPremium){
@@ -2366,10 +2366,10 @@ G.trancheroute = { mount(stage, api){
     const rows = () => TRACKS.map((t, i) => { const open = unlocked(t), bk = bests()[t.id + '.' + DIFFS[dIdx].id];
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `🔒 ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${SPRAY[i % SPRAY.length]}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');
-    sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">${tx('CASSETTES')}</b><button class="k7btn" id="k7cx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Fermer')}">✕</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('CASSETTES')}</b><button class="k7btn" id="k7cx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="k7clist"></div></div>`;
-    menu.appendChild(sh); const close = () => sh.remove();
+    menu.appendChild(sh); const close = () => pageOut(sh);
     const fill = () => { sh.querySelector('#k7cdiff').innerHTML = diffHtml(); sh.querySelector('.k7clist').innerHTML = rows();
       sh.querySelectorAll('.k7crow').forEach(b => b.onclick = () => { pickCass(+b.dataset.i); close(); }); };
     fill(); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7cx').onclick = close;
@@ -2410,6 +2410,20 @@ G.trancheroute = { mount(stage, api){
     .k7brief.fit{overflow:hidden;display:flex;align-items:center;justify-content:center;box-sizing:border-box}.k7brief.fit .in{max-height:100%;box-sizing:border-box;margin:0}.k7brief.fit .in > *{flex:none}
     .k7brief.fit .in > .lb{flex:1 1 auto;min-height:92px;max-height:none}
     @media (max-height:660px){.k7brief.fit .how{display:none}}
+    /* pages : chaque écran du menu remplace l'accueil en glissant depuis la droite, bord d'encre en biais devant
+       (plus de fenêtre par-dessus) ; au retour il repart vers la droite */
+    #stage .k7sheet,#stage .k7brief{padding:0;display:block;overflow:visible;background:radial-gradient(rgba(28,27,25,.07) 1px,transparent 1.4px) 0 0/7px 7px,#f1e8d2;animation:k7pgin .42s cubic-bezier(.2,.85,.25,1) both}
+    #stage .k7sheet::before,#stage .k7brief::before{content:"";position:absolute;top:0;bottom:0;left:-46px;width:46px;background:linear-gradient(90deg,#ffd23f 0 9px,${INK} 9px);clip-path:polygon(0 0,62% 0,100% 100%,38% 100%);pointer-events:none}
+    #stage .k7out{animation:k7pgout .3s cubic-bezier(.5,0,.75,.3) both;pointer-events:none}
+    @keyframes k7pgin{from{transform:translateX(calc(100% + 40px))}}
+    @keyframes k7pgout{to{transform:translateX(calc(100% + 40px))}}
+    #stage .k7sheet > div,#stage .k7brief .in{width:100%;max-width:480px;height:100%;max-height:none;margin:0 auto;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;transform:none;background:none;animation:none;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 18px 22px}
+    #stage .k7sheet > div > *{flex:none}
+    #stage .k7brief .in::before,#stage .k7brief .in::after{display:none}
+    #stage .k7brief .acts{margin:auto -18px -22px;border-radius:0}
+    #stage .k7gal figcaption{font-size:12px;line-height:1.25}
+    #stage .k7gal{max-height:none;overflow:visible;grid-auto-rows:max-content}
+    @media (prefers-reduced-motion:reduce){#stage .k7sheet,#stage .k7brief,#stage .k7out{animation:none}}
     .k7brief .lb div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;background:#fff;border:2px solid ${INK};border-radius:9px;padding:5px 9px;font-size:14px}
     @font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF;src:url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}
     .k7brief .lb .fl{font-style:normal;font-family:"Twemoji Country Flags","Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}  /* drapeaux aussi sur Windows, qui n'en a pas */
@@ -2431,8 +2445,11 @@ G.trancheroute = { mount(stage, api){
   // les briques d'une cassette, dans l'ordre où on les apprend
   function brickKinds(list){ const a = new Set(list.map(t => t.sections.map(x => x.acts).join('')).join('')), ks = [];
     if(a.has('C')) ks.push('CV', 'CH'); if(a.has('G')) ks.push('CD'); if(a.has('J')) ks.push('J'); if(a.has('D')) ks.push('D'); if(a.has('H')) ks.push('H'); if(a.has('S')) ks.push('S'); return ks; }
+  // une page s'en va en glissant vers la droite ; une page remplacée par une autre reste dessous le temps que la nouvelle arrive
+  function pageOut(el){ if(!el || !el.isConnected) return; el.classList.add('k7out'); setTimeout(() => el.remove(), 320); }
+  function pageUnder(sel){ for(const o of stage.querySelectorAll(sel)){ o.style.zIndex = '29'; setTimeout(() => o.remove(), 450); } }
   function briefing(t, go, death){
-    const old = stage.querySelector('.k7brief'); if(old) old.remove();
+    pageUnder('.k7brief');
     const el = document.createElement('div'); el.className = 'k7brief';
     const ks = brickKinds(death ? TRACKS : [t]), d = death ? DIFFS[1] : DIFFS[dIdx];
     const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
@@ -2453,7 +2470,7 @@ G.trancheroute = { mount(stage, api){
       bar.style.width = Math.round((ok ? 1 : Math.min(.95, k))*100) + '%';
       if(ok){ btn.disabled = false; btn.textContent = tx('C\'EST PARTI') + ' ▶'; return; } requestAnimationFrame(fill); })();
     btn.onclick = () => { api.sfx.coin(); el.remove(); go(); };
-    el.querySelector('.back').onclick = () => { api.sfx.click(); el.remove(); if(menu.hidden){ showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); };
+    el.querySelector('.back').onclick = () => { api.sfx.click(); if(menu.hidden){ pageOut(el); showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); else pageOut(el); };
   }
 
   /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
@@ -2499,7 +2516,7 @@ G.trancheroute = { mount(stage, api){
     api.after(900, () => deathBoard(me, top));
   }
   function deathBoard(me, top){
-    const old = stage.querySelector('.k7brief'); if(old) old.remove(); top = top || deathTop();
+    pageUnder('.k7brief'); top = top || deathTop();
     const el = document.createElement('div'); el.className = 'k7brief fit';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
     el.innerHTML = `<div class="in"><div class="hd"><span class="face">${SKULL(INK)}</span><b>${me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort')}</b><small>${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</small></div>
@@ -2510,8 +2527,8 @@ G.trancheroute = { mount(stage, api){
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
     const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
     const after = go => me ? adBreak(TRACKS.length).then(go) : go(); // après une Cassette de la mort, comme après un morceau
-    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); el.remove(); after(() => briefing(null, deathStart, true)); };
-    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); el.remove(); if(me) after(() => { showMenu(); showHome('title'); }); };
+    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); after(() => briefing(null, deathStart, true)); };
+    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); pageOut(el); if(me) after(() => { showMenu(); showHome('title'); }); };
   }
   home.querySelector('#k7tdeath').onclick = () => { api.sfx.click(); deathBoard(null); };
   home.querySelector('#k7tcamp').onclick = () => { api.sfx.click(); showHome('camp'); };
@@ -2525,9 +2542,9 @@ G.trancheroute = { mount(stage, api){
     const cells = TRACKS.map(t => { const arts = artsOf(t.id), n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0)), cap = `<span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span>`;
       if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div><figcaption>${cap}</figcaption></figure>`;
       return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
-    sh.innerHTML = `<div><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-family:${FONT};font-size:18px">${tx('MES ŒUVRES')}</b><button class="k7btn" id="k7gx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Fermer')}">✕</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:12px"><b style="font-family:${FONT};font-size:20px">${tx('MES ŒUVRES')}</b><button class="k7btn" id="k7gx" style="width:40px;height:38px;padding:0;font-size:16px" aria-label="${tx('Retour')}">◀</button></div>
       <div style="font-size:13px;opacity:.8;margin-top:-4px">${tx('Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.')}</div><div class="k7gal">${cells}</div></div>`;
-    menu.appendChild(sh); const close = () => sh.remove(); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
+    menu.appendChild(sh); const close = () => pageOut(sh); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
     sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;
       if(window.claude && window.claude.use){ try{ const dl = await window.claude.use('downloads'); if(dl){ await dl.save({filename: name, data: await (await fetch(im.src)).blob()}); return; } }catch(e){ return; } }
       const a = document.createElement('a'); a.href = im.src; a.download = name; document.body.appendChild(a); a.click(); a.remove(); });
