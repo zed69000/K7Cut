@@ -161,11 +161,13 @@ const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines',
 const LAB = [byId('test')];
 
 const VERSION = '0.31.0';
+// tuning values are read on use, so the GDD preview reacts at once
+const discAt = list => list.map(x => x + Tuning.num("disques.ecart", 0));
 const DIFFS = [
-  {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, win: 1.55, dens: .6, cap: 1, gap: .55, easy: true, hearts: 5, disc: [70, 85, 95]},
-  {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, win: 1.15, dens: .85, cap: 2, gap: .34, hearts: 3, disc: [60, 80, 92]},
-  {id: 'virtuose', name: tx('Virtuose'), note: tx('Plus dense, plus précis, plus rapide'), mult: 2.5, win: .85, dens: 1.25, speed: 1.1, cap: 3, gap: .24, hearts: 3, disc: [55, 75, 90]},
-  {id: 'roi', name: tx('Roi'), note: tx("Pas de mesure d'écoute, très serré : 3 ratés de suite et la bande casse"), mult: 4, win: .62, dens: 1.75, cap: 3, gap: .15, speed: 1.25, noCall: true, ko: 3, boost: 1, hearts: 1, disc: [50, 70, 86]}
+  {id: 'apprenti', name: tx('Apprenti'), note: tx('Pour apprendre, tout en douceur'), mult: 1, get win(){ return Tuning.num("niveau.apprenti.tolerance", 1.55); }, get dens(){ return Tuning.num("niveau.apprenti.densite", .6); }, cap: 1, gap: .55, easy: true, hearts: 5, get disc(){ return discAt([70, 85, 95]); }},
+  {id: 'musicien', name: tx('Musicien'), note: tx('Le jeu tel qu\'il est pensé'), mult: 1.5, get win(){ return Tuning.num("niveau.musicien.tolerance", 1.15); }, get dens(){ return Tuning.num("niveau.musicien.densite", .85); }, cap: 2, gap: .34, hearts: 3, get disc(){ return discAt([60, 80, 92]); }},
+  {id: 'virtuose', name: tx('Virtuose'), note: tx('Plus dense, plus précis, plus rapide'), mult: 2.5, get win(){ return Tuning.num("niveau.virtuose.tolerance", .85); }, get dens(){ return Tuning.num("niveau.virtuose.densite", 1.25); }, speed: 1.1, cap: 3, gap: .24, hearts: 3, get disc(){ return discAt([55, 75, 90]); }},
+  {id: 'roi', name: tx('Roi'), note: tx("Pas de mesure d'écoute, très serré : 3 ratés de suite et la bande casse"), mult: 4, get win(){ return Tuning.num("niveau.roi.tolerance", .62); }, get dens(){ return Tuning.num("niveau.roi.densite", 1.75); }, cap: 3, gap: .15, speed: 1.25, noCall: true, get ko(){ return Tuning.num("niveau.roi.ko", 3); }, boost: 1, hearts: 1, get disc(){ return discAt([50, 70, 86]); }}
 ];
 const TITLES = [[0, tx('Apprenti')], [60, tx('Musicien')], [180, tx('Virtuose')], [400, tx('Maître du scratch')], [800, tx('Roi du scratch et du rythme')]];
 function rngFrom(str){ let h = 2166136261; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } let s = h >>> 0; return () => { s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }; }
@@ -819,10 +821,12 @@ G.trancheroute = { mount(stage, api){
   }
   let spawned = 1;
 
-  const grade = d => { const a = Math.abs(d)/diff.win; return a < .055 ? 'perfect' : a < .11 ? 'good' : 'ok'; };
+  const hitWin = () => Tuning.num("rythme.fenetre", 200)/1000*diff.win;
+  const grade = d => { const a = Math.abs(d)/diff.win; return a < Tuning.num("rythme.parfait", 55)/1000 ? 'perfect' : a < Tuning.num("rythme.bien", 110)/1000 ? 'good' : 'ok'; };
   const LABEL = {perfect: tx('PARFAIT'), good: tx('BIEN'), ok: tx('OK'), miss: tx('RATÉ')};
-  const xOf = beat => HXs + (beat - beatNow)*PPB;
-  const TIERS = [0, 10, 25, 50, 100], TNAME = ['', tx('EN RYTHME'), tx('TRANSE'), tx('HYPNOSE'), tx('NIRVANA')], TMULT = [1, 1.5, 2, 3, 4];
+  const ppbNow = () => PPB*Tuning.num("bande.vitesse", 1);
+  const xOf = beat => HXs + (beat - beatNow)*ppbNow();
+  const tiers = () => [0, Tuning.num("transe.seuil1", 10), Tuning.num("transe.seuil2", 25), Tuning.num("transe.seuil3", 50), Tuning.num("transe.seuil4", 100)], TNAME = ['', tx('EN RYTHME'), tx('TRANSE'), tx('HYPNOSE'), tx('NIRVANA')], TMULT = [1, 1.5, 2, 3, 4];
   function setTrance(n, t){
     if(n === trance) return; const up = n > trance; trance = n;
     if(up){ if(voiceOn()){ const d0 = chordOf(Math.floor(beatNow/4)), fx = VFX[tr.style] || {}; [0, 2, 4].forEach((k2, i) => { const o3 = {long: true, pan: (i - 1)*.5, rev: .45, drive: fx.drive, hp: fx.hp, lp: fx.lp}; if(!voiceNote(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), .45*(fx.vol || 1), o3)) sing(vox, qNext(t + .05, 1) + i*.03, freq(d0 + k2 + 7, 4), 6, .45*(fx.vol || 1), o3); }); } celebrate(n); if(n >= 4 && useAudio) applause(RT(t), .5); judges.push({txt: TNAME[n], sub: tx('points x{n}', {n: TMULT[n]}), x: W/2, y: H*.12, t: 0, big: true}); I.crash(t); I.swell(t, .5); bump = 1; api.vibe([20, 30, 40]);
@@ -834,7 +838,7 @@ G.trancheroute = { mount(stage, api){
     osc(master, 'sawtooth', 420, t, 1, .16, {glide: 35, gt: .9, lp: [1800, 200, 2]});
   }
   // perdre le fil : deux ratés d'affilée et la bande ralentit ; chaque geste réussi la relance un peu
-  const SLOW = .78, REC = 10;
+  const SLOW = .78, REC = () => Tuning.num("bande.reprise", 10);
   function loseThread(t){
     slowed = true; recHits = 0; rateTgt = SLOW;
     judges.push({txt: tx('LA BANDE RALENTIT'), sub: tx('reprends le rythme, elle repartira'), x: W/2, y: H*.2, t: 0, big: true});
@@ -851,9 +855,9 @@ G.trancheroute = { mount(stage, api){
       api.vibe(120); api.shake(9); confetti(x, y, [INK, RED], 14, 1.1);
     } else {
       missRun = 0;
-      if(slowed){ recHits++; rateTgt = SLOW + (1 - SLOW)*Math.min(1, recHits/REC); if(recHits >= REC){ slowed = false; rateTgt = 1; judges.push({txt: tx('ÇA REPART !'), x: W/2, y: H*.2, t: 0, big: true}); I.crash(Math.max(t, o.time)); } }
+      if(slowed){ recHits++; rateTgt = SLOW + (1 - SLOW)*Math.min(1, recHits/REC()); if(recHits >= REC()){ slowed = false; rateTgt = 1; judges.push({txt: tx('ÇA REPART !'), x: W/2, y: H*.2, t: 0, big: true}); I.crash(Math.max(t, o.time)); } }
       if(o.k === 'H' && useAudio && tr.song){ const d0 = chordOf(Math.floor(beatNow/4)), m0 = music; music = master; try{ I.chord(t, [d0, d0 + 4], bpb*.5, STAB[tr.style] || 'brass', 3000); } finally { music = m0; } }
-      combo++; maxCombo = Math.max(maxCombo, combo); comboVoice(o.k !== 'H' && o.k !== 'S' ? Math.max(t, o.time) : t); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(TIERS.filter(x => combo >= x).length - 1, t);
+      combo++; maxCombo = Math.max(maxCombo, combo); comboVoice(o.k !== 'H' && o.k !== 'S' ? Math.max(t, o.time) : t); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(tiers().filter(x => combo >= x).length - 1, t);
       const base = g === 'perfect' ? 100 : g === 'good' ? 60 : 25; score += Math.round(base*(1 + Math.min(combo, 50)/10)*TMULT[trance]*(slowed ? .5 : 1));
       const when = Math.max(t, o.time);
       // le joueur joue la mélodie
@@ -868,7 +872,7 @@ G.trancheroute = { mount(stage, api){
       if(g === 'perfect') bump = Math.max(bump, .5);
       api.vibe(g === 'perfect' ? 16 : 8);
       if(combo > 100 && combo % 50 === 0) celebrate(4, tx('ENCORE {n} !', {n: combo}));
-      if(combo % 25 === 0 && !TIERS.includes(combo)) judges.push({txt: tx('{n} COMBO', {n: combo}), x: W/2, y: H*.2, t: 0, big: true});
+      if(combo % 25 === 0 && !tiers().includes(combo)) judges.push({txt: tx('{n} COMBO', {n: combo}), x: W/2, y: H*.2, t: 0, big: true});
     }
     judges.push({txt: LABEL[g], g, x: 'HSOW'.includes(o.k) ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: o.wrongShape ? (o.k === 'O' ? tx('fais un cercle complet') : tx('zigzag de gauche à droite')) : o.wrongWay ? (o.shape === 'tall' ? tx('coupe vers le haut ↑') : o.shape === 'diag' ? tx('en diagonale ↗') : tx('coupe vers la droite →')) : (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? tx('en retard') : tx('en avance')) : null});
   }
@@ -878,7 +882,7 @@ G.trancheroute = { mount(stage, api){
   // dans l'ordre, comme une partition : le plus ancien obstacle encore jouable reçoit le geste,
   // sauf s'il est déjà très en retard alors que le suivant tombe pile
   function pickAt(t){
-    const win = .2*diff.win, cand = [];
+    const win = hitWin(), cand = [];
     for(const o of objs){
       if(o.done) continue; let d;
       if(o.k === 'H' && !o.holding) d = t - o.time;
@@ -961,10 +965,10 @@ G.trancheroute = { mount(stage, api){
   // cercle, vaguelette, deux doigts : jugés sur l'instant où le geste commence
   function specialObj(o, t){ o.dt = t - o.time; resolve(o, grade(o.dt), t); }
   let slash = null;
-  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < .2*diff.win).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
+  function nearest(t, f){ return objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) < hitWin()).sort((a, b) => Math.abs(t - a.time) - Math.abs(t - b.time))[0]; }
   // parmi les obstacles du bon type : le plus ancien encore jouable, sauf s'il est très en retard et que le suivant tombe pile
   function firstOf(t, f){
-    const win = .2*diff.win, c = objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) <= win).sort((a, b) => a.time - b.time);
+    const win = hitWin(), c = objs.filter(o => !o.done && f(o) && Math.abs(t - o.time) <= win).sort((a, b) => a.time - b.time);
     if(c[1] && t - c[0].time > .13*diff.win && Math.abs(t - c[1].time) < .06) return c[1];
     return c[0] || null;
   }
@@ -1092,7 +1096,7 @@ G.trancheroute = { mount(stage, api){
     else {
       const pool = trance >= 2 && frR() < .4 ? Object.values(GCOL).flat() : GCOL[o.k] || GCOL.C;
       ev.col = pool[Math.floor(frR()*pool.length)]; ev.col2 = trance >= 1 ? Object.values(GCOL).flat()[Math.floor(frR()*7)] : ev.col;
-      ev.e = o.dt != null ? Math.max(-1, Math.min(1, o.dt/(.2*diff.win))) : 0;
+      ev.e = o.dt != null ? Math.max(-1, Math.min(1, o.dt/(hitWin()))) : 0;
       ev.R = (g === 'perfect' ? 11 : g === 'good' ? 9 : 7)*(1 + Math.min(combo, 80)/60)*(o.k === 'H' ? 1.25 : 1);
       ev.hold = o.k === 'H'; ev.zig = o.k === 'S'; ev.big = combo && combo % 25 === 0;
     }
@@ -1102,7 +1106,7 @@ G.trancheroute = { mount(stage, api){
   // l'œuvre finale : on rejoue tous les coups de pinceau sur une grande toile en papier ancien
   // le titre de l'œuvre : la composition, l'humeur de la partie, un numéro de série
   let artTitle = '';
-  function nameArt(){ const moods = ['brute', 'qui groove', 'en transe', 'hypnotique', 'nirvana'], m = tx(moods[TIERS.filter(x => x && maxCombo >= x).length]), n = api.load('runs', 0);
+  function nameArt(){ const moods = ['brute', 'qui groove', 'en transe', 'hypnotique', 'nirvana'], m = tx(moods[tiers().filter(x => x && maxCombo >= x).length]), n = api.load('runs', 0);
     const t2 = tx('{oeuvre} {humeur} n°{n}', {oeuvre: (compo || COMPOS[0]).name, humeur: m, n}); return t2.charAt(0).toUpperCase() + t2.slice(1); /* « hypnotic Spiral » -> « Hypnotic Spiral » */ }
   function artwork(acc){
     artTitle = nameArt();
@@ -1298,7 +1302,7 @@ G.trancheroute = { mount(stage, api){
     if(nextT && unlocked(nextT)) actions.unshift({label: `Face ${nextT.face} : ${nextT.name}`, fn: () => startTrack(nextT)});
     actions.push({label: 'Choisir une cassette', fn: showMenu});
     const TT = ['PAS ENCORE CALÉ', 'ÇA GROOVE', 'SUPER RYTHME', 'RYTHME PARFAIT'];
-    const mood = tx(['brut', 'qui groove', 'en transe', 'hypnotique', 'nirvana'][TIERS.filter(x => x && maxCombo >= x).length]);
+    const mood = tx(['brut', 'qui groove', 'en transe', 'hypnotique', 'nirvana'][tiers().filter(x => x && maxCombo >= x).length]);
     let img = null; try{ img = artwork(acc); saveArt(img, acc); }catch(e){}
     if(img) actions.splice(actions.length - 1, 0, {label: 'Garder mon œuvre', keep: true, fn: async () => { const name = `k7cut-${tr.id}-${acc}.jpg`;
       // dans Claude : la sauvegarde passe par la fenêtre de confirmation ; ailleurs (GitHub Pages, appli) : téléchargement classique
@@ -1341,8 +1345,8 @@ G.trancheroute = { mount(stage, api){
         if(o.k === 'N' && t >= o.time) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && t >= o.time) collect(o, t);
         else if((o.k === 'A' || o.k === 'L') && t > o.time + .12){ o.done = true; o.result = 'gone'; }
-        else if('CJOWD'.includes(o.k) && t > o.time + .2*diff.win && !(pendingNear(o) && t < o.time + ('OW'.includes(o.k) ? 1.4 : .6))) resolve(o, 'miss', t);
-        else if(o.k === 'H'){ if(!o.holding && t > o.time + .2*diff.win) resolve(o, 'miss', t); else if(o.holding){ if(t > o.endTime + .04) endHold(t, o.startGrade); else if(Math.random() < .5) confetti(HXs, Y0 - 12, [RED, PAPER], 1, .3); } }
+        else if('CJOWD'.includes(o.k) && t > o.time + hitWin() && !(pendingNear(o) && t < o.time + ('OW'.includes(o.k) ? 1.4 : .6))) resolve(o, 'miss', t);
+        else if(o.k === 'H'){ if(!o.holding && t > o.time + hitWin()) resolve(o, 'miss', t); else if(o.holding){ if(t > o.endTime + .04) endHold(t, o.startGrade); else if(Math.random() < .5) confetti(HXs, Y0 - 12, [RED, PAPER], 1, .3); } }
         else if(o.k === 'S' && t > o.endTime + .1){ const r = o.strokes/o.need; resolve(o, r >= 1.5 ? 'perfect' : r >= 1 ? 'good' : r > 0 ? 'ok' : 'miss', t); if(scratchState && scratchState.o === o) scratchState = null; }
       }
       objs = objs.filter(o => o.endBeat > beatNow - 3);
@@ -1798,7 +1802,7 @@ G.trancheroute = { mount(stage, api){
     // bande
     if(trance >= 3){ ctx.fillStyle = 'rgba(215,38,61,.55)'; ctx.fillRect(-4, Y0 - 3, W + 8, TT); ctx.fillStyle = 'rgba(61,220,255,.45)'; ctx.fillRect(4, Y0 + 3, W, TT); }
     shadow(true, 18, 8); ctx.fillStyle = INK; ctx.fillRect(0, Y0, W, TT); shadow(false);
-    for(let b=Math.floor(beatNow) - 2; b<beatNow + W/PPB + 2; b++){ const x = xOf(b), barLine = ((b % 4) + 4) % 4 === 0, pulse = Math.max(0, 1 - Math.abs(beatNow - b)*3);
+    for(let b=Math.floor(beatNow) - 2; b<beatNow + W/ppbNow() + 2; b++){ const x = xOf(b), barLine = ((b % 4) + 4) % 4 === 0, pulse = Math.max(0, 1 - Math.abs(beatNow - b)*3);
       ctx.fillStyle = barLine ? RED : '#f2c21b'; const hh = (barLine ? 14 : 9) + pulse*8; ctx.fillRect(x - (barLine ? 2 : 1), Y0 + TT/2 - hh/2, barLine ? 4 : 2, hh); }
     // tête de lecture
     shadow(true, 10, 4); ctx.fillStyle = RED; rrect(HXs - 11, Y0 + TT + 2, 22, 20 + ek*5, 5); ctx.fill(); shadow(false); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = RED; ctx.fillRect(HXs - 2, Y0 + 2, 4, TT);
@@ -1877,7 +1881,7 @@ G.trancheroute = { mount(stage, api){
     if(flashR > 0){ ctx.fillStyle = `rgba(215,38,61,${flashR*.35})`; ctx.fillRect(0, 0, W, H); }
     if(rate < .995 && state === 'play'){ const k = (1 - rate)/(1 - SLOW); ctx.fillStyle = `rgba(110,80,40,${.22*k})`; ctx.fillRect(0, 0, W, H);
       ctx.save(); ctx.translate(W/2, 98); ctx.textAlign = 'center'; ctx.font = `14px ${FONT}`; ctx.fillStyle = TH().text; ctx.globalAlpha = .6 + .4*Math.abs(Math.sin(rt*3)); ctx.fillText('◀◀ ' + tx('BANDE RALENTIE') + ' x' + rate.toFixed(2), 0, 0); ctx.globalAlpha = 1;
-      if(slowed){ const w = 120; ctx.fillStyle = 'rgba(28,27,25,.25)'; ctx.fillRect(-w/2, 8, w, 6); ctx.fillStyle = RED; ctx.fillRect(-w/2, 8, w*recHits/REC, 6); }
+      if(slowed){ const w = 120; ctx.fillStyle = 'rgba(28,27,25,.25)'; ctx.fillRect(-w/2, 8, w, 6); ctx.fillStyle = RED; ctx.fillRect(-w/2, 8, w*recHits/REC(), 6); }
       ctx.restore(); }
 
     // interface
@@ -2589,7 +2593,7 @@ G.trancheroute = { mount(stage, api){
   const RANK_API = `https://${/\.workers\.dev$/.test(location.hostname) ? location.host : 'beatsplash.sebastienalzamora.workers.dev'}/api`;
   const pid = () => { let v = api.load('pid', ''); if(!/^[a-z0-9]{16,40}$/.test(v)){ v = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); api.save('pid', v); } return v; };
   const pseudo = () => api.load('pseudo', '');
-  function sendScore(score, songs){ try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
+  function sendScore(score, songs){ if(Tuning.preview) return Promise.resolve(null); try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
   async function fetchTop(){ try{ const r = await fetch(RANK_API + '/top?id=' + pid(), {cache: 'no-store'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
   const esc = v => String(v).replace(/[<>&"]/g, '');
   // le petit drapeau du pays (code à deux lettres -> emoji drapeau)
@@ -2844,7 +2848,7 @@ G.trancheroute = { mount(stage, api){
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
-  window.__k7 = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get trance(){ return trance; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return PPB; }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  window.__k7 = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get trance(){ return trance; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return ppbNow(); }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
     const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); if(!titleSplat) titleSplat = makeTitleSplat();

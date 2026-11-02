@@ -17,7 +17,6 @@
   const SELF={id:"beat-splash",android:"com.zed69000.beatsplash"};
   const CACHE_KEY="bs_promo_catalog";
   const TIMEOUT_MS=4000;
-  const SHARE=1/3;
   const cap=window.Capacitor;
   const platform=cap&&cap.getPlatform?cap.getPlatform():"web";
   const tr=(s,v)=>window.BSi18n?BSi18n.t(s,v):s;
@@ -52,7 +51,7 @@
     if(saved&&saved.data)games=parse(saved.data,CATALOG_URL);
   }catch(e){}
 
-  const api={SHARE,available,show,open,storeUrl,onChange:null};
+  const api={get SHARE(){return Tuning.num("pub.maison",1/3);},available,show,open,storeUrl,onChange:null};
   (function refresh(){
     if(!window.fetch)return;
     const ctl=window.AbortController?new AbortController():null;
@@ -76,6 +75,7 @@
   function available(){return games.filter(storeUrl);}
   // anonymous counters for the catalog stats: which game was shown or clicked, and from which game
   function stat(g,event){
+    if(window.Tuning&&Tuning.preview)return;
     try{
       const body=JSON.stringify({game:g.id,from:SELF.id,event});
       if(navigator.sendBeacon&&navigator.sendBeacon(STATS_URL,body))return;
