@@ -1,6 +1,6 @@
 # BEAT SPLASH
 
-Jeu de rythme mobile en cassettes : on coupe, saute, maintient et scratche sur une bande, et chaque coupe réussie joue la mélodie du morceau. 6 faces (Robots de minuit, Pas de lune, Racines, Vent des collines, Autoroute 86, Cri du garage) à débloquer avec les disques gagnés.
+Jeu de rythme mobile en cassettes : on coupe, saute, maintient et scratche sur une bande, et chaque coupe réussie joue la mélodie du morceau. 10 faces (de Robots de minuit à La Forge, de la French house au métal) à débloquer avec les disques gagnés.
 
 Tout est en HTML, CSS et JavaScript, sans dépendance ni fichier audio : la musique est synthétisée en direct avec la Web Audio API.
 
