@@ -161,6 +161,7 @@ const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines',
 const LAB = [byId('test')];
 
 const VERSION = '0.31.0';
+window.K7_VERSION = VERSION; // read by update.js
 // tuning values are read on use, so the GDD preview reacts at once
 const discAt = list => list.map(x => x + Tuning.num("disques.ecart", 0));
 const DIFFS = [

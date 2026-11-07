@@ -29,5 +29,17 @@ window.BS_TEST_BUILD = true;</script>
 <script src="js/ads.js"></script>
 <script src="js/game.js"></script>
 <script src="js/main.js"></script>
+<script src="js/update.js"></script>
+<script>/* Testers on an older Google Play build: offered once per version, on the menus only, never during a run.
+   The save is written to localStorage as the player goes, so nothing waits to be saved. */
+GameUpdate.init({
+  id: "beat-splash",
+  version: window.K7_VERSION,
+  android: "com.zed69000.beatsplash",
+  lang: window.BSi18n && BSi18n.lang,
+  isIdle: () => !!window.__k7 && __k7.state === "menu" && !document.querySelector(".k7sheet, .k7brief, .bs-load, #stage .end, #k7tutoov") && !document.documentElement.classList.contains("splash"),
+  theme: { bg: "#f4f0e6", fg: "#1c1b19", muted: "#5b5750", accent: "#ff1f7a", accentFg: "#ffffff", font: "Rubik, system-ui, sans-serif", radius: "12px" },
+});
+</script>
 </body>
 </html>
