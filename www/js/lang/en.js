@@ -176,6 +176,7 @@ BSi18n.add("en", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "If your cuts show up as “late” while you're on the beat, raise the offset.",
   "REJOUER L'INTRO": "REPLAY INTRO",
   "REVOIR LES TUTOS": "REPLAY TUTORIALS",
+  "SIGNALER UN BUG OU UNE IDÉE": "REPORT A BUG OR AN IDEA",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "LAB: LISTEN TO NEW TRACKS",
   "TUTOS RÉACTIVÉS": "TUTORIALS BACK ON",
   "Options": "Options",

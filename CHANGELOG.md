@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.31.1 — Signaler un bug ou une idée
+- **Signaler un bug ou une idée** : touche l'écran avec trois doigts, ou RÉGLAGES › SIGNALER UN BUG OU UNE IDÉE. Une capture de l'écran (on peut dessiner dessus), ce qu'on a vu ou ce qu'on voudrait, et c'est envoyé à l'équipe.
+
 ## 0.31.0 — Le décor vit, briques à l'envers, écran de fin sur une page
 - **Le décor bouge pendant la partie** : il dérive doucement et pulse sur le tempo ; des notes, étoiles et confettis aux couleurs de la cassette flottent, les traits de vitesse filent, une onde part à chaque mesure. Tout monte avec le combo : plus de particules et de vitesse en EN RYTHME, une onde à chaque temps en TRANSE, le décor tangue en HYPNOSE, il tremble et explose en gerbes en NIRVANA. Coupé si le téléphone demande moins d'animations.
 - **Nouvelles briques à glisser dans l'autre sens** (vers le bas, vers la gauche, en diagonale vers le bas), à partir de Vent des collines et hors Apprenti, environ une coupe sur quatre, avec leur tuto. Couleurs chaudes pour les gestes qui montent (↑ orange, ↗ jaune, → rose), froides pour ceux qui descendent (↓ bleu, ↙ vert menthe, ← violet).

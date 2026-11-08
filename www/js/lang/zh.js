@@ -176,6 +176,7 @@ BSi18n.add("zh", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "如果你明明踩准了却显示「慢了」，就把校准值调高。",
   "REJOUER L'INTRO": "重看开场",
   "REVOIR LES TUTOS": "重看教程",
+  "SIGNALER UN BUG OU UNE IDÉE": "报告错误或提出想法",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "实验室：试听新曲目",
   "TUTOS RÉACTIVÉS": "教程已重新开启",
   "Options": "选项",

@@ -176,6 +176,7 @@ BSi18n.add("de", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "Wenn deine Schnitte „zu spät“ zeigen, obwohl du im Takt bist, erhöhe den Ausgleich.",
   "REJOUER L'INTRO": "INTRO NOCHMAL",
   "REVOIR LES TUTOS": "TUTORIALS NOCHMAL",
+  "SIGNALER UN BUG OU UNE IDÉE": "FEHLER ODER IDEE MELDEN",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "LABOR: NEUE SONGS ANHÖREN",
   "TUTOS RÉACTIVÉS": "TUTORIALS WIEDER AN",
   "Options": "Optionen",

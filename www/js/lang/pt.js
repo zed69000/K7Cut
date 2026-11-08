@@ -176,6 +176,7 @@ BSi18n.add("pt", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "Se seus cortes aparecem como “atrasado” mesmo no tempo, aumente o ajuste.",
   "REJOUER L'INTRO": "REVER A INTRO",
   "REVOIR LES TUTOS": "REVER TUTORIAIS",
+  "SIGNALER UN BUG OU UNE IDÉE": "RELATAR UM BUG OU UMA IDEIA",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "LAB: OUVIR MÚSICAS NOVAS",
   "TUTOS RÉACTIVÉS": "TUTORIAIS REATIVADOS",
   "Options": "Opções",

@@ -176,6 +176,7 @@ BSi18n.add("ko", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "박자에 맞췄는데도 ‘늦음’이 뜨면 싱크 값을 올려 주세요.",
   "REJOUER L'INTRO": "인트로 다시 보기",
   "REVOIR LES TUTOS": "튜토리얼 다시 보기",
+  "SIGNALER UN BUG OU UNE IDÉE": "버그 또는 아이디어 보내기",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "실험실: 새 곡 들어 보기",
   "TUTOS RÉACTIVÉS": "튜토리얼 다시 켜짐",
   "Options": "옵션",

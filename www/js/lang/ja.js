@@ -176,6 +176,7 @@ BSi18n.add("ja", {
   "Si tes coupes s'affichent « en retard » alors que tu es dans le temps, monte le calage.": "タイミングが合っているのに「遅い」と出る場合は、調整値を上げてください。",
   "REJOUER L'INTRO": "イントロをもう一度見る",
   "REVOIR LES TUTOS": "チュートリアルを見直す",
+  "SIGNALER UN BUG OU UNE IDÉE": "バグやアイデアを報告",
   "LABO : ÉCOUTER DE NOUVEAUX MORCEAUX": "ラボ：新曲を試聴",
   "TUTOS RÉACTIVÉS": "チュートリアルを再表示します",
   "Options": "オプション",
