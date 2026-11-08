@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- bug and idea reports of the testers (copy of games-catalog/client/bugreport.js): loaded first to keep the console -->
+<script src="js/bugreport.js"></script>
 <script>/* premier lancement de la session : l'écran du studio MusclorDuck avant l'accueil */
 try{if(!sessionStorage.getItem("bs_splash")){sessionStorage.setItem("bs_splash","1");document.documentElement.classList.add("splash");}}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
@@ -38,6 +40,14 @@ GameUpdate.init({
   android: "com.zed69000.beatsplash",
   lang: window.BSi18n && BSi18n.lang,
   isIdle: () => !!window.__k7 && __k7.state === "menu" && !document.querySelector(".k7sheet, .k7brief, .bs-load, #stage .end, #k7tutoov") && !document.documentElement.classList.contains("splash"),
+  theme: { bg: "#f4f0e6", fg: "#1c1b19", muted: "#5b5750", accent: "#ff1f7a", accentFg: "#ffffff", font: "Rubik, system-ui, sans-serif", radius: "12px" },
+});
+/* Every tester can report a bug or an idea: the 🐞 button, F8; it lands in the catalog's Bugs tab. */
+BugReport.init({
+  id: "beat-splash",
+  version: window.K7_VERSION,
+  lang: window.BSi18n && BSi18n.lang,
+  scene: () => (window.__k7 && __k7.state) || "",
   theme: { bg: "#f4f0e6", fg: "#1c1b19", muted: "#5b5750", accent: "#ff1f7a", accentFg: "#ffffff", font: "Rubik, system-ui, sans-serif", radius: "12px" },
 });
 </script>
