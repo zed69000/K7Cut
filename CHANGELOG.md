@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.31.2 — Outils des testeurs partagés
+- Le rapport de bug et la fenêtre de nouvelle version viennent maintenant du kit commun du studio, avec le même aspect sombre dans tous les jeux.
+
 ## 0.31.1 — Signaler un bug ou une idée
 - **Signaler un bug ou une idée** : touche l'écran avec trois doigts, ou RÉGLAGES › SIGNALER UN BUG OU UNE IDÉE. Une capture de l'écran (on peut dessiner dessus), ce qu'on a vu ou ce qu'on voudrait, et c'est envoyé à l'équipe.
 

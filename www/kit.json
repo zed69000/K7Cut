@@ -1,0 +1,8 @@
+{
+  "id": "beat-splash",
+  "android": "com.zed69000.beatsplash",
+  "tools": [
+    "bugreport",
+    "update"
+  ]
+}

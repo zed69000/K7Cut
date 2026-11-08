@@ -160,8 +160,8 @@ const byId = id => SONGS.find(t => t.id === id);
 const TRACKS = ['robots', 'lune', 'facettes', 'racines', 'trottoir', 'collines', 'autoroute', 'velours', 'garage', 'forge'].map(byId);
 const LAB = [byId('test')];
 
-const VERSION = '0.31.1';
-window.K7_VERSION = VERSION; // read by update.js
+const VERSION = '0.31.2';
+window.K7_VERSION = window.GAME_VERSION = VERSION; // read by the studio kit
 // tuning values are read on use, so the GDD preview reacts at once
 const discAt = list => list.map(x => x + Tuning.num("disques.ecart", 0));
 const DIFFS = [
