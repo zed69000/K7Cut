@@ -1,5 +1,17 @@
 # Journal des versions
 
+## 0.32.0 — Les 31 demandes du GDD
+- **Cassette de la mort sans fin** : plus d'écran entre deux morceaux, le suivant démarre aussitôt (bandeau « Morceau tenu »), le combo et la transe continuent ; premier tour du plus lent au plus rapide, puis tours mélangés.
+- **Classement par saisons** (réglage `classement.saison` du GDD) : la saison précédente reste consultable ; pseudos injurieux et liens remplacés.
+- **Réglages** : séparés entre le joueur (son, volume de la voix, calage, tutos, langue, Premium) et les outils de test (tout débloquer, labo), visibles seulement en version de test. « Tout débloquer » n'agit plus hors version de test.
+- **Calage guidé** : on tape sur 8 coups, le jeu propose le calage ; conseil du casque filaire.
+- **Écran de fin** : REJOUER dès l'apparition de la toile, légende de lecture de la toile, le geste qui a coûté le plus de ratés avec un bouton pour revoir son tuto ; GARDER MON ŒUVRE passe par la feuille de partage du téléphone. Icônes dessinées à la place des emojis.
+- **Jeu** : Trottoir 90 passe avant Racines ; Velours et Racines raccourcis (2:43 et 2:35) ; en Apprenti la musique ne se coupe que 2 temps après un raté ; la foule est déçue quand la bande ralentit et se relève à chaque réussite ; la bande repart après 6 réussites (valeur à mettre en ligne dans le GDD).
+- **K7 et Bobine** : la cassette mascotte parle dans les astuces du chargement.
+- **Décors** : habillage propre pour Vent des collines (prairie, vent) et Velours (bordeaux et or) ; plus de tête de mort ni de croix sur le rock et le métal.
+- **Pub** : pas d'offre Premium juste après la toute première pub.
+- **Technique** : polices embarquées (plus de Google Fonts ni de jsdelivr), commandes de test cachées hors version de test, formes inutilisées retirées (cercle, vaguelette, bombe, bonus de vie), plus de noms d'artistes dans le code.
+
 ## 0.31.2 — Outils des testeurs partagés
 - Le rapport de bug et la fenêtre de nouvelle version viennent maintenant du kit commun du studio, avec le même aspect sombre dans tous les jeux.
 
@@ -115,7 +127,7 @@
 - **Une vraie batterie.** Au démarrage, le jeu rend une fois pour toutes un kit complet (3 grosses caisses, 3 caisses claires dont une « années 80 », clap, claquement de doigts, rimshot, charleston ouvert/fermé métalliques, crash, ride, shaker, tom), saturé et passé dans une pièce, comme de vrais échantillons. Il passe dans un bus batterie (saturation + compresseur qui fait claquer) qui n'est plus écrasé par la pompe de la grosse caisse. Toutes les cassettes en profitent.
 - **Vrais instruments** : guitare en cordes pincées (claire, ou saturée en power chord sur deux prises gauche/droite, étouffée ou ouverte), piano acoustique calculé note par note, section de cordes, orgue, et des basses avec des harmoniques pour s'entendre même sur un haut-parleur de téléphone.
 - **Labo musique** (Réglages → « LABO », ou `?labo` dans l'adresse) : ▶ ÉCOUTER (le jeu joue tout seul), 🎮 JOUER (en Apprenti), ♥ pour garder. 6 morceaux composés, chacun dans l'esprit d'une référence, avec une mélodie originale que tu joues en coupant :
-  1. Robots de minuit — French house filtrée (esprit Daft Punk) · 2. Autoroute 86 — synthwave de nuit (esprit Kavinsky) · 3. Cri du garage — rock alternatif calme/fort (esprit Pixies) · 4. Vent des collines — orchestral piano et cordes (esprit films de Miyazaki) · 5. Racines — reggae one drop (esprit Bob Marley) · 6. Pas de lune — pop funk (esprit Michael Jackson)
+  1. Robots de minuit — French house filtrée · 2. Autoroute 86 — synthwave de nuit · 3. Cri du garage — rock alternatif calme/fort · 4. Vent des collines — orchestral piano et cordes · 5. Racines — reggae one drop · 6. Pas de lune — pop funk
 - Partitions dans le tableau `LAB` : motifs de batterie sur 16 pas, ligne de basse, accords (avec balayage de filtre), guitares, arpège et mélodie écrite.
 
 ## 0.20.0 — Vrai scratch de la musique, écran stable

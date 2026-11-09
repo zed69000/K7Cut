@@ -4,20 +4,23 @@
 Schneide, tippe, scratche im Takt: Jede Geste spielt Musik und malt dein Bild
 
 **Description complète** :
-Wischen, tippen, Töne halten, die Platte scratchen: In BEAT SPLASH spielst du den Song selbst.
+Wischen, tippen, Note halten, Platte scratchen: In BEAT SPLASH spielst du den Song selbst, mit K7, dem Kassetten-Maskottchen.
 
-Die Kassetten laufen über das Band, und jede Geste, die genau auf den Beat sitzt, fügt deinen Part zur Musik hinzu: ein Bläserstoß, eine verzerrte Gitarre, ein Reggae-Offbeat. Verpasst du eine Note, steigt dein Part aus. Reihst du sie aneinander, wird die Musik immer größer, bis zur Trance.
+Die Kassetten laufen über das Band, und jede Geste genau im Takt fügt deinen Part zur Musik hinzu: ein Bläserstoß, eine verzerrte Gitarre, ein Reggae-Offbeat. Verpasst du eine Note, fällt dein Part weg. Reih sie aneinander, und die Musik wächst bis zur Trance, während die Kulisse mit dir abgeht.
 
 🎵 10 KASSETTEN, 10 STILE
-French house, Pop funk, Disco, Reggae roots, Boom-Bap-Hip-Hop, Orchestral, Nacht-Synthwave, Neo-Soul, Alternative Rock, Metal. Jede Seite hat ihre eigene Komposition, ihr eigenes Schlagzeug und eine neue Geste zum Lernen.
+French House, Pop-Funk, Disco, Hip-Hop, Roots-Reggae, Orchester, nächtlicher Synthwave, Neo-Soul, Alternative Rock und Metal. Jede Seite hat ihre eigene Komposition, ihr Schlagzeug und eine neue Geste zum Lernen.
 
 ✋ EINFACHE GESTEN, ECHTE HERAUSFORDERUNG
-Schneide den Block in Pfeilrichtung (Grün nach oben, Blau nach rechts, Gelb diagonal), tippe die Kreise an, halte die langen Noten, scratche die Platte vor und zurück. Ein Tutorial zeigt dir jede neue Geste genau im richtigen Moment, direkt am echten Hindernis.
+Schneide den Block in Richtung seiner Pfeile: warme Farben, wenn die Geste nach oben geht, kalte, wenn sie nach unten geht. Tippe die Kreise, tippe mit zwei Fingern, halte die langen Noten, scratche die Platte. Ein Tutorial zeigt jede neue Geste im richtigen Moment, auf der echten Form.
 
 🎨 JEDE RUNDE MALT EIN BILD
-Dein Rhythmus wird zum Gemälde: runder Klecks, wenn du genau triffst, Spritzer, wenn du zu früh bist, Tropfen, wenn du zu spät bist. Behalte deine schönsten Werke.
+Dein Rhythmus wird zum Gemälde: ein sauberer Punkt, wenn du genau triffst, Spritzer, wenn du zu früh bist, Tropfen, wenn du zu spät bist. Behalte deine schönsten Werke und teile sie.
+
+☠ DIE TODESKASSETTE
+Drei Herzen, Songs ohne Pause und immer schneller: Halte so lange durch wie möglich und steig in der Weltrangliste auf.
 
 👑 4 STUFEN, VOM LEHRLING ZUM KÖNIG
-Starte ganz sanft, gewinne Platten, um die nächsten Kassetten freizuschalten, und spiel dieselbe Seite dann eine Stufe höher. Als König gibt es keine Gnade: drei Fehler in Folge und das Band reißt.
+Fang sanft an, verdiene Discs, um die nächsten Kassetten zu öffnen, und spiel dieselbe Seite eine Stufe höher.
 
-Kostenlos, mit Werbung zwischen den Songs, nie während des Spiels. Der Premium-Kauf entfernt sie für immer. Kein Konto nötig. Spiel mit Kopfhörern für perfektes Timing.
+Kostenlos, mit Werbung zwischen den Songs (nie während einer Runde). Ein einmaliger „Premium“-Kauf entfernt sie für immer. Kein Konto. Spiel mit kabelgebundenen Kopfhörern: Das Spiel stimmt dein Timing in ein paar Taps ab.

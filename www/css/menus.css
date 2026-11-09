@@ -271,7 +271,7 @@
 #stage .k7rw .again{background:linear-gradient(90deg,transparent 0 22%,#ff1f7a 42%),radial-gradient(circle,rgba(255,255,255,.3) 1.4px,transparent 2px) 0 0/8px 8px,#ff1f7a;color:#fff;-webkit-text-stroke:5px var(--bs-ink);paint-order:stroke fill;text-shadow:0 3px 0 var(--bs-ink);box-shadow:0 6px 0 #a8004a}
 #stage .k7rw .keep{background:var(--bs-cream);color:var(--bs-ink);box-shadow:0 6px 0 var(--bs-cyan);font-size:min(15px,3.8vw)!important}
 #stage .k7rw .links{gap:8px}#stage .k7rw .links button{background:#16151c;border:3px solid var(--bs-pink);border-radius:16px;font:italic 900 13px/1.1 "Rubik",sans-serif;text-transform:uppercase;color:#fff;padding:10px 8px;min-height:44px}
-#stage .k7rw .in > div:last-child{display:none}
+
 @media (max-height:780px){#stage .k7rw .in > [style*="--n:8"]{display:none}}
 @media (max-height:680px){#stage .k7rw .cell.row2{display:none}#stage .k7rw .disc{width:15%}#stage .k7rw .panel{padding-top:22px}#stage .k7rw .next{display:none}}
 /* écran de fin : la toile d'abord ; seulement score et combo, disques plus petits */
@@ -282,3 +282,33 @@
 @media (max-height:680px){#stage .k7rw .in > .artw{min-height:110px}#stage .k7rw .disc{width:13%}}
 #stage .k7rw .art{padding:6px}#stage .k7rw .art .cap{display:none}
 @media (max-height:680px){#stage .k7rw .in > .top{display:none}#stage .k7rw h2{font-size:min(28px,7.6vw);padding:4px 6px}#stage .k7rw .in{gap:7px}#stage .k7rw .btns button{min-height:50px}#stage .k7rw .harder{padding:4px 12px}#stage .k7rw .links button{min-height:40px;padding:8px}}
+
+/* --- réglages : volume de la voix, zone des outils de test, calage guidé --- */
+.bs-vol{display:flex;align-items:center;gap:10px;background:var(--bs-cream);color:var(--bs-ink);border:4px solid #fff;border-radius:20px;box-shadow:0 7px 0 var(--bs-cyan);padding:8px 14px;box-sizing:border-box}
+.bs-vol .ic{flex:none;width:38px;display:grid;place-items:center}.bs-vol .sep{flex:none;width:3px;height:30px;background:currentColor;transform:skewX(-14deg)}
+.bs-vol .bl{flex:none;display:flex;flex-direction:column;min-width:74px}.bs-vol b{font:italic 900 min(19px,4.8vw)/1 "Rubik",sans-serif}.bs-vol small{font:italic 800 12px/1.2 "Rubik",sans-serif;opacity:.7}
+.bs-vol input{flex:1;min-width:0;accent-color:var(--bs-pink);height:28px}
+.bs-cal .bs-btn{margin-top:10px;min-height:44px;font-size:min(16px,4.2vw)}
+.bs-testzone{border:3px dashed rgba(255,255,255,.45);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.bs-testzone > b{font:italic 900 13px/1 "Rubik",sans-serif;letter-spacing:.06em;opacity:.8}
+.bs-pad{position:relative;align-self:center;width:min(62vw,240px);aspect-ratio:1;border-radius:50%;border:5px solid #fff;background:radial-gradient(circle,var(--bs-pink) 0 calc(30% + var(--k,0)*25%),#16151c calc(31% + var(--k,0)*25%));box-shadow:0 0 0 4px var(--bs-ink),0 0 calc(var(--k,0)*40px) var(--bs-pink);color:#fff;cursor:pointer;display:grid;place-items:center;touch-action:manipulation}
+.bs-pad b{font:italic 900 min(18px,4.6vw)/1.1 "Rubik",sans-serif;text-transform:uppercase;-webkit-text-stroke:4px var(--bs-ink);paint-order:stroke fill;text-align:center;padding:0 14px}
+.bs-pad.hit{animation:bspadhit .18s ease-out}@keyframes bspadhit{from{transform:scale(.93)}}
+.k7sheet .acts2 .bs-btn.pill{flex:1;min-width:0;font-size:min(18px,4.6vw);padding:6px 10px}
+
+/* --- écran de fin : légende de la toile, geste qui coûte le plus --- */
+#stage .k7rw .bs-legend{margin-top:-4px;text-align:center;font:italic 700 12px/1.3 "Rubik",sans-serif;opacity:.85}
+#stage .k7rw .bs-miss{display:flex;align-items:center;gap:10px;background:#16151c;border:3px solid var(--bs-cyan);border-radius:16px;padding:8px 10px 8px 14px;font:700 13px/1.25 "Rubik",sans-serif}
+#stage .k7rw .bs-miss span{flex:1;min-width:0}#stage .k7rw .bs-miss b{color:var(--bs-yellow);font-style:italic;font-weight:900}
+#stage .k7rw .bs-miss button{flex:none;border:3px solid #fff;border-radius:999px;background:var(--bs-yellow);color:var(--bs-ink);font:italic 900 12px/1 "Rubik",sans-serif;padding:9px 12px;cursor:pointer;box-shadow:0 4px 0 #b38f00}
+#stage .k7rw .keep svg{vertical-align:-4px}
+@media (max-height:680px){#stage .k7rw .bs-legend{display:none}}
+#stage .k7rw .band{display:none}
+#stage .k7rw .bs-legend{font-size:11px;line-height:1.25}
+#stage .k7rw .bs-miss{padding:6px 8px 6px 12px;font-size:12px}
+#stage .k7rw .in:has(.bs-miss) .next{display:none}
+#stage .k7rw .in:has(.bs-miss) .panel{padding-bottom:8px}
+#stage .k7rw .in > .artw{min-height:120px}
+@media (max-height:780px){#stage .k7rw .in:has(.bs-miss) .bs-legend{display:none}}
+@media (max-height:680px){#stage .k7rw .in > .artw{min-height:84px}#stage .k7rw .in:has(.bs-miss) .harder{display:none}#stage .k7rw .bs-miss{padding:4px 6px 4px 10px;font-size:11.5px}}
+.bs-rank .bs-season{background:none;border:0;color:var(--bs-pink);font:italic 900 13px/1 "Rubik",sans-serif;text-decoration:underline;cursor:pointer;padding:2px 4px}

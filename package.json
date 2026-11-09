@@ -1,6 +1,6 @@
 {
   "name": "beat-splash",
-  "version": "0.31.2",
+  "version": "0.32.0",
   "private": true,
   "description": "BEAT SPLASH : jeu de rythme mobile en cassettes",
   "scripts": {
@@ -15,6 +15,8 @@
     "@capacitor-community/admob": "^8.2.1",
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
     "@capgo/native-purchases": "^8.9.6"
   }
 }
