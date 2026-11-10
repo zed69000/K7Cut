@@ -1285,7 +1285,7 @@ G.trancheroute = { mount(stage, api){
     if(holdState){ if(holdState.voice) holdState.voice.stop(); holdState = null; }
     if(deathRun){ if(won) deathNext(); else deathOver(); return; }
     api.save('runs', api.load('runs', 0) + 1); api.save('cue', cueN);
-    const acc = rhythmPct() || 0, stars = diff.disc.filter(x => acc >= x).length, discsBefore = discs();
+    const acc = rhythmPct() || 0, stars = won ? diff.disc.filter(x => acc >= x).length : 0, discsBefore = discs(); // bande cassée (Roi) : pas de disque, le talent des notes reste
     const titleBefore = titleOf(bank()), gained = Math.round(notesRun*diff.mult + stars*5*diff.mult);
     api.save('notes', bank() + gained);
     const titleAfter = titleOf(bank());
@@ -2917,7 +2917,7 @@ G.trancheroute = { mount(stage, api){
   showMenu(); showHome('title');
   if(document.documentElement.classList.contains('splash')) window.addEventListener('bs-splash-end', () => introGo(), {once: true});
   else api.after(250, introGo);
-  if(/labo/.test(location.search)) showLabo();
+  if(window.BS_TEST_BUILD && /labo/.test(location.search)) showLabo();
   return () => { try{ if(holdState && holdState.voice) holdState.voice.stop(); if(actx) actx.close(); }catch(e){} };
 }};
 })();
