@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.32.1 — Retouches du GDD
+- **Roi** : une bande cassée ne donne plus de disque ; le talent des notes jouées reste acquis.
+- **Labo** : l'adresse `?labo` ne l'ouvre plus que dans la version de test.
+- **Fiche Play** : plus d'emojis, la toile en tête ; public déclaré 13+ mais contenu et pubs tout public.
+
 ## 0.32.0 — Les 31 demandes du GDD
 - **Cassette de la mort sans fin** : plus d'écran entre deux morceaux, le suivant démarre aussitôt (bandeau « Morceau tenu »), le combo et la transe continuent ; premier tour du plus lent au plus rapide, puis tours mélangés.
 - **Classement par saisons** (réglage `classement.saison` du GDD) : la saison précédente reste consultable ; pseudos injurieux et liens remplacés.
