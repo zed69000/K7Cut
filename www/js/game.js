@@ -2202,10 +2202,9 @@ G.trancheroute = { mount(stage, api){
       <label class="bs-vol"><span class="ic">${BSI.mic(INK)}</span><span class="sep"></span><span class="bl"><b>${tx('VOIX')}</b><small id="k7vv">${vv ? vv + ' %' : tx('COUPÉE')}</small></span><input id="k7voice" type="range" min="0" max="100" step="10" value="${vv}" aria-label="${tx('Volume de la voix')}"></label>
       <div class="bs-cal"><div class="row"><b>${tx('Calage du rythme')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Joue avec un casque filaire : le sans-fil ajoute du retard. Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage, ou laisse le jeu le trouver :')}</p>${bsBtn('yellow pill', 'k7calib', '', tx('CALER EN TAPANT LE RYTHME'))}</div>
       ${bsBtn('', 'k7tuto', BSI.cap(INK), tx('REVOIR LES TUTOS'))}<button class="bs-link" id="k7intro">${tx('Revoir l\'intro')}</button>
-      ${window.BugReport ? bsBtn('', 'k7bug', BSI.bulb(INK), tx('SIGNALER UN BUG OU UNE IDÉE')) : ''}
       <div class="bs-langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="${c === BSi18n.lang ? 'on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
       ${window.BSPremium ? bsBtn('pink pill', 'k7prem', BSI.crown(INK), '') + `<button class="bs-link" id="k7rest">${tx('Restaurer mes achats')}</button>` : ''}
-      ${window.BS_TEST_BUILD ? `<div class="bs-testzone"><b>${tx('OUTILS DE TEST')}</b>
+      ${window.BS_TEST_BUILD ? `<div class="bs-testzone"><b>${tx('OUTILS DU DÉVELOPPEUR')}</b>
         ${bsBtn('dark', 'k7all', BSI.lock('#fff'), tx(api.load('allOpen', false) ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'))}
         ${bsBtn('yellow', 'k7labo', BSI.phones(INK), tx('LABO : ÉCOUTER DE NOUVEAUX MORCEAUX'))}</div>` : ''}
       <div class="bs-ver">BEAT SPLASH · version ${VERSION}</div></div></div>`;
@@ -2230,8 +2229,6 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
     sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     { const lb = sh.querySelector('#k7labo'); if(lb) lb.onclick = () => { close(); showLabo(); }; }
-    // the sheet slides away first, so the screenshot shows the menu behind it
-    const bug = sh.querySelector('#k7bug'); if(bug) bug.onclick = () => { api.sfx.click(); close(); setTimeout(() => window.BugReport.open(), 450); };
     const all = sh.querySelector('#k7all'); if(all) all.onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
     sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','CVR','CHR','CDR','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
