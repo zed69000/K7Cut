@@ -75,3 +75,33 @@ console.log("build.gradle prêt : version " + VERSION + " (" + BUILD + "), signa
 
 cpSync("tools/app/android-res", "android/app/src/main/res", { recursive: true });
 console.log("icône Android en place");
+
+// pas d'effet élastique d'Android quand on glisse le doigt : sinon toute l'interface bouge d'un bloc, comme sur des glissières
+{
+  const path = "android/app/src/main/java/com/zed69000/beatsplash/MainActivity.java";
+  edit(path, s => {
+    if (s.includes("OVER_SCROLL_NEVER")) return s;
+    if (!/extends BridgeActivity\s*\{\s*\}/.test(s)) throw new Error("MainActivity.java inattendu : ajouter OVER_SCROLL_NEVER à la main");
+    return `package com.zed69000.beatsplash;
+
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebView;
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WebView web = getBridge() != null ? getBridge().getWebView() : null;
+        if (web != null) {
+            web.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            web.setHorizontalScrollBarEnabled(false);
+            web.setVerticalScrollBarEnabled(false);
+        }
+    }
+}
+`;
+  });
+  console.log("MainActivity prête : pas d'effet élastique");
+}

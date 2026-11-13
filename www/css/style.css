@@ -1,7 +1,7 @@
 /* Un seul thème assumé : la cassette jaune. Colonne au format téléphone, centrée sur grand écran. */
 :root{ --yellow:#f2cd4c; --yellow2:#d6a93a; --ink:#1c1b19; --paper:#f4f0e6; --red:#d7263d; --display:"Bungee","Rubik",sans-serif; --body:"Rubik",system-ui,sans-serif; color-scheme:light; }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--ink);font-family:var(--body)}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;touch-action:none;background:var(--ink);color:var(--ink);font-family:var(--body)}
 body{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));-webkit-tap-highlight-color:transparent}
 /* marges de sécurité du téléphone : encoche, barre d'état, barre de gestes (--sat/--sab, complétées par main.js) */
 :root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
