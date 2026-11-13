@@ -9,6 +9,8 @@ BSi18n.add("zh", {
   "Robots de minuit": "午夜机器人",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "切 · 点",
+  "Traîneau turbo": "涡轮雪橇",
+  "Pop de Noël · 132 BPM": "圣诞流行 · 132 BPM",
   "Autoroute 86": "86号公路",
   "Synthwave de nuit · 112 BPM": "夜色 Synthwave · 112 BPM",
   "Scratch + notes longues": "搓碟 + 长音",

@@ -9,6 +9,8 @@ BSi18n.add("en", {
   "Robots de minuit": "Midnight Robots",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "Cut · Tap",
+  "Traîneau turbo": "Turbo Sleigh",
+  "Pop de Noël · 132 BPM": "Christmas pop · 132 BPM",
   "Autoroute 86": "Highway 86",
   "Synthwave de nuit · 112 BPM": "Night synthwave · 112 BPM",
   "Scratch + notes longues": "Scratch + long notes",

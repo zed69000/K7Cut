@@ -9,6 +9,8 @@ BSi18n.add("ko", {
   "Robots de minuit": "한밤의 로봇",
   "French house · 122 BPM": "프렌치 하우스 · 122 BPM",
   "Couper · Taper": "자르기 · 탭",
+  "Traîneau turbo": "터보 썰매",
+  "Pop de Noël · 132 BPM": "크리스마스 팝 · 132 BPM",
   "Autoroute 86": "86번 고속도로",
   "Synthwave de nuit · 112 BPM": "밤의 신스웨이브 · 112 BPM",
   "Scratch + notes longues": "스크래치 + 롱노트",
