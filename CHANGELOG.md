@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 0.33.0 — Noël et menus épurés
+- **Noël** (tout décembre, `?noel` pour le voir avant) : cassette « Traîneau turbo » (Jingle Bells, domaine public, grelots et cuivres), hors campagne et hors Cassette de la mort ; thème de Noël sur toutes les cassettes (guirlande, boules, houx, neige, sapins) ; K7 en bonnet, neige sur l'accueil et les menus, guirlandes sur les panneaux.
+- **Chargement** : fond noir, une barre, et les briques de la cassette qui font leur geste avec leur nom (tuto) ; la page d'explications avant la cassette disparaît.
+- **Menus** : Cassette de la mort et records allégés, textes raccourcis, langues en codes courts, un seul bouton retour partout, plus de « Revoir l'intro ».
+- **Écran** : plus d'effet élastique quand on glisse le doigt.
+- **Tests** : les tests automatiques n'écrivent plus dans le classement.
+
 ## 0.32.1 — Retouches du GDD
 - **Roi** : une bande cassée ne donne plus de disque ; le talent des notes jouées reste acquis.
 - **Labo** : l'adresse `?labo` ne l'ouvre plus que dans la version de test.

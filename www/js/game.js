@@ -177,7 +177,7 @@ const LAB = [byId('test')];
 // l'étagère des menus : en décembre la cassette de Noël passe devant ; elle reste hors campagne (pas de disque) et hors Cassette de la mort
 const NOEL = byId('noel'), SHELF = XMAS ? [NOEL, ...TRACKS] : TRACKS;
 
-const VERSION = '0.32.1';
+const VERSION = '0.33.0';
 window.K7_VERSION = window.GAME_VERSION = VERSION; // read by the studio kit
 // tuning values are read on use, so the GDD preview reacts at once
 const discAt = list => list.map(x => x + Tuning.num("disques.ecart", 0));
