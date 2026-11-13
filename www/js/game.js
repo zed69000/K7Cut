@@ -2252,7 +2252,7 @@ G.trancheroute = { mount(stage, api){
     const muted0 = api.store.load('muted', false), vv = Math.round(voiceVol()*100);
     // pour le joueur : son, voix, calage, tutos, langue, Premium ; les outils de test seulement dans la version de test
     sh.innerHTML = `<div><div class="bs-top"><div class="k7badge">${home.querySelector('#k7htal').innerHTML}</div><div class="bs-r"><button class="k7sq" data-a="gal" aria-label="${tx('Mes œuvres')}">${BSI.gal(INK)}</button><button class="k7sq" data-a="x" aria-label="${tx('Fermer')}">${BSI.gear(INK)}</button></div></div>
-      <div class="bs-panel bs-set"><button class="x" id="k7x" aria-label="${tx('Fermer')}">${BSI.close(INK)}</button><div class="bs-title">${tx('RÉGLAGES')}</div>
+      <div class="bs-panel bs-set"><button class="bs-back x" id="k7x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><div class="bs-title">${tx('RÉGLAGES')}</div>
       ${bsBtn('', 'k7mute', (muted0 ? BSI.mute : BSI.spk)(INK), tx(muted0 ? 'SON : COUPÉ' : 'SON : ACTIVÉ'))}
       <label class="bs-vol"><span class="ic">${BSI.mic(INK)}</span><span class="sep"></span><span class="bl"><b>${tx('VOIX')}</b><small id="k7vv">${vv ? vv + ' %' : tx('COUPÉE')}</small></span><input id="k7voice" type="range" min="0" max="100" step="10" value="${vv}" aria-label="${tx('Volume de la voix')}"></label>
       <div class="bs-cal"><div class="row"><b>${tx('Calage du rythme')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Joue avec un casque filaire : le sans-fil ajoute du retard. Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage, ou laisse le jeu le trouver :')}</p>${bsBtn('yellow pill', 'k7calib', '', tx('CALER EN TAPANT LE RYTHME'))}</div>
@@ -2294,7 +2294,7 @@ G.trancheroute = { mount(stage, api){
   function calibrate(done){
     try{ muted = api.store.load('muted', false); audioInit(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
     const sh = document.createElement('div'); sh.className = 'k7sheet';
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CALAGE')}</b><button class="bs-back" data-a="x" aria-label="${tx('Retour')}">◀</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CALAGE')}</b><button class="bs-back" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
       <div class="bs-card">${tx('Mets ton casque filaire. Le jeu joue des coups réguliers : tape n\'importe où, pile sur chaque coup. Les 4 premiers servent à te caler, les 8 suivants sont mesurés.')}</div>
       <button class="bs-pad" type="button" aria-label="${tx('Tape ici sur chaque coup')}"><i></i><b>${tx('TOUCHE POUR COMMENCER')}</b></button>
       <div class="bs-rank" data-a="res">${tx('Calage actuel : {n} ms', {n: api.load('offset', 0)})}</div>
@@ -2493,7 +2493,7 @@ G.trancheroute = { mount(stage, api){
   home.insertAdjacentHTML('beforeend', `
     <div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div><span class="bs-tape case">${tx('TOUCHE POUR LANCER LA CASSETTE')}</span><span class="bs-line"></span></div>
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
-      <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq" aria-label="${tx('Retour')}" hidden><svg width="22" height="22" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq bs-back" aria-label="${tx('Retour')}" hidden>${BSI.back(INK)}</button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
       <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${INK}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${INK}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#e8344f"/></svg><span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
     <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
       <button id="k7hplay" class="k7plate big"><span class="lbl"></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
@@ -2539,7 +2539,7 @@ G.trancheroute = { mount(stage, api){
     const rows = () => SHELF.map((t, i) => { const open = unlocked(t), bk = bests()[t.id + '.' + DIFFS[dIdx].id];
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `${BSI.lockS('#d7263d')} ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${TRACKS.includes(t) ? SPRAY[TRACKS.indexOf(t) % SPRAY.length] : '#e8343f'}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CASSETTES')}</b><button class="bs-back" id="k7cx" aria-label="${tx('Retour')}">◀</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CASSETTES')}</b><button class="bs-back" id="k7cx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="k7clist"></div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh);
@@ -2733,7 +2733,7 @@ G.trancheroute = { mount(stage, api){
     const el = document.createElement('div'); el.className = 'k7brief fit bs-spk';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
     // une page lisible : un titre, une ligne de règle (ou ton résultat), le classement qui a de la place, ton pseudo, LANCER ; le retour est en haut
-    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><button class="x" data-a="x" aria-label="${tx('Accueil')}">${BSI.back(INK)}</button><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
+    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><button class="bs-back x" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
       <div class="bs-title">${twoTone(me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort'))}</div>
       ${me ? `<div class="bs-card bs-res"><b>${me.score.toLocaleString('fr-FR')}</b><span>${tx(me.songs > 1 ? '{n} morceaux tenus' : '{n} morceau tenu', {n: me.songs})}</span></div>`
         : `<div class="bs-card bs-rule">${tx('3 cœurs : chaque raté en coûte un. Les morceaux s\'enchaînent, de plus en plus vite.')}</div>`}
@@ -2758,7 +2758,7 @@ G.trancheroute = { mount(stage, api){
     const cells = (artsOf('noel').length && !XMAS ? [...TRACKS, NOEL] : SHELF).map(t => { const arts = artsOf(t.id), n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0)), cap = `<span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span>`;
       if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div><figcaption>${cap}</figcaption></figure>`;
       return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('MES ŒUVRES')}</b><button class="bs-back" id="k7gx" aria-label="${tx('Retour')}">◀</button></div>
+    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('MES ŒUVRES')}</b><button class="bs-back" id="k7gx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
       <div class="bs-desc">${tx('Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.')}</div><div class="k7gal">${cells}</div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
     sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;

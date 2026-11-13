@@ -318,7 +318,6 @@ html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;to
 @keyframes bsxmas{50%{filter:brightness(1.4) saturate(1.4)}}
 @media (prefers-reduced-motion:reduce){html.xmas .bs-panel::before{animation:none}}
 /* Cassette de la mort / records : page allégée (retour en haut, une ligne de règle, le classement prend la place libre) */
-.bs-rec .x{position:absolute;left:14px;top:14px;width:50px;height:48px;border:4px solid #fff;border-radius:16px;background:var(--bs-cream);box-shadow:0 0 0 3px var(--bs-ink),0 4px 0 3px var(--bs-ink);display:grid;place-items:center;cursor:pointer;z-index:4;padding:0}
 #stage .bs-rec .bs-title{font-size:min(30px,8vw);padding:6px 4px 4px;margin:0 40px 0 56px;transform:rotate(-3deg);background:none}
 .bs-rec .bs-card.bs-rule{font:700 15px/1.35 "Rubik",sans-serif;text-align:center;padding:10px 14px}
 .bs-rec .bs-card.bs-res{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 14px}
@@ -343,3 +342,7 @@ html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;to
 .bs-lcap i{display:inline-block;font:italic 900 12px/1 "Rubik",sans-serif;background:var(--bs-pink);color:#fff;padding:4px 8px;border-radius:6px;margin-bottom:8px;transform:rotate(-3deg)}
 .bs-lcap.pop{animation:bslcap .35s cubic-bezier(.3,1.5,.5,1)}@keyframes bslcap{from{opacity:0;transform:translateY(10px)}}
 .bs-lskip{position:absolute;left:0;right:0;bottom:calc(16% + var(--sab,0px) - 34px);text-align:center;color:rgba(255,255,255,.55);font:700 14px/1 "Rubik",sans-serif}
+/* un seul bouton retour dans tous les menus : carré crème, triangle noir, en haut à gauche */
+#stage .bs-back svg{width:24px;height:26px;display:block}
+#stage .bs-set .bs-back.x,#stage .bs-rec .bs-back.x{position:absolute;left:14px;right:auto;top:14px;z-index:4}
+#stage .bs-set .bs-title{margin:0 6px 8px 64px}
