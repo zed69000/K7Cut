@@ -1231,7 +1231,7 @@ G.trancheroute = { mount(stage, api){
     el.innerHTML = `<canvas></canvas><div class="in">
       ${P(0, `<h2>${TT}</h2>`)}
       ${R.img ? P(1, `<div class="art"><img src="${R.img}" alt="${tx('Ta toile')}"><div class="cap"><b>« ${R.artTitle} »</b><span>${tr.name} · ${R.acc} %</span></div></div>`, 'artw') : ''}
-      ${R.img ? P(1, `<div class="bs-legend">${tx('Taches rondes : pile dans le temps. Coulures : en retard. Jets : en avance.')}</div>`) : ''}
+      ${R.img ? P(1, `<div class="bs-legend">${tx('Rond net = pile · jets = en avance · coulures = en retard')}</div>`) : ''}
       <div class="top"><div class="ttl">${P(2, `<div class="band">${tr.name} ${R.mood}</div>`)}${P(2, `<div class="pct"><span data-count="${R.acc}">0</span> % ${tx('de super rythme')}</div>`)}</div></div>
       ${P(3, `<div class="panel"><div class="ribbon">${ribbon}</div><div class="discs">${[0, 1, 2].map(i => `<div class="disc pop ${i < R.stars ? 'on' : ''}" style="--n:${4 + i}">${i < R.stars ? '<div class="burst"></div>' : ''}${discSvg(i < R.stars, '#ffd23f')}</div>`).join('')}</div>
         <div class="next">${R.stars < 3 ? tx('PROCHAIN DISQUE À {n} %', {n: diff.disc[R.stars]}) : tx('LES 3 DISQUES, BRAVO !')}</div></div>`)}
@@ -1284,7 +1284,7 @@ G.trancheroute = { mount(stage, api){
     return new Promise(resolve => {
       const sh = document.createElement('div'); sh.className = 'k7sheet';
       sh.innerHTML = `<div style="justify-content:center"><div class="bs-panel" style="text-align:center;gap:16px"><div class="bs-title bolt">${tx('Jouer sans pub ?')}</div>
-        <div class="bs-card">${tx('Passe en Premium : plus aucune pub, pour toujours. Le reste du jeu ne change pas.')}</div>
+        <div class="bs-card">${tx('Plus aucune pub, pour toujours.')}</div>
         ${bsBtn('pink cta bs-sparks', '', '', BSI.crown(INK) + tx('PREMIUM · {price}', {price: BSPremium.price()}), 'data-a="buy" style="font-size:min(26px,6.4vw)"')}
         ${bsBtn('pill', '', '', tx('Plus tard'), 'data-a="later"')}</div></div>`;
       stage.appendChild(sh);
@@ -2255,13 +2255,13 @@ G.trancheroute = { mount(stage, api){
       <div class="bs-panel bs-set"><button class="bs-back x" id="k7x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><div class="bs-title">${tx('RÉGLAGES')}</div>
       ${bsBtn('', 'k7mute', (muted0 ? BSI.mute : BSI.spk)(INK), tx(muted0 ? 'SON : COUPÉ' : 'SON : ACTIVÉ'))}
       <label class="bs-vol"><span class="ic">${BSI.mic(INK)}</span><span class="sep"></span><span class="bl"><b>${tx('VOIX')}</b><small id="k7vv">${vv ? vv + ' %' : tx('COUPÉE')}</small></span><input id="k7voice" type="range" min="0" max="100" step="10" value="${vv}" aria-label="${tx('Volume de la voix')}"></label>
-      <div class="bs-cal"><div class="row"><b>${tx('Calage du rythme')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Joue avec un casque filaire : le sans-fil ajoute du retard. Si tes coupes s\'affichent « en retard » alors que tu es dans le temps, monte le calage, ou laisse le jeu le trouver :')}</p>${bsBtn('yellow pill', 'k7calib', '', tx('CALER EN TAPANT LE RYTHME'))}</div>
-      ${bsBtn('', 'k7tuto', BSI.cap(INK), tx('REVOIR LES TUTOS'))}<button class="bs-link" id="k7intro">${tx('Revoir l\'intro')}</button>
-      <div class="bs-langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="${c === BSi18n.lang ? 'on' : ''}" data-lang="${c}">${n}</button>`).join('')}</div>
+      <div class="bs-cal"><div class="row"><b>${tx('Calage')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.')}</p>${bsBtn('yellow pill', 'k7calib', '', tx('TROUVER MON CALAGE'))}</div>
+      ${bsBtn('', 'k7tuto', BSI.cap(INK), tx('REVOIR LES TUTOS'))}
+      <div class="bs-langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="${c === BSi18n.lang ? 'on' : ''}" data-lang="${c}" aria-label="${n}">${['zh', 'ja', 'ko'].includes(c) ? n : c.toUpperCase()}</button>`).join('')}</div>
       ${window.BSPremium ? bsBtn('pink pill', 'k7prem', BSI.crown(INK), '') + `<button class="bs-link" id="k7rest">${tx('Restaurer mes achats')}</button>` : ''}
       ${window.BS_TEST_BUILD ? `<div class="bs-testzone"><b>${tx('OUTILS DU DÉVELOPPEUR')}</b>
-        ${bsBtn('dark', 'k7all', BSI.lock('#fff'), tx(api.load('allOpen', false) ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'))}
-        ${bsBtn('yellow', 'k7labo', BSI.phones(INK), tx('LABO : ÉCOUTER DE NOUVEAUX MORCEAUX'))}</div>` : ''}
+        ${bsBtn('dark', 'k7all', BSI.lock('#fff'), tx(api.load('allOpen', false) ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'))}
+        ${bsBtn('yellow', 'k7labo', BSI.phones(INK), tx('LABO'))}</div>` : ''}
       <div class="bs-ver">BEAT SPLASH · version ${VERSION}</div></div></div>`;
     menu.appendChild(sh);
     const close = () => { pageOut(sh); if(window.BSPremium) BSPremium.onChange = null; };
@@ -2282,9 +2282,8 @@ G.trancheroute = { mount(stage, api){
     sh.querySelector('#k7mute').onclick = () => { const m = !api.store.load('muted', false); api.store.save('muted', m); sh.querySelector('#k7mute .bl').textContent = tx(m ? 'SON : COUPÉ' : 'SON : ACTIVÉ'); sh.querySelector('#k7mute .ic').innerHTML = (m ? BSI.mute : BSI.spk)(INK); };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
-    sh.querySelector('#k7intro').onclick = () => { close(); intro = {stage: 'wait', t: 0}; introGo(); };
     { const lb = sh.querySelector('#k7labo'); if(lb) lb.onclick = () => { close(); showLabo(); }; }
-    const all = sh.querySelector('#k7all'); if(all) all.onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'TOUTES LES CASSETTES SONT OUVERTES (toucher pour rebloquer)' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
+    const all = sh.querySelector('#k7all'); if(all) all.onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
     sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','CVR','CHR','CDR','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
   };
@@ -2295,7 +2294,7 @@ G.trancheroute = { mount(stage, api){
     try{ muted = api.store.load('muted', false); audioInit(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
     const sh = document.createElement('div'); sh.className = 'k7sheet';
     sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CALAGE')}</b><button class="bs-back" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
-      <div class="bs-card">${tx('Mets ton casque filaire. Le jeu joue des coups réguliers : tape n\'importe où, pile sur chaque coup. Les 4 premiers servent à te caler, les 8 suivants sont mesurés.')}</div>
+      <div class="bs-card">${tx('Casque filaire conseillé. Tape pile sur chaque coup.')}</div>
       <button class="bs-pad" type="button" aria-label="${tx('Tape ici sur chaque coup')}"><i></i><b>${tx('TOUCHE POUR COMMENCER')}</b></button>
       <div class="bs-rank" data-a="res">${tx('Calage actuel : {n} ms', {n: api.load('offset', 0)})}</div>
       <div class="acts2" style="display:flex;gap:12px" hidden>${bsBtn('pink pill', '', '', tx('APPLIQUER'), 'data-a="ok"')}${bsBtn('pill', '', '', tx('RECOMMENCER'), 'data-a="again"')}</div></div>`;
@@ -2759,7 +2758,7 @@ G.trancheroute = { mount(stage, api){
       if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div><figcaption>${cap}</figcaption></figure>`;
       return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
     sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('MES ŒUVRES')}</b><button class="bs-back" id="k7gx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
-      <div class="bs-desc">${tx('Tes 3 dernières toiles par cassette : chaque partie en peint une différente. Rond net = pile · jets = en avance · coulures = en retard · gris = raté.')}</div><div class="k7gal">${cells}</div></div>`;
+      <div class="bs-desc">${tx('Rond net = pile · jets = en avance · coulures = en retard')}</div><div class="k7gal">${cells}</div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
     sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;
       shareArt(im.src, name); });
