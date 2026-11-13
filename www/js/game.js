@@ -37,6 +37,7 @@ const bsBtn = (cls, id, ic, label, extra = '') => `<button class="bs-btn ${cls}"
 const MAJ = [0, 2, 4, 5, 7, 9, 11], MIN = [0, 2, 3, 5, 7, 8, 10];
 // Noël : en décembre, la cassette de Noël s'ajoute en tête de l'étagère et tout se décore (neige, bonnet de K7) ; ?noel pour la voir avant
 const XMAS = new Date().getMonth() === 11 || /[?&]noel\b/.test(location.search);
+if(XMAS) document.documentElement.classList.add('xmas'); // décos de Noël des menus : menus.css
 const ALL = ['kick','snare','hat','bass','chords','arp','perc','lead','gtr'];
 
 const DOR = [0, 2, 3, 5, 7, 9, 10], PHR = [0, 1, 3, 5, 7, 8, 10];
@@ -1424,6 +1425,27 @@ G.trancheroute = { mount(stage, api){
   function artBolt(g, x, y, s, col){ g.fillStyle = col; g.beginPath(); g.moveTo(x, y); g.lineTo(x + s*.5, y); g.lineTo(x + s*.15, y + s*.6); g.lineTo(x + s*.55, y + s*.6); g.lineTo(x - s*.1, y + s*1.4); g.lineTo(x + s*.1, y + s*.8); g.lineTo(x - s*.25, y + s*.8); g.closePath(); g.fill(); }
   function artPalm(g, x, y, h, s){ g.save(); g.translate(x, y); g.scale(s, 1); g.strokeStyle = '#1d4a24'; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(18, -h*.5, 6, -h); g.stroke(); g.fillStyle = '#1f6b2c';
     for(let i=0;i<7;i++){ const a = -Math.PI/2 + (i - 3)*.5, L = 60 + (i % 2)*20; g.save(); g.translate(6, -h); g.rotate(a); g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(L*.5, -16, L, 8); g.quadraticCurveTo(L*.5, -2, 0, 4); g.closePath(); g.fill(); g.restore(); } g.restore(); }
+  /* ---------- Noël : guirlande lumineuse et sapin enneigé (cassette de Noël, et toutes les cassettes en décembre) ---------- */
+  const XBULBS = ['#e8343f', '#ffd23f', '#2fbf71', '#29c4ff', '#ff6fa0'];
+  function xmasGarland(g, w, y0, y1, sag, r, lit){
+    const cy = Math.max(y0, y1) + sag*2; g.strokeStyle = '#0a1226'; g.lineWidth = 2; g.beginPath(); g.moveTo(-10, y0); g.quadraticCurveTo(w/2, cy, w + 10, y1); g.stroke();
+    for(let k=1;k<12;k++){ const t2 = k/12, x = -10 + (w + 20)*t2, y = (1 - t2)*(1 - t2)*y0 + 2*t2*(1 - t2)*cy + t2*t2*y1, c2 = XBULBS[k % XBULBS.length], on = lit == null ? 1 : lit(k);
+      if(on > 0){ const gl = g.createRadialGradient(x, y + 6, 0, x, y + 6, 14); gl.addColorStop(0, c2 + (on > .5 ? 'aa' : '55')); gl.addColorStop(1, c2 + '00'); g.fillStyle = gl; g.beginPath(); g.arc(x, y + 6, 14, 0, 6.283); g.fill(); }
+      g.fillStyle = c2; g.strokeStyle = INK; g.lineWidth = 1.5; g.beginPath(); g.ellipse(x, y + 6, 3.6, 5.5, 0, 0, 6.283); g.fill(); g.stroke(); }
+  }
+  function xmasFir(g, x, y, s2){ g.fillStyle = '#5a3a22'; g.fillRect(x - 5*s2, y - 6*s2, 10*s2, 14*s2);
+    for(let k=0;k<3;k++){ const yy = y - 6*s2 - k*22*s2, ww = (40 - k*9)*s2; g.fillStyle = '#1f7a4a'; g.strokeStyle = INK; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x - ww, yy); g.lineTo(x, yy - 36*s2); g.lineTo(x + ww, yy); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x - ww*.55, yy - 15*s2); g.lineTo(x, yy - 36*s2); g.lineTo(x + ww*.55, yy - 15*s2); g.quadraticCurveTo(x, yy - 22*s2, x - ww*.55, yy - 15*s2); g.fill(); }
+    const ty = y - 6*s2 - 2*22*s2 - 36*s2; g.fillStyle = '#ffd23f'; g.beginPath(); for(let k=0;k<10;k++){ const a = k*Math.PI/5 - Math.PI/2, rr = (k % 2 ? 4 : 9)*s2; g.lineTo(x + Math.cos(a)*rr, ty + Math.sin(a)*rr); } g.closePath(); g.fill(); }
+  // en décembre, chaque cassette garde son style et se pare pour Noël : guirlande en haut, neige au sol, deux sapins sur les côtés, boules et houx
+  function xmasDress(g, w, h, r){
+    xmasGarland(g, w, h*.17, h*.19, h*.03, r);
+    g.fillStyle = 'rgba(255,255,255,.92)'; g.beginPath(); g.moveTo(0, h); for(let x=0;x<=w;x+=10) g.lineTo(x, h*.8 + Math.sin(x/w*6.283*1.6)*10 + Math.sin(x/w*31)*3); g.lineTo(w, h); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(28,27,25,.35)'; g.lineWidth = 2; g.beginPath(); for(let x=0;x<=w;x+=10) g.lineTo(x, h*.8 + Math.sin(x/w*6.283*1.6)*10 + Math.sin(x/w*31)*3); g.stroke();
+    xmasFir(g, w*.07, h*.84, .9); xmasFir(g, w*.94, h*.85, 1);
+    for(const [x, y, c2] of [[w*.3, h*.27, '#e8343f'], [w*.62, h*.29, '#ffd23f'], [w*.82, h*.26, '#2fbf71']]){ g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, y - 30); g.lineTo(x, y - 9); g.stroke(); g.fillStyle = c2; g.strokeStyle = INK; g.lineWidth = 2; g.beginPath(); g.arc(x, y, 9, 0, 6.283); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.arc(x - 3, y - 3, 2.6, 0, 6.283); g.fill(); }
+    for(const [x, y] of [[w*.18, h*.08], [w*.9, h*.24]]){ g.fillStyle = '#1f7a4a'; g.strokeStyle = INK; g.lineWidth = 1.8; for(const s3 of [-1, 1]){ g.beginPath(); g.ellipse(x + s3*9, y, 11, 5, s3*.4, 0, 6.283); g.fill(); g.stroke(); } g.fillStyle = '#e8343f'; for(const [dx, dy] of [[-3, -3], [3, -3], [0, 2]]){ g.beginPath(); g.arc(x + dx, y + dy, 3.4, 0, 6.283); g.fill(); g.stroke(); } }
+  }
   function themeArt(g, t, w, h, r){
     const th = skinOf(t) || THEMES.metal;
     if(th.art === 'metal' || th.art === 'punk'){
@@ -1460,17 +1482,9 @@ G.trancheroute = { mount(stage, api){
     if(th.art === 'noel'){ // nuit d'hiver : lune, étoiles, guirlande, collines enneigées et sapins
       { const gr = g.createRadialGradient(w*.8, h*.13, 0, w*.8, h*.13, w*.22); gr.addColorStop(0, 'rgba(255,246,216,.5)'); gr.addColorStop(1, 'rgba(255,246,216,0)'); g.fillStyle = gr; g.beginPath(); g.arc(w*.8, h*.13, w*.22, 0, 6.283); g.fill(); g.fillStyle = '#fff6d8'; g.beginPath(); g.arc(w*.8, h*.13, w*.07, 0, 6.283); g.fill(); }
       for(let i=0;i<70;i++){ g.fillStyle = `rgba(255,255,255,${.3 + r()*.6})`; g.beginPath(); g.arc(r()*w, r()*h*.45, r()*1.7, 0, 6.283); g.fill(); }
-      const bulbs = ['#e8343f', '#ffd23f', '#2fbf71', '#29c4ff', '#ff6fa0'];
-      for(const [y0, y1, sag] of [[h*.03, h*.07, h*.05], [h*.1, h*.05, h*.04]]){ g.strokeStyle = '#0a1226'; g.lineWidth = 2; g.beginPath(); g.moveTo(-10, y0); g.quadraticCurveTo(w/2, Math.max(y0, y1) + sag*2, w + 10, y1); g.stroke();
-        for(let k=1;k<12;k++){ const t2 = k/12, x = -10 + (w + 20)*t2, y = (1 - t2)*(1 - t2)*y0 + 2*t2*(1 - t2)*(Math.max(y0, y1) + sag*2) + t2*t2*y1, c2 = bulbs[k % bulbs.length];
-          const gl = g.createRadialGradient(x, y + 6, 0, x, y + 6, 14); gl.addColorStop(0, c2 + 'aa'); gl.addColorStop(1, c2 + '00'); g.fillStyle = gl; g.beginPath(); g.arc(x, y + 6, 14, 0, 6.283); g.fill();
-          g.fillStyle = c2; g.strokeStyle = INK; g.lineWidth = 1.5; g.beginPath(); g.ellipse(x, y + 6, 3.6, 5.5, 0, 0, 6.283); g.fill(); g.stroke(); } }
+      xmasGarland(g, w, h*.03, h*.07, h*.05, r); xmasGarland(g, w, h*.1, h*.05, h*.04, r);
       for(const [y0, col, amp] of [[h*.6, '#c9d9f0', 20], [h*.68, '#e6eefa', 26], [h*.78, '#ffffff', 16]]){ g.fillStyle = col; g.beginPath(); g.moveTo(0, h); for(let x=0;x<=w;x+=12) g.lineTo(x, y0 + Math.sin(x/w*6.283*1.1 + y0)*amp); g.lineTo(w, h); g.closePath(); g.fill(); }
-      const fir = (x, y, s2) => { g.fillStyle = '#5a3a22'; g.fillRect(x - 5*s2, y - 6*s2, 10*s2, 14*s2);
-        for(let k=0;k<3;k++){ const yy = y - 6*s2 - k*22*s2, ww = (40 - k*9)*s2; g.fillStyle = '#1f7a4a'; g.strokeStyle = INK; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x - ww, yy); g.lineTo(x, yy - 36*s2); g.lineTo(x + ww, yy); g.closePath(); g.fill(); g.stroke();
-          g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x - ww*.55, yy - 15*s2); g.lineTo(x, yy - 36*s2); g.lineTo(x + ww*.55, yy - 15*s2); g.quadraticCurveTo(x, yy - 22*s2, x - ww*.55, yy - 15*s2); g.fill(); }
-        const ty = y - 6*s2 - 2*22*s2 - 36*s2; g.fillStyle = '#ffd23f'; g.beginPath(); for(let k=0;k<10;k++){ const a = k*Math.PI/5 - Math.PI/2, rr = (k % 2 ? 4 : 9)*s2; g.lineTo(x + Math.cos(a)*rr, ty + Math.sin(a)*rr); } g.closePath(); g.fill(); };
-      fir(w*.1, h*.66, 1.1); fir(w*.24, h*.7, .75); fir(w*.86, h*.64, 1.2); fir(w*.72, h*.72, .7); fir(w*.5, h*.8, .6);
+      xmasFir(g, w*.1, h*.66, 1.1); xmasFir(g, w*.24, h*.7, .75); xmasFir(g, w*.86, h*.64, 1.2); xmasFir(g, w*.72, h*.72, .7); xmasFir(g, w*.5, h*.8, .6);
       g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.6; g.lineCap = 'round'; for(let i=0;i<14;i++){ const x = r()*w, y = r()*h*.55, s2 = 3 + r()*5; g.beginPath(); for(let k=0;k<3;k++){ const a = k*Math.PI/3; g.moveTo(x - Math.cos(a)*s2, y - Math.sin(a)*s2); g.lineTo(x + Math.cos(a)*s2, y + Math.sin(a)*s2); } g.stroke(); }
     }
     if(th.art === 'dnb'){ g.strokeStyle = 'rgba(182,255,59,.5)'; g.lineCap = 'round'; for(let i=0;i<30;i++){ const x = r()*w, y = r()*h, l = 30 + r()*80; g.lineWidth = 1 + r()*2.5; g.beginPath(); g.moveTo(x, y); g.lineTo(x + l, y - l*.35); g.stroke(); } }
@@ -1488,6 +1502,7 @@ G.trancheroute = { mount(stage, api){
     if(!th.dark || th.art === 'disco'){ band(-40, h*.36, w*.6, -40, [[0, 46, B1, th.dark ? .5 : .92], [38, 16, B2, .9], [-40, 10, B2, .8], [70, 6, B1, .7]]);
     band(w*.45, h + 40, w + 40, h*.5, [[0, 40, B1, th.dark ? .5 : .9], [-34, 14, B2, .9], [40, 10, th.acc[1] || acc, .85]]); }
     themeArt(g, t || TRACKS[0], w, h, r);
+    if(XMAS && (skinOf(t) || {}).art !== 'noel') xmasDress(g, w, h, r);
     // traits de vitesse
     g.strokeStyle = th.dark ? 'rgba(255,255,255,.35)' : 'rgba(28,27,25,.5)'; g.lineCap = 'round'; for(let i=0;i<22;i++){ const x = r()*w, y = r()*h, l = 20 + r()*60; g.lineWidth = .8 + r()*1.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + l*.8, y - l*.6); g.stroke(); }
     // giclées rouges et de la couleur de la face
@@ -2831,6 +2846,7 @@ G.trancheroute = { mount(stage, api){
   function homeFrame(dt){
     hTime += dt; introFrame(null, dt); const g = hx, beat = hTime*MBPM/60, kick = Math.max(0, 1 - (beat % 1)*4);
     g.clearRect(0, 0, W, H); // le décor (fond sombre, enceintes, nuages) et le logo sont en HTML/CSS : menus.css
+    if(XMAS) xmasGarland(g, W, H*.025, H*.035, H*.03, null, k => ((k + Math.floor(beat)) % 3 === 0 ? 1 : .35));
     if(XMAS){ if(!hSnow.length) for(let i=0;i<46;i++) hSnow.push({x: Math.random()*W, y: Math.random()*H, s: 1.4 + Math.random()*2.6, v: 22 + Math.random()*40, ph: Math.random()*6.283});
       g.fillStyle = '#fff'; for(const f of hSnow){ f.y += f.v*dt; f.x += Math.sin(hTime*1.2 + f.ph)*14*dt; if(f.y > H + 6){ f.y = -6; f.x = Math.random()*W; } g.globalAlpha = .8; g.beginPath(); g.arc(f.x, f.y, f.s, 0, 6.283); g.fill(); } g.globalAlpha = 1; }
     // éclairs jaunes autour de la cassette, qui claquent sur le temps

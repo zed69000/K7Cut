@@ -312,3 +312,8 @@
 @media (max-height:780px){#stage .k7rw .in:has(.bs-miss) .bs-legend{display:none}}
 @media (max-height:680px){#stage .k7rw .in > .artw{min-height:84px}#stage .k7rw .in:has(.bs-miss) .harder{display:none}#stage .k7rw .bs-miss{padding:4px 6px 4px 10px;font-size:11.5px}}
 .bs-rank .bs-season{background:none;border:0;color:var(--bs-pink);font:italic 900 13px/1 "Rubik",sans-serif;text-decoration:underline;cursor:pointer;padding:2px 4px}
+/* Noël : en décembre (classe xmas sur html), de la neige sur les boutons et une guirlande qui clignote en haut des panneaux */
+html.xmas .bs-btn::before{content:"";position:absolute;left:10px;right:10px;top:-12px;height:18px;background:%SNOWCAP% center/100% 100% no-repeat;pointer-events:none;z-index:2}
+html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;top:-12px;height:30px;background:%GARL% left top/120px 30px repeat-x;pointer-events:none;z-index:3;animation:bsxmas 1.1s steps(2) infinite}
+@keyframes bsxmas{50%{filter:brightness(1.4) saturate(1.4)}}
+@media (prefers-reduced-motion:reduce){html.xmas .bs-panel::before{animation:none}}
