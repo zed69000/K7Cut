@@ -25,6 +25,7 @@ CLOUDS = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><path d=
 SNOWCAP = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 24" preserveAspectRatio="none"><path d="M2 16C6 6 18 3 32 6S58 2 74 5 104 1 122 5 152 2 168 5 192 4 198 15C198 19 190 18 186 17 182 24 174 24 172 17L128 17C124 22 116 22 114 17L58 17C54 23 44 23 42 17L8 18C4 18 2 18 2 16z" fill="#fff" stroke="{INK}" stroke-width="2" stroke-linejoin="round"/></svg>')
 GARL = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 30"><path d="M0 6Q30 20 60 6T120 6" fill="none" stroke="#0a1226" stroke-width="2.4"/>'
         + ''.join(f'<ellipse cx="{x}" cy="{y}" rx="4.2" ry="6" fill="{c}" stroke="{INK}" stroke-width="1.6"/>' for x, y, c in [(15, 18, '#e8343f'), (45, 18, '#ffd23f'), (75, 18, '#2fbf71'), (105, 18, '#29c4ff')]) + '</svg>')
+PEN = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 20l1-5L16 4l4 4L9 19z" fill="#ffd23f" stroke="{INK}" stroke-width="2" stroke-linejoin="round"/><path d="M14 6l4 4" stroke="{INK}" stroke-width="2"/></svg>'
 HALF = 'radial-gradient(circle,rgba(255,255,255,.13) 1.3px,transparent 1.9px)'
 PINKBG = f'linear-gradient(90deg,transparent 0 22%,{PINK} 42%),radial-gradient(circle,rgba(255,255,255,.3) 1.4px,transparent 2px) 0 0/8px 8px,{PINK}'
 HEAD = 'italic 900 {} "Rubik",sans-serif'
@@ -32,7 +33,7 @@ HEAD = 'italic 900 {} "Rubik",sans-serif'
 css = Path(__file__).with_name('menus_css.template.css').read_text(encoding='utf-8')
 for k, v in {'INK': INK, 'PINK': PINK, 'CYAN': CYAN, 'YEL': YEL, 'HALF': HALF, 'PINKBG': PINKBG,
              'BURST': uri(BURST), 'RAYS': uri(RAYS), 'BOLT': uri(BOLT), 'CROWN': uri(CROWN),
-             'SPKL': uri(SPKL), 'SPKR': uri(SPKR), 'CLOUDS': uri(CLOUDS), 'SNOWCAP': uri(SNOWCAP), 'GARL': uri(GARL)}.items():
+             'SPKL': uri(SPKL), 'SPKR': uri(SPKR), 'CLOUDS': uri(CLOUDS), 'PEN': uri(PEN), 'SNOWCAP': uri(SNOWCAP), 'GARL': uri(GARL)}.items():
     css = css.replace('%' + k + '%', v)
 out = Path(__file__).resolve().parents[1] / 'www' / 'css' / 'menus.css'
 out.write_text(css, encoding='utf-8')

@@ -346,3 +346,19 @@ html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;to
 #stage .bs-back svg{width:24px;height:26px;display:block}
 #stage .bs-set .bs-back.x,#stage .bs-rec .bs-back.x{position:absolute;left:14px;right:auto;top:14px;z-index:4}
 #stage .bs-set .bs-title{margin:0 6px 8px 64px}
+/* règle : seul un bouton a la forme d'un bouton (couleur pleine + bord blanc + ombre). Les infos (textes, rangs, compteurs, titres de section)
+   sont en verre sombre, texte blanc, sans bord ni ombre : on ne cherche pas à appuyer dessus */
+#stage .bs-card,#stage .bs-rank,#stage .bs-rhead{background:rgba(255,255,255,.08);color:#fff;box-shadow:none;border:0}
+#stage .bs-rhead svg path{fill:#ffd23f;stroke:#ffd23f}
+#stage .bs-rank .bs-season{color:#ff8ab5}
+#stage .k7badge{background:rgba(255,255,255,.08);border:0;box-shadow:none;color:#ffd23f}
+#stage .k7badge small{color:#fff;opacity:.85}
+#stage .k7rw .ribbon{background:none;border:0;box-shadow:none;color:#fff}
+#stage .k7rw .pct,#stage .k7rw .next{background:none;color:#fff;opacity:.85}
+/* le pseudo : on voit qu'on peut écrire (crayon dans le champ) */
+.bs-pseudo{position:relative}
+.bs-pseudo::after{content:"";position:absolute;right:12px;top:50%;width:20px;height:20px;margin-top:-10px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%3E%3Cpath%20d=%22M4%2020l1-5L16%204l4%204L9%2019z%22%20fill=%22%23ffd23f%22%20stroke=%22%2315141a%22%20stroke-width=%222%22%20stroke-linejoin=%22round%22/%3E%3Cpath%20d=%22M14%206l4%204%22%20stroke=%22%2315141a%22%20stroke-width=%222%22/%3E%3C/svg%3E") center/contain no-repeat}
+.bs-pseudo .bs-input{padding-right:40px;border-style:dashed}
+.bs-pseudo .bs-input:focus{border-style:solid;outline:3px solid #ffd23f;outline-offset:2px}
+#stage .k7rw .card{background:rgba(255,255,255,.08);border:0;box-shadow:none;color:#fff}
+#stage .k7rw .card small,#stage .k7rw .card .lb{color:rgba(255,255,255,.75)}
