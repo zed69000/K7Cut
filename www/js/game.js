@@ -19,6 +19,10 @@ const BSI = {
   crown: c => `<svg viewBox="0 0 40 30" width="36" height="27"><path d="M3 26V8l9 8 8-13 8 13 9-8v18z" fill="#ffd60a" stroke="${c}" stroke-width="3" stroke-linejoin="round"/></svg>`,
   redo: c => `<svg viewBox="0 0 30 30" width="30" height="30"><path d="M24 15a9 9 0 1 1-3-6.7" fill="none" stroke="${c}" stroke-width="4.2" stroke-linecap="round"/><path d="M16.5 3.5h8v8z" fill="${c}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`,
   back: c => `<svg viewBox="0 0 28 30" width="26" height="28"><path d="M22 4 5 15l17 11z" fill="${c}" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+  fwd: c => `<svg viewBox="0 0 28 30" width="26" height="28"><path d="M6 4l17 11L6 26z" fill="${c}" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+  // petits triangles dans les liens et boutons texte (les caractères ◀ ▶ deviennent des emojis bleus sur iPhone)
+  triL: () => `<svg viewBox="0 0 10 12" width=".62em" height=".75em" style="vertical-align:-.05em"><path d="M9 1 1 6l8 5z" fill="currentColor"/></svg>`,
+  triR: () => `<svg viewBox="0 0 10 12" width=".62em" height=".75em" style="vertical-align:-.05em"><path d="M1 1l8 5-8 5z" fill="currentColor"/></svg>`,
   close: c => `<svg viewBox="0 0 24 24" width="24" height="24"><path d="M5 5l14 14M19 5 5 19" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`,
   cup: c => `<svg viewBox="0 0 24 24" width="30" height="30"><path d="M7 3h10v5a5 5 0 0 1-10 0z" fill="${c}"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3" fill="none" stroke="${c}" stroke-width="2.2"/><path d="M12 13v4M8 21h8l-1-4H9z" fill="${c}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`,
   gal: c => `<svg width="30" height="30" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${c}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${c}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#ff1f7a"/></svg>`,
@@ -890,7 +894,7 @@ G.trancheroute = { mount(stage, api){
       if(combo > 100 && combo % 50 === 0) celebrate(4, tx('ENCORE {n} !', {n: combo}));
       if(combo % 25 === 0 && !tiers().includes(combo)) judges.push({txt: tx('{n} COMBO', {n: combo}), x: W/2, y: H*.2, t: 0, big: true});
     }
-    judges.push({txt: LABEL[g], g, x: 'HS'.includes(o.k) ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: o.wrongWay ? (o.shape === 'tall' ? tx('coupe vers le haut ↑') : o.shape === 'diag' ? tx('en diagonale ↗') : tx('coupe vers la droite →')) : (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? tx('en retard') : tx('en avance')) : null});
+    judges.push({txt: LABEL[g], g, x: 'HS'.includes(o.k) ? HXs + 30 : x, y: Y0 - 74, t: 0, sub: o.wrongWay ? (o.shape === 'tall' ? tx('coupe vers le haut ↑') : o.shape === 'diag' ? tx('en diagonale ↗︎') : tx('coupe vers la droite →')) : (g === 'good' || g === 'ok') && o.dt != null ? (o.dt > 0 ? tx('en retard') : tx('en avance')) : null});
   }
 
   /* ---------- gestes : un geste par doigt, la cible est l'obstacle le plus proche dans le temps ---------- */
@@ -1240,8 +1244,8 @@ G.trancheroute = { mount(stage, api){
         <div class="cell row2"><div class="ic" style="background:#e8344f;color:#fff">♪</div><div><b>${tx('+{n} talent ♪', {n: R.gained})}</b><div class="sm">${tx('total {n}', {n: bank()})}</div></div></div><div class="cell row2"><div class="ic" style="background:#d8d2c6">▭</div><div>${lostTime > .3 ? `${tx('Bande ralentie :')}<br><b>${tx('+{n} s perdues', {n: lostTime.toFixed(1).replace('.', ',')})}</b>` : `${tx('Bande intacte :')}<br><b>${tx('jamais ralentie')}</b>`}</div></div></div>`)}
       ${P(8, `<div class="card">${second.slice(0, 2).join('')}</div>`)}
       ${harder ? P(2, `<button class="harder"><span>${tx('ENCORE ? REJOUE EN')}</span><b>${harder.name.toUpperCase()} ▲</b><small>${harder.note}</small></button>`) : ''}
-      ${P(1, `<div class="btns"><button class="again">${tx('REJOUER')} ▶</button>${R.img ? `<button class="keep">${tx('GARDER MON ŒUVRE')} ${BSI.disk(INK)}</button>` : `<button class="keep">${tx('CASSETTES')}</button>`}</div>`)}
-      ${P(1, `<div class="links"><button class="tomenu">◀ ${tx('CASSETTES')}</button>${R.nextT && unlocked(R.nextT) ? `<button class="next2">${tx('FACE')} ${R.nextT.face} : ${R.nextT.name.toUpperCase()} ▶</button>` : ''}</div>`)}
+      ${P(1, `<div class="btns"><button class="again">${tx('REJOUER')} ${BSI.triR()}</button>${R.img ? `<button class="keep">${tx('GARDER MON ŒUVRE')} ${BSI.disk(INK)}</button>` : `<button class="keep">${tx('CASSETTES')}</button>`}</div>`)}
+      ${P(1, `<div class="links"><button class="tomenu">${BSI.triL()} ${tx('CASSETTES')}</button>${R.nextT && unlocked(R.nextT) ? `<button class="next2">${tx('FACE')} ${R.nextT.face} : ${R.nextT.name.toUpperCase()} ${BSI.triR()}</button>` : ''}</div>`)}
       </div>`;
     stage.appendChild(el);
     const close = () => { alive = false; el.remove(); outroStop(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
@@ -1550,10 +1554,10 @@ G.trancheroute = { mount(stage, api){
     J: {verb: tx('TAPE UNE FOIS'), hint: tx('un tap sec, sans glisser'), need: 1, cue: tx('TAPE')},
     H: {verb: tx('POSE LE DOIGT ET TIENS'), hint: tx('jusqu\'au bout du ruban'), need: 1, cue: tx('TIENS')},
     S: {verb: tx('GRATTE'), hint: tx('allers-retours de haut en bas'), need: 4, cue: tx('GRATTE')},
-    CD: {verb: tx('GLISSE EN DIAGONALE ↗'), hint: tx('vers le haut et la droite à la fois'), need: 1, cue: tx('GLISSE ↗')},
+    CD: {verb: tx('GLISSE EN DIAGONALE ↗︎'), hint: tx('vers le haut et la droite à la fois'), need: 1, cue: tx('GLISSE ↗︎')},
     CVR: {verb: tx('GLISSE VERS LE BAS'), hint: tx('brique bleue : le geste descend'), need: 1, cue: tx('GLISSE ↓')},
     CHR: {verb: tx('GLISSE VERS LA GAUCHE'), hint: tx('brique violette : le geste recule'), need: 1, cue: tx('GLISSE ←')},
-    CDR: {verb: tx('GLISSE EN DIAGONALE ↙'), hint: tx('vers le bas et la gauche à la fois'), need: 1, cue: tx('GLISSE ↙')},
+    CDR: {verb: tx('GLISSE EN DIAGONALE ↙︎'), hint: tx('vers le bas et la gauche à la fois'), need: 1, cue: tx('GLISSE ↙︎')},
     D: {verb: tx('TAPE À DEUX DOIGTS'), hint: tx('deux doigts en même temps (souris : clic droit)'), need: 1, cue: tx('2 DOIGTS')}
   };
   const tk = o => o.k === 'C' ? (o.shape === 'wide' ? 'CH' : o.shape === 'diag' ? 'CD' : 'CV') + (o.rev ? 'R' : '') : o.k;
@@ -2221,9 +2225,9 @@ G.trancheroute = { mount(stage, api){
     <div class="ui k7bottom" style="bottom:22px;flex-direction:column;gap:16px;align-items:stretch">
       <div id="k7info" class="k7card"></div>
       <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-        <button id="k7dl" class="k7btn k7round" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="k7dl" class="k7btn bs-back bs-nav" aria-label="${tx('Difficulté plus facile')}">${BSI.back(INK)}</button>
         <div id="k7diffbox" style="text-align:center"></div>
-        <button id="k7dr" class="k7btn k7round" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <button id="k7dr" class="k7btn bs-back bs-nav" aria-label="${tx('Difficulté plus dure')}">${BSI.fwd(INK)}</button></div>
       <div style="display:flex;justify-content:center"><button id="k7play" class="k7btn k7play"></button></div></div>`);
   ['k7back','k7tal','k7gear','k7info','k7dl','k7dr','k7diffbox','k7play'].forEach(id => ui[id] = menu.querySelector('#' + id));
 
@@ -2539,7 +2543,7 @@ G.trancheroute = { mount(stage, api){
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `${BSI.lockS('#d7263d')} ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${TRACKS.includes(t) ? SPRAY[TRACKS.indexOf(t) % SPRAY.length] : '#e8343f'}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');
     sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CASSETTES')}</b><button class="bs-back" id="k7cx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn k7round" id="k7cdl" aria-label="${tx('Difficulté plus facile')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M13 3 6 10l7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div id="k7cdiff"></div><button class="k7btn k7round" id="k7cdr" aria-label="${tx('Difficulté plus dure')}"><svg width="20" height="20" viewBox="0 0 20 20"><path d="m7 3 7 7-7 7" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 10px 4px"><button class="k7btn bs-back bs-nav" id="k7cdl" aria-label="${tx('Difficulté plus facile')}">${BSI.back(INK)}</button><div id="k7cdiff"></div><button class="k7btn bs-back bs-nav" id="k7cdr" aria-label="${tx('Difficulté plus dure')}">${BSI.fwd(INK)}</button></div>
       <div class="k7clist"></div></div>`;
     menu.appendChild(sh); const close = () => pageOut(sh);
     const fill = () => { sh.querySelector('#k7cdiff').innerHTML = diffHtml(); sh.querySelector('.k7clist').innerHTML = rows();
@@ -2702,7 +2706,7 @@ G.trancheroute = { mount(stage, api){
       const mine = box.querySelector('.me'); if(mine) box.scrollTop = mine.offsetTop - box.offsetTop - box.clientHeight/2 + mine.offsetHeight/2; // sa propre ligne au milieu du cadre
       if(note){ note.textContent = (cur > 1 ? tx('Saison {n}', {n: want}) + ' · ' : '') + (g.me ? tx('Ton rang : {n} sur {t}', {n: g.me, t: g.total}) : tx(g.total > 1 ? 'Classement mondial : {t} joueurs' : 'Classement mondial : {t} joueur', {t: g.total}));
         // un lien vers la saison précédente (ou retour à la saison en cours), quand il y en a une
-        if(want < cur || g.previous){ const a = document.createElement('button'); a.type = 'button'; a.className = 'bs-season'; a.textContent = want < cur ? tx('Saison en cours') + ' ▶' : '◀ ' + tx('Saison précédente'); a.onclick = () => fillBoard(box, note, want < cur ? cur : want - 1); note.append(' ', a); } }
+        if(want < cur || g.previous){ const a = document.createElement('button'); a.type = 'button'; a.className = 'bs-season'; a.innerHTML = want < cur ? tx('Saison en cours') + ' ' + BSI.triR() : BSI.triL() + ' ' + tx('Saison précédente'); a.onclick = () => fillBoard(box, note, want < cur ? cur : want - 1); note.append(' ', a); } }
     } else {
       const top = deathTop(); box.innerHTML = top.length ? top.map((e, i) => row(i + 1, {n: e.name, s: e.score, k: e.songs}, false)).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
       if(note) note.textContent = tx('Hors ligne : classement de ce téléphone');
@@ -2940,8 +2944,8 @@ G.trancheroute = { mount(stage, api){
     el.innerHTML = `<div class="in"><h2>LABO MUSIQUE</h2>
       <div class="intro"><b>▶ ÉCOUTER</b> : le jeu joue tout seul, tu entends le morceau complet avec la mélodie que font les coupes. <b>${BSI.pad(INK)} JOUER</b> : tu joues en Apprenti. Le carré ■ en haut te ramène ici.</div>
       ${LAB.map((t, i) => `<div class="card" data-i="${i}"><div class="num" style="background:${t.bg[0]}">${i + 1}</div><div class="nm">${t.name}</div><div class="gn">${t.label.toUpperCase()}${t.ref ? ' · ' + t.ref.toUpperCase() : ''}</div>
-        <div class="ds">${t.desc}</div><div class="bt"><button class="play">▶ ÉCOUTER</button><button class="game">${BSI.pad(INK)} JOUER</button><button class="like ${likes.has(t.id) ? 'on' : ''}">♥</button></div></div>`).join('')}
-      <div class="sum"></div><button class="back">◀ RETOUR AUX CASSETTES</button></div>`;
+        <div class="ds">${t.desc}</div><div class="bt"><button class="play">${BSI.triR()} ÉCOUTER</button><button class="game">${BSI.pad(INK)} JOUER</button><button class="like ${likes.has(t.id) ? 'on' : ''}">♥</button></div></div>`).join('')}
+      <div class="sum"></div><button class="back">${BSI.triL()} RETOUR AUX CASSETTES</button></div>`;
     stage.appendChild(el); el.querySelector('.sum').textContent = sum();
     el.querySelectorAll('.card').forEach(c => { const t = LAB[+c.dataset.i];
       c.querySelector('.play').onclick = () => { el.remove(); diff = DIFFS[1]; auto = true; startTrack(t); auto = true; };
