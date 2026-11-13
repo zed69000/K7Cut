@@ -2628,32 +2628,42 @@ G.trancheroute = { mount(stage, api){
   // les astuces de l'écran de chargement
   // les astuces du chargement : c'est K7, la cassette mascotte, qui parle (et Bobine, la petite roue qui file sur la bande)
   const TIPS = [tx("Glisse pile quand la brique touche la ligne rouge : c'est là que je chante le plus fort !"), tx("Enchaîne sans rater et je pars en transe. Les disques suivent !"), tx("Tes coupes arrivent en retard ? Mets un casque filaire et cale le rythme dans les réglages."), tx("Sur une note longue, garde le doigt posé jusqu'au bout. Bobine compte sur toi !"), tx("Bleu, violet, vert menthe : la brique descend. Orange, rose, jaune : elle monte."), tx("Rate une note et la bande ralentit. Six réussites et on repart à fond !")];
-  /* écran de chargement : la cassette danse sur scène pendant que le son se prépare, puis le niveau démarre tout seul */
+  /* écran de chargement épuré : fond noir, les briques de la cassette qui défilent vers la ligne rouge et y font leur geste, une barre */
   function loadingScreen(t, d, death, go){
-    const el = document.createElement('div'), mt = t || SHELF[cur], mi = SHELF.indexOf(mt); el.className = 'bs-load';
-    el.innerHTML = `<div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div></div>
-      <div class="bs-trk">${BSI.vinyl()}<span class="sep"></span><div class="t"><b>${death ? tx('Cassette de la mort') : tx('FACE') + ' ' + t.face + ' · ' + t.name}</b><span>${BSI.bars(INK)} ${d.name}</span></div></div>
-      <div><span class="bs-tape case">${tx('PRÉPARATION DE LA CASSETTE')}</span><span class="bs-line"></span></div>
-      <canvas></canvas>
-      <div class="bs-lcard"><div class="hd"><b>${tx('Chargement…')}</b><div class="bs-bar"><i></i><em>0%</em></div></div><ul class="bs-steps"><li>${tx('Synchronisation du rythme')}</li><li>${tx('Préparation des briques')}</li><li>${tx('Montage du morceau')}</li></ul></div>
-      <div class="bs-tip"><span class="ic">${BSI.bulb()}</span><p><b>K7 :</b> ${TIPS[Math.floor(Math.random()*TIPS.length)]}</p></div>
-      <div class="bs-go"><i>»</i><span>${tx('LE NIVEAU DÉMARRE…')}</span><i>»</i></div>`;
+    const el = document.createElement('div'); el.className = 'bs-load bs-load2';
+    el.innerHTML = `<canvas></canvas><div class="bs-lbar" role="progressbar" aria-label="${tx('Chargement…')}"><i></i></div>`;
     stage.appendChild(el);
-    const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bs-bar i'), pc = el.querySelector('.bs-bar em'), li = el.querySelectorAll('.bs-steps li'), t0l = performance.now();
+    const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bs-lbar i'), t0l = performance.now();
+    // les briques à montrer, en images (les mêmes dessins que la page d'avant)
+    const ks = brickKinds(death ? TRACKS : [t]), img = {};
+    for(const k of ks){ const im = new Image(); im.src = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">${BRICK[k]}</svg>`); img[k] = im; }
+    // le geste de chaque coupe : la direction des chevrons
+    const DIR = {CV: [0, -1], CH: [1, 0], CD: [.71, -.71], CVR: [0, 1], CHR: [-1, 0], CDR: [-.71, .71]};
+    const GAP = .8, SPEED = 170; // une brique toutes les 0,8 s
     let done = false;
-    (function frame(){ if(!el.isConnected) return; const now2 = performance.now(), el2 = now2 - t0l, tt = el2/1000;
-      // la cassette mascotte sur sa scène, deux projecteurs roses
+    (function frame(){ if(!el.isConnected) return; const el2 = performance.now() - t0l, tt = el2/1000;
       const w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-      for(const sd of [-1, 1]){ const gx = w/2 + sd*w*.42; const gr = g.createLinearGradient(gx, 0, w/2, h); gr.addColorStop(0, 'rgba(255,31,122,.55)'); gr.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(gx - 10, 4); g.lineTo(gx + 10, 4); g.lineTo(w/2 + sd*w*.05 - sd*60, h); g.lineTo(w/2 + sd*w*.05 + sd*40, h); g.closePath(); g.fill(); g.fillStyle = '#2c2b36'; g.beginPath(); g.arc(gx, 8, 10, 0, 6.283); g.fill(); g.fillStyle = '#ff7ab0'; g.beginPath(); g.arc(gx, 10, 5, 0, 6.283); g.fill(); }
-      const sc = Math.min(w/340, (h - 18)/330), fy = h - 14;
-      const gl = g.createRadialGradient(w/2, fy, 2, w/2, fy, 150*sc + 20); gl.addColorStop(0, 'rgba(255,31,122,.6)'); gl.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(w/2, fy, 170*sc + 20, 26*sc + 8, 0, 0, 6.283); g.fill();
-      g.strokeStyle = 'rgba(255,31,122,.9)'; g.lineWidth = 3; g.beginPath(); g.ellipse(w/2, fy, 130*sc + 10, 16*sc + 5, 0, 0, 6.283); g.stroke();
-      g.save(); g.translate(w/2, fy - 166*sc); g.scale(sc, sc); mascot(g, mt, Math.max(0, mi), true, true, tt, {x: Math.sin(tt*1.3)*.5, y: -.3}); g.restore();
-      // la barre et les trois étapes
+      const y = h*.46, lx = w*.32, S = Math.min(96, w*.24);
+      // la piste et la ligne rouge
+      g.strokeStyle = 'rgba(255,255,255,.14)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, y - S*.7); g.lineTo(w, y - S*.7); g.moveTo(0, y + S*.7); g.lineTo(w, y + S*.7); g.stroke();
+      g.strokeStyle = '#e8344f'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(lx, y - S*.95); g.lineTo(lx, y + S*.95); g.stroke();
+      // chaque brique arrive de la droite ; sur la ligne, elle fait son geste puis s'efface
+      const n0 = Math.floor(tt/GAP);
+      for(let n = Math.max(0, n0 - 6); n <= n0; n++){
+        const k = ks[n % ks.length], age = tt - n*GAP, arrive = (w + S - lx)/SPEED, im = img[k]; if(!im || !im.complete) continue;
+        let x = w + S - age*SPEED, yy = y, a = 1, sc = 1, rot = 0, after = age - arrive;
+        if(after > 0){ x = lx; const u = Math.min(1, after/.45);
+          if(DIR[k]){ const [dx, dy] = DIR[k]; x += dx*u*S*1.4; yy += dy*u*S*1.4; a = 1 - u;
+            g.save(); g.globalAlpha = (1 - u)*.8; g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.moveTo(lx - dx*S*.5, y - dy*S*.5); g.lineTo(lx + dx*S*(.2 + u*1.4), y + dy*S*(.2 + u*1.4)); g.stroke(); g.restore(); }
+          else if(k === 'H'){ const v = Math.min(1, after/.9); a = after > .9 ? Math.max(0, 1 - (after - .9)/.3) : 1; g.save(); g.globalAlpha = a; g.strokeStyle = '#ffd23f'; g.lineWidth = 6; g.beginPath(); g.arc(lx, y, S*.62, -Math.PI/2, -Math.PI/2 + v*6.283); g.stroke(); g.restore(); }
+          else if(k === 'S'){ rot = Math.sin(after*18)*.6; a = after > .7 ? Math.max(0, 1 - (after - .7)/.3) : 1; }
+          else { sc = 1 + u*.5; a = 1 - u; g.save(); g.globalAlpha = (1 - u); g.strokeStyle = '#fff'; g.lineWidth = 4; g.beginPath(); g.arc(lx, y, S*(.45 + u*.6), 0, 6.283); g.stroke(); if(k === 'D'){ g.beginPath(); g.arc(lx, y, S*(.3 + u*.9), 0, 6.283); g.stroke(); } g.restore(); }
+          if(a <= 0) continue; }
+        g.save(); g.globalAlpha = a; g.translate(x, yy); g.rotate(rot); g.scale(sc, sc); g.drawImage(im, -S/2, -S/2, S, S); g.restore();
+      }
       const k = Math.min(1, el2/1700), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || el2 > 4500), pct = ok ? 100 : Math.round(Math.min(95, k*100));
-      bar.style.width = `calc(${pct}% - 6px)`; pc.textContent = pct + '%';
-      li.forEach((n, i) => { const at = [34, 68, 100][i], prev = i ? [34, 68, 100][i - 1] : 0; n.className = pct >= at ? 'ok' : pct >= prev ? 'on' : ''; n.insertAdjacentHTML && !n.firstElementChild && n.insertAdjacentHTML('afterbegin', '<i></i>'); });
+      bar.style.width = pct + '%';
       if(ok && !done){ done = true; api.after(450, () => { if(!el.isConnected) return; el.remove(); go(); }); }
       requestAnimationFrame(frame); })();
   }
@@ -2686,7 +2696,7 @@ G.trancheroute = { mount(stage, api){
   const RANK_API = `https://${/\.workers\.dev$/.test(location.hostname) ? location.host : 'beatsplash.sebastienalzamora.workers.dev'}/api`;
   const pid = () => { let v = api.load('pid', ''); if(!/^[a-z0-9]{16,40}$/.test(v)){ v = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); api.save('pid', v); } return v; };
   const pseudo = () => api.load('pseudo', '');
-  function sendScore(score, songs){ if(Tuning.preview) return Promise.resolve(null); try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs, season: SEASON()})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
+  function sendScore(score, songs){ if(Tuning.preview || window.__k7bot) return Promise.resolve(null); /* ni l'aperçu du GDD ni les tests automatiques n'écrivent dans le vrai classement */ try{ return fetch(RANK_API + '/score', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: pid(), name: pseudo(), score, songs, season: SEASON()})}).then(r => r.json()).catch(() => null); }catch(e){ return Promise.resolve(null); } }
   // la saison du classement : on ne l'augmente (dans le GDD) que quand un réglage change vraiment les scores possibles
   const SEASON = () => Math.max(1, Math.round(Tuning.num("classement.saison", 1)));
   async function fetchTop(season){ try{ const r = await fetch(RANK_API + '/top?id=' + pid() + '&season=' + (season || SEASON()), {cache: 'no-store'}); if(!r.ok) return null; return await r.json(); }catch(e){ return null; } }
@@ -2731,13 +2741,14 @@ G.trancheroute = { mount(stage, api){
     pageUnder('.k7brief'); top = top || deathTop();
     const el = document.createElement('div'); el.className = 'k7brief fit bs-spk';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
-    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
+    // une page lisible : un titre, une ligne de règle (ou ton résultat), le classement qui a de la place, ton pseudo, LANCER ; le retour est en haut
+    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><button class="x" data-a="x" aria-label="${tx('Accueil')}">${BSI.back(INK)}</button><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
       <div class="bs-title">${twoTone(me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort'))}</div>
-      <div><span class="bs-tape">${me ? tx(me.songs > 1 ? 'Tu as tenu {n} morceaux · {p} points' : 'Tu as tenu {n} morceau · {p} points', {n: me.songs, p: me.score.toLocaleString('fr-FR')}) : tx('3 cœurs · du plus lent au plus rapide')}</span><span class="bs-line"></span></div>
-      ${me ? '' : `<div class="bs-card">${tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !')}</div>`}
-      <div class="bs-tab bs-sparks">${BSI.cup('#fff')}<span class="sep"></span>${tx('RECORDS')}</div><div class="nt bs-rank"></div><div class="lb">${list()}</div>
-      <input class="bs-input" maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}">
-      <div class="acts2">${bsBtn('pink cta bs-sparks l', '', '', tx(me ? 'REJOUER' : 'LANCER') + ' ' + BSI.play(INK), 'data-a="go"')}${bsBtn('pill', '', '', tx('ACCUEIL'), 'data-a="x"')}</div></div></div>`;
+      ${me ? `<div class="bs-card bs-res"><b>${me.score.toLocaleString('fr-FR')}</b><span>${tx(me.songs > 1 ? '{n} morceaux tenus' : '{n} morceau tenu', {n: me.songs})}</span></div>`
+        : `<div class="bs-card bs-rule">${tx('3 cœurs : chaque raté en coûte un. Les morceaux s\'enchaînent, de plus en plus vite.')}</div>`}
+      <div class="bs-rhead">${BSI.cup(INK)}<b>${tx('RECORDS')}</b><span class="nt bs-rank"></span></div><div class="lb">${list()}</div>
+      <label class="bs-pseudo"><span>${tx('Ton pseudo')}</span><input class="bs-input" maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}"></label>
+      <div class="acts2">${bsBtn('pink cta', '', '', tx(me ? 'REJOUER' : 'LANCER') + ' ' + BSI.play(INK), 'data-a="go"')}</div></div></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
     const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
     const after = go => me ? adBreak(TRACKS.length).then(go) : go(); // après une Cassette de la mort, comme après un morceau
