@@ -9,6 +9,7 @@ BSi18n.add("ko", {
   "Robots de minuit": "한밤의 로봇",
   "French house · 122 BPM": "프렌치 하우스 · 122 BPM",
   "Couper · Taper": "자르기 · 탭",
+  "Touche pour commencer": "탭해서 시작",
   "Accueil": "홈",
   "3 cœurs : chaque raté en coûte un. Les morceaux s'enchaînent, de plus en plus vite.": "하트 3개: 실수할 때마다 하나씩 잃어요. 곡이 쉬지 않고 이어지며 점점 빨라져요.",
   "{n} morceaux tenus": "{n}곡 버팀",

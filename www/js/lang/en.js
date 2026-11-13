@@ -9,6 +9,7 @@ BSi18n.add("en", {
   "Robots de minuit": "Midnight Robots",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "Cut · Tap",
+  "Touche pour commencer": "Tap to start",
   "Accueil": "Home",
   "3 cœurs : chaque raté en coûte un. Les morceaux s'enchaînent, de plus en plus vite.": "3 hearts: every miss costs one. Songs follow each other, faster and faster.",
   "{n} morceaux tenus": "{n} songs held",

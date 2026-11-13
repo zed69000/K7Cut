@@ -320,10 +320,9 @@
     step('Accueil', 2600); await sleep(2600);
     step('Campagne', 2400); click('#k7tcamp'); await sleep(2400);
     if(withExtras){ step('Cassettes', 3200); click('#k7hlvl'); await sleep(300); await glide(scroller(q('.k7sheet')), null, 2600); dropOverlays(); }
-    step('Avant-niveau', 3200); click('#k7hplay'); await sleep(3200);
-    step('Chargement'); click('.k7brief [data-go]');
+    step('Chargement'); click('#k7hplay'); // plus de page avant le niveau : le chargement montre les briques
     P.reset(); P.err = err; P.on = true;
-    await until(() => k.state === 'play', 8000);
+    await until(() => k.state === 'play', 12000);
     step('Partie');
     if(withExtras){ await sleep(3500); step('Pause'); P.allowPause = true; click(document.querySelector('#stage > button')); await sleep(2400); click('.k7pause .go'); P.allowPause = false; step('Partie'); }
     await until(() => q('.k7rw'), 90000);

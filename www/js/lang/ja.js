@@ -9,6 +9,7 @@ BSi18n.add("ja", {
   "Robots de minuit": "真夜中のロボット",
   "French house · 122 BPM": "フレンチハウス · 122 BPM",
   "Couper · Taper": "カット · タップ",
+  "Touche pour commencer": "タップでスタート",
   "Accueil": "ホーム",
   "3 cœurs : chaque raté en coûte un. Les morceaux s'enchaînent, de plus en plus vite.": "ハートは3つ：ミスするたびに1つ減る。曲は止まらず、どんどん速くなる。",
   "{n} morceaux tenus": "{n} 曲クリア",

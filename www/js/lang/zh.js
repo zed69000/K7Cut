@@ -9,6 +9,7 @@ BSi18n.add("zh", {
   "Robots de minuit": "午夜机器人",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "切 · 点",
+  "Touche pour commencer": "点击开始",
   "Accueil": "主页",
   "3 cœurs : chaque raté en coûte un. Les morceaux s'enchaînent, de plus en plus vite.": "3 颗心：每次失误扣一颗。歌曲接连不断，越来越快。",
   "{n} morceaux tenus": "坚持了 {n} 首",

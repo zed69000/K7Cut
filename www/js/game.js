@@ -2631,15 +2631,17 @@ G.trancheroute = { mount(stage, api){
   /* écran de chargement épuré : fond noir, les briques de la cassette qui défilent vers la ligne rouge et y font leur geste, une barre */
   function loadingScreen(t, d, death, go){
     const el = document.createElement('div'); el.className = 'bs-load bs-load2';
-    el.innerHTML = `<canvas></canvas><div class="bs-lbar" role="progressbar" aria-label="${tx('Chargement…')}"><i></i></div>`;
+    el.innerHTML = `<canvas></canvas><div class="bs-lcap"><i hidden>${tx('NOUVEAU')}</i><b></b><small></small></div><div class="bs-lbar" role="progressbar" aria-label="${tx('Chargement…')}"><i></i></div><div class="bs-lskip" hidden>${tx('Touche pour commencer')}</div>`;
     stage.appendChild(el);
     const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bs-lbar i'), t0l = performance.now();
     // les briques à montrer, en images (les mêmes dessins que la page d'avant)
-    const ks = brickKinds(death ? TRACKS : [t]), img = {};
+    // c'est aussi le tuto des briques : les nouvelles d'abord, chacune passe une fois sur la ligne avec son nom
+    const isNew = k => !api.load('tuto3.' + k, false), ks = brickKinds(death ? TRACKS : [t]).sort((a, b) => isNew(b) - isNew(a)), img = {};
+    const cap = el.querySelector('.bs-lcap'), skipEl = el.querySelector('.bs-lskip'); let skip = false, capK = null; el.onclick = () => { skip = true; };
     for(const k of ks){ const im = new Image(); im.src = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">${BRICK[k]}</svg>`); img[k] = im; }
     // le geste de chaque coupe : la direction des chevrons
     const DIR = {CV: [0, -1], CH: [1, 0], CD: [.71, -.71], CVR: [0, 1], CHR: [-1, 0], CDR: [-.71, .71]};
-    const GAP = .8, SPEED = 170; // une brique toutes les 0,8 s
+    const GAP = 1.15, SPEED = 230; // une brique toutes les 1,15 s : le temps de lire son nom
     let done = false;
     (function frame(){ if(!el.isConnected) return; const el2 = performance.now() - t0l, tt = el2/1000;
       const w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
@@ -2649,10 +2651,11 @@ G.trancheroute = { mount(stage, api){
       g.strokeStyle = 'rgba(255,255,255,.14)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, y - S*.7); g.lineTo(w, y - S*.7); g.moveTo(0, y + S*.7); g.lineTo(w, y + S*.7); g.stroke();
       g.strokeStyle = '#e8344f'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(lx, y - S*.95); g.lineTo(lx, y + S*.95); g.stroke();
       // chaque brique arrive de la droite ; sur la ligne, elle fait son geste puis s'efface
-      const n0 = Math.floor(tt/GAP);
+      const n0 = Math.floor(tt/GAP); let atLine = null;
       for(let n = Math.max(0, n0 - 6); n <= n0; n++){
         const k = ks[n % ks.length], age = tt - n*GAP, arrive = (w + S - lx)/SPEED, im = img[k]; if(!im || !im.complete) continue;
         let x = w + S - age*SPEED, yy = y, a = 1, sc = 1, rot = 0, after = age - arrive;
+        if(age > arrive - .35 && after < .8) atLine = k;
         if(after > 0){ x = lx; const u = Math.min(1, after/.45);
           if(DIR[k]){ const [dx, dy] = DIR[k]; x += dx*u*S*1.4; yy += dy*u*S*1.4; a = 1 - u;
             g.save(); g.globalAlpha = (1 - u)*.8; g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.moveTo(lx - dx*S*.5, y - dy*S*.5); g.lineTo(lx + dx*S*(.2 + u*1.4), y + dy*S*(.2 + u*1.4)); g.stroke(); g.restore(); }
@@ -2662,31 +2665,19 @@ G.trancheroute = { mount(stage, api){
           if(a <= 0) continue; }
         g.save(); g.globalAlpha = a; g.translate(x, yy); g.rotate(rot); g.scale(sc, sc); g.drawImage(im, -S/2, -S/2, S, S); g.restore();
       }
-      const k = Math.min(1, el2/1700), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || el2 > 4500), pct = ok ? 100 : Math.round(Math.min(95, k*100));
+      if(atLine && atLine !== capK){ capK = atLine; cap.querySelector('i').hidden = !isNew(atLine); cap.querySelector('b').textContent = TUTO[atLine].verb; cap.querySelector('small').textContent = TUTO[atLine].hint; cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop'); }
+      // le son est prêt, et chaque brique est passée une fois (7 s au plus) ; un tap fait démarrer plus tôt
+      const need = Math.min(7, (ks.length - 1)*GAP + (w + S - w*.32)/SPEED + .7)*1000, ready = el2 > 1700 && (Object.keys(recBuf).length >= 2 || el2 > 4500);
+      const ok = ready && (el2 >= need || skip), pct = ok ? 100 : Math.round(Math.min(ready ? 99 : 90, el2/Math.max(need, 1700)*100)); skipEl.hidden = !ready || ok;
       bar.style.width = pct + '%';
       if(ok && !done){ done = true; api.after(450, () => { if(!el.isConnected) return; el.remove(); go(); }); }
       requestAnimationFrame(frame); })();
   }
+  // plus de page d'explications avant la cassette : le chargement montre ses briques et leur geste
   function briefing(t, go, death){
-    pageUnder('.k7brief');
-    const el = document.createElement('div'); el.className = 'k7brief';
-    const ks = brickKinds(death ? TRACKS : [t]), d = death ? DIFFS[1] : DIFFS[dIdx];
-    const rows = ks.map(k => `<div class="br"><svg viewBox="0 0 60 60">${BRICK[k]}</svg><span class="sep"></span><span><b>${TUTO[k].verb}</b><small>${TUTO[k].hint}</small></span>${api.load('tuto3.' + k, false) ? '' : `<i>${tx('NOUVEAU')}</i>`}</div>`).join('');
-    el.innerHTML = `<div class="in">
-      <div class="bs-head"><span class="bs-badge pk${death ? '' : ' face'}" style="color:#fff">${death ? SKULL('#16151c') : tx('FACE') + '<br>' + t.face}</span><b>${death ? tx('Cassette de la mort') : t.name}</b></div>
-      <span class="bs-tape">${death ? tx('3 cœurs · du plus lent au plus rapide') : t.label + ' · ' + d.name}</span>
-      <div class="bs-howbox"><span class="bs-tab">${tx('COMMENT ON JOUE')}</span>
-        <p>${tx('Les briques arrivent vers la ligne rouge. Fais leur geste au moment où elles la touchent, en rythme : chaque geste réussi joue ta partie du morceau.')}</p>
-        <p>${death ? tx('Chaque raté coûte un cœur. Les morceaux s\'enchaînent sans pause, de plus en plus vite : tiens le plus longtemps possible !') : tx('Un raté ralentit la bande et casse ton combo. Enchaîne les réussites pour monter en transe et gagner des disques.')}</p></div>
-      <span class="bs-sub bs-sparks l">${tx('LES BRIQUES DE CETTE CASSETTE')}</span>
-      <div class="bricks">${rows}</div>
-      <div class="acts">${bsBtn('sq back', '', '', BSI.back(INK), `aria-label="${tx('Retour')}"`)}${bsBtn('pink cta bs-sparks', '', '', tx('C\'EST PARTI') + ' ' + BSI.play(INK), 'data-go')}</div></div>`;
-    stage.appendChild(el);
-    // pendant qu'on lit : le son se prépare (enregistrements, piano), la barre se remplit
+    pageUnder('.k7brief'); const d = death ? DIFFS[1] : DIFFS[dIdx];
     try{ muted = api.store.load('muted', false); audioInit(); loadRecs(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
-    // C'EST PARTI : l'écran de chargement prend le relais, le niveau démarre quand le son est prêt
-    el.querySelector('[data-go]').onclick = () => { api.sfx.coin(); loadingScreen(t, d, death, go); pageUnder('.k7brief'); };
-    el.querySelector('.back').onclick = () => { api.sfx.click(); if(menu.hidden){ pageOut(el); showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); else pageOut(el); };
+    loadingScreen(t, d, death, go);
   }
 
   /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
