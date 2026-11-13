@@ -9,6 +9,8 @@ BSi18n.add("zh", {
   "Robots de minuit": "午夜机器人",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "切 · 点",
+  "Le plus raté :": "失误最多：",
+  "REVOIR LE TUTO": "查看教程",
   "Calage": "校准",
   "Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.": "划动显示“偏晚”？调高校准，或让游戏自动找。",
   "TROUVER MON CALAGE": "自动校准",

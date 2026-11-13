@@ -864,7 +864,7 @@ G.trancheroute = { mount(stage, api){
   const SLOW = .78, REC = () => Tuning.num("bande.reprise", 6);
   function loseThread(t){
     slowed = true; recHits = 0; rateTgt = SLOW;
-    judges.push({txt: tx('LA BANDE RALENTIT'), sub: tx('reprends le rythme, elle repartira'), x: W/2, y: H*.2, t: 0, big: true});
+    judges.push({txt: tx('LA BANDE RALENTIT'), x: W/2, y: H*.2, t: 0, big: true});
     osc(master, 'sawtooth', 300, t, .7, .1, {glide: 120, gt: .6, lp: [1600, 300, 1]}); api.vibe(60);
   }
   function resolve(o, g, t, dir){
@@ -1239,7 +1239,7 @@ G.trancheroute = { mount(stage, api){
       <div class="top"><div class="ttl">${P(2, `<div class="band">${tr.name} ${R.mood}</div>`)}${P(2, `<div class="pct"><span data-count="${R.acc}">0</span> % ${tx('de super rythme')}</div>`)}</div></div>
       ${P(3, `<div class="panel"><div class="ribbon">${ribbon}</div><div class="discs">${[0, 1, 2].map(i => `<div class="disc pop ${i < R.stars ? 'on' : ''}" style="--n:${4 + i}">${i < R.stars ? '<div class="burst"></div>' : ''}${discSvg(i < R.stars, '#ffd23f')}</div>`).join('')}</div>
         <div class="next">${R.stars < 3 ? tx('PROCHAIN DISQUE À {n} %', {n: diff.disc[R.stars]}) : tx('LES 3 DISQUES, BRAVO !')}</div></div>`)}
-      ${R.worst ? P(6, `<div class="bs-miss"><span>${tx('Le geste qui t\'a coûté le plus :')} <b>${TUTO[R.worst[0]] ? TUTO[R.worst[0]].verb : ''}</b> (${tx(R.worst[1] > 1 ? '{n} ratés' : '{n} raté', {n: R.worst[1]})})</span><button class="retuto">${tx('REVOIR SON TUTO')}</button></div>`) : ''}
+      ${R.worst ? P(6, `<div class="bs-miss"><span>${tx('Le plus raté :')} <b>${TUTO[R.worst[0]] ? TUTO[R.worst[0]].verb : ''}</b> ×${R.worst[1]}</span><button class="retuto">${tx('REVOIR LE TUTO')}</button></div>`) : ''}
       ${P(7, `<div class="card"><div class="cell"><div class="ic">${BSI.cup(INK)}</div><div><div class="lb">${tx('SCORE')}</div><div class="vl" data-count="${score}">0</div><div class="sm">${tx('points')}</div></div></div><div class="cell"><div class="ic" style="background:#29c4ff">✸</div><div><div class="lb">${tx('COMBO MAX')}</div><div class="vl">${maxCombo}</div></div></div>
         <div class="cell row2"><div class="ic" style="background:#e8344f;color:#fff">♪</div><div><b>${tx('+{n} talent ♪', {n: R.gained})}</b><div class="sm">${tx('total {n}', {n: bank()})}</div></div></div><div class="cell row2"><div class="ic" style="background:#d8d2c6">▭</div><div>${lostTime > .3 ? `${tx('Bande ralentie :')}<br><b>${tx('+{n} s perdues', {n: lostTime.toFixed(1).replace('.', ',')})}</b>` : `${tx('Bande intacte :')}<br><b>${tx('jamais ralentie')}</b>`}</div></div></div>`)}
       ${P(8, `<div class="card">${second.slice(0, 2).join('')}</div>`)}
@@ -1927,7 +1927,7 @@ G.trancheroute = { mount(stage, api){
     ctx.restore();
     if(flashR > 0){ ctx.fillStyle = `rgba(215,38,61,${flashR*.35})`; ctx.fillRect(0, 0, W, H); }
     if(rate < .995 && state === 'play'){ const k = (1 - rate)/(1 - SLOW); ctx.fillStyle = `rgba(110,80,40,${.22*k})`; ctx.fillRect(0, 0, W, H);
-      ctx.save(); ctx.translate(W/2, 98); ctx.textAlign = 'center'; ctx.font = `14px ${FONT}`; ctx.fillStyle = TH().text; ctx.globalAlpha = .6 + .4*Math.abs(Math.sin(rt*3)); ctx.fillText('◀◀ ' + tx('BANDE RALENTIE') + ' x' + rate.toFixed(2), 0, 0); ctx.globalAlpha = 1;
+      ctx.save(); ctx.translate(W/2, 98); ctx.textAlign = 'center'; ctx.font = `14px ${FONT}`; ctx.fillStyle = TH().text; ctx.globalAlpha = .6 + .4*Math.abs(Math.sin(rt*3)); ctx.globalAlpha = 1;
       if(slowed){ const w = 120; ctx.fillStyle = 'rgba(28,27,25,.25)'; ctx.fillRect(-w/2, 8, w, 6); ctx.fillStyle = RED; ctx.fillRect(-w/2, 8, w*recHits/REC(), 6); }
       ctx.restore(); }
 
@@ -2474,7 +2474,7 @@ G.trancheroute = { mount(stage, api){
     .k7plate.big .lbl{display:flex;flex-direction:column;align-items:center;line-height:.95}
     .k7plate.big .lbl small{font-family:Rubik,sans-serif;font-weight:800;text-transform:uppercase;font-size:13px;-webkit-text-stroke:0;text-shadow:none;color:#fff;background:${INK};padding:2px 10px 1px;margin-top:4px;transform:rotate(1deg);letter-spacing:.3px;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}
     .k7clist{display:flex;flex-direction:column;gap:9px}
-    #k7cdiff .k7diff{padding:6px 16px 7px 14px}#k7cdiff .k7diff .dn{font-size:19px}#k7cdiff .k7mult{right:-14px}
+    #k7cdiff .k7diff{padding:6px 30px 7px 14px}#k7cdiff .k7diff .dn{font-size:18px;white-space:nowrap}#k7cdiff .k7mult{right:-18px;top:-18px;font-size:16px;padding:7px 7px 5px}
     .k7crow{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:4px 12px;text-align:left;background:#fff;border:3px solid ${INK};border-radius:12px;padding:8px 12px;box-shadow:0 4px 0 ${INK};font:inherit;color:${INK};cursor:pointer}
     .k7crow.on{background:#ffd23f}.k7crow.lock{background:#e4ddcc}
     .k7crow .sw{grid-row:span 2;width:38px;height:26px;border:3px solid ${INK};border-radius:5px;position:relative}
@@ -2494,7 +2494,7 @@ G.trancheroute = { mount(stage, api){
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
   const SKULL_HOME = `<svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="#fff"/><circle cx="8.7" cy="10.6" r="2.4" fill="${INK}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${INK}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${INK}"/></svg>`;
   home.insertAdjacentHTML('beforeend', `
-    <div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div><span class="bs-tape case">${tx('TOUCHE POUR LANCER LA CASSETTE')}</span><span class="bs-line"></span></div>
+    <div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div></div>
     <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
       <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq bs-back" aria-label="${tx('Retour')}" hidden>${BSI.back(INK)}</button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
       <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${INK}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${INK}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#e8344f"/></svg><span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
@@ -2538,7 +2538,7 @@ G.trancheroute = { mount(stage, api){
   // CASSETTES : un volet par-dessus l'accueil, avec la liste et la difficulté
   home.querySelector('#k7hlvl').onclick = () => { api.sfx.click();
     const sh = document.createElement('div'); sh.className = 'k7sheet';
-    const diffHtml = () => { const d = DIFFS[dIdx]; return `<div style="position:relative;display:inline-block"><div class="k7diff"><div class="dn"><svg width="24" height="18" viewBox="0 0 24 18"><path d="M2 16V5l5 5 5-8 5 8 5-5v11z" fill="#fff" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/></svg><span style="color:${dIdx >= 3 ? LABELRED : INK}">${d.name}</span></div><small>${d.note}</small></div><span class="k7mult">x${d.mult}</span></div>`; };
+    const diffHtml = () => { const d = DIFFS[dIdx]; return `<div style="position:relative;display:inline-block"><div class="k7diff"><div class="dn"><svg width="24" height="18" viewBox="0 0 24 18"><path d="M2 16V5l5 5 5-8 5 8 5-5v11z" fill="#fff" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/></svg><span style="color:${dIdx >= 3 ? LABELRED : INK}">${d.name}</span></div></div><span class="k7mult">x${d.mult}</span></div>`; };
     const rows = () => SHELF.map((t, i) => { const open = unlocked(t), bk = bests()[t.id + '.' + DIFFS[dIdx].id];
       const st = open ? (bk ? `${DISC(bk.discs || 0)} ${bk.pct || 0}%` : '') : `${BSI.lockS('#d7263d')} ${t.cost} ◉`;
       return `<button class="k7crow${i === cur ? ' on' : ''}${open ? '' : ' lock'}" data-i="${i}"><span class="sw" style="background:${TRACKS.includes(t) ? SPRAY[TRACKS.indexOf(t) % SPRAY.length] : '#e8343f'}"></span><span class="nm">${t.name}</span><span class="ss">${st}</span><span class="mt">${t.label} · ${t.gestures}</span></button>`; }).join('');

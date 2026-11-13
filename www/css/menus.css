@@ -362,3 +362,5 @@ html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;to
 .bs-pseudo .bs-input:focus{border-style:solid;outline:3px solid #ffd23f;outline-offset:2px}
 #stage .k7rw .card{background:rgba(255,255,255,.08);border:0;box-shadow:none;color:#fff}
 #stage .k7rw .card small,#stage .k7rw .card .lb{color:rgba(255,255,255,.75)}
+#stage .k7sheet .k7gal figure:has(.empty){background:none;border:3px dashed rgba(255,255,255,.22);box-shadow:none;color:rgba(255,255,255,.7)}
+#stage .k7sheet .k7gal figure:has(.empty) .empty{background:none;color:rgba(255,255,255,.55)}

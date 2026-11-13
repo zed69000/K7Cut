@@ -9,6 +9,8 @@ BSi18n.add("ja", {
   "Robots de minuit": "真夜中のロボット",
   "French house · 122 BPM": "フレンチハウス · 122 BPM",
   "Couper · Taper": "カット · タップ",
+  "Le plus raté :": "いちばんミスした：",
+  "REVOIR LE TUTO": "チュートリアルを見る",
   "Calage": "キャリブレーション",
   "Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.": "カットが「遅い」？ 調整を上げるか、ゲームに任せよう。",
   "TROUVER MON CALAGE": "自動で調整",

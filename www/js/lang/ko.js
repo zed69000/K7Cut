@@ -9,6 +9,8 @@ BSi18n.add("ko", {
   "Robots de minuit": "한밤의 로봇",
   "French house · 122 BPM": "프렌치 하우스 · 122 BPM",
   "Couper · Taper": "자르기 · 탭",
+  "Le plus raté :": "가장 많이 놓친 것:",
+  "REVOIR LE TUTO": "튜토리얼 보기",
   "Calage": "싱크 조절",
   "Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.": "컷이 “늦음”으로 나와요? 싱크를 올리거나 게임이 찾게 하세요.",
   "TROUVER MON CALAGE": "자동으로 맞추기",

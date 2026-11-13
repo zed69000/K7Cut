@@ -9,6 +9,8 @@ BSi18n.add("es", {
   "Robots de minuit": "Robots de medianoche",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "Cortar · Tocar",
+  "Le plus raté :": "Lo más fallado:",
+  "REVOIR LE TUTO": "VER EL TUTORIAL",
   "Calage": "Calibración",
   "Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.": "¿Cortes «tarde»? Sube la calibración o deja que el juego la encuentre.",
   "TROUVER MON CALAGE": "BUSCAR MI CALIBRACIÓN",
