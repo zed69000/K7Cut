@@ -183,7 +183,7 @@ const SONGS = [
   { id: 'lab_epic', lab: true, dens: 0.85, face: 'L11', name: "Assaut final", style: 'metal', label: 'Orchestral épique · 132 BPM', ref: '', bpm: 132, root: 55, scale: MIN, prog: [0, 5, 3, 4], swing: 0, cost: 0,
     bg: ['#d7263d', '#1c1b19'], deco: 'stripes', gestures: 'Labo', delay: .5, desc: "Cordes qui martèlent, cuivres héroïques, toms de guerre et timbales : la bande-annonce",
     song: {kick: 'kick808', snare: 'rock', bass: {kind: 'sub', line: [[0, 0, 4], [4, 0, 2], [6, 0, 2], [8, 0, 4], [12, 4, 4]]},
-      chords: {kind: 'strings', steps: [0, 2, 4, 6, 8, 10, 12, 14], dur: 1}, lead: 'brass', perc: 'tom', arp: {notes: [0, 4, 7, 4], every: 2, oct: 8, kind: 'glock'},
+      chords: {kind: 'strings', steps: [0, 4, 8, 12], dur: 2}, lead: 'brass', perc: 'tom', arp: {notes: [0, 4, 7, 4], every: 2, oct: 8, kind: 'glock'},
       drums: {kick: 'x.......x.......', snare: '........x.......', perc: 'x..x..x.x..x..x.'},
       drums2: {kick: 'x.....x.x.....x.', snare: '....x.......x...', perc: 'x..x..x.x..xx.xx', ride: 'x...x...x...x...'},
       hook: [0, null, null, 2, 4, null, null, null, 5, null, 4, null, 2, null, null, null, 0, null, null, 2, 4, null, null, 7, 6, null, 4, null, 5, null, null, null]},
@@ -324,7 +324,9 @@ G.trancheroute = { mount(stage, api){
   function audioInit(){
     if(muted || actx) return;
     try{
-      actx = new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
+      // sur téléphone : une mémoire tampon un peu plus grande (40 ms), sinon le son craque dès que le processeur est chargé.
+      // Le jeu juge déjà les gestes sur ce que le joueur entend (latence de sortie), donc le rythme reste calé.
+      actx = new (window.AudioContext || window.webkitAudioContext)({latencyHint: window.matchMedia && matchMedia('(pointer: coarse)').matches ? .04 : 'interactive'});
       // compresseur à attaque lente (les attaques de batterie passent devant), saturation douce qui colle le tout, puis limiteur
       const comp = actx.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 6; comp.ratio.value = 3; comp.attack.value = .015; comp.release.value = .12;
       const glue = actx.createWaveShaper(); glue.curve = curve(1.6); glue.oversample = '2x';
@@ -671,8 +673,19 @@ G.trancheroute = { mount(stage, api){
     if(o2.rev){ const s = actx.createGain(); s.gain.value = o2.rev; out.connect(s).connect(sendVia ? sendVia.rev : revIn); }
     if(o2.dly){ const s = actx.createGain(); s.gain.value = o2.dly; out.connect(s).connect(sendVia ? sendVia.dly : dlyIn); }
   }
+  /* budget de sons : un téléphone ne suit pas des centaines d'oscillateurs à la fois (le son saccade alors que l'image reste fluide).
+     On compte les sons en cours ; au-delà du budget, les plus discrets de la musique sont laissés de côté. Ce que joue le joueur
+     (bus principal) et les sons forts (grosse caisse, basse, mélodie) passent toujours. */
+  const VOICE_MAX = +(new URLSearchParams(location.search).get('voix')) || (window.matchMedia && matchMedia('(pointer: coarse)').matches ? 44 : 90), voiceEnds = []; let voiceCut = 0;
+  function voiceOK(bus, T, end, vol){
+    for(let i = voiceEnds.length - 1; i >= 0; i--) if(voiceEnds[i] <= T) voiceEnds.splice(i, 1);
+    const n = voiceEnds.length;
+    if(bus !== master && ((n >= VOICE_MAX && vol < .3) || (n >= VOICE_MAX*.7 && vol < .05) || n >= VOICE_MAX*1.5)){ voiceCut++; return false; }
+    voiceEnds.push(end); return true;
+  }
   function osc(bus, type, f, at, dur, vol, o2){
     if(!useAudio) return null; o2 = o2 || {};
+    if(!voiceOK(bus, RT(at), RT(at) + (o2.a || 0) + (o2.sus || 0) + dur + .05, vol)) return null;
     const T = RT(at), tk = tapeK(), o = actx.createOscillator(), gn = actx.createGain(); o.type = type; f *= tk; o.frequency.setValueAtTime(f, T);
     if(o2.glide) o.frequency.exponentialRampToValueAtTime(o2.glide*tk, T + (o2.gt || dur*.8));
     if(o2.detune) o.detune.value = o2.detune;
@@ -686,6 +699,7 @@ G.trancheroute = { mount(stage, api){
   }
   function noise(bus, at, dur, vol, type, f1, f2, swell, o2){
     if(!useAudio) return; o2 = o2 || {};
+    if(!voiceOK(bus, RT(at), RT(at) + dur + .05, vol)) return;
     if(!noiseBuf){ noiseBuf = actx.createBuffer(1, actx.sampleRate*6, actx.sampleRate); const d = noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i] = Math.random()*2 - 1; }
     const T = RT(at), tk = tapeK(), s = actx.createBufferSource(), f = actx.createBiquadFilter(), gn = actx.createGain(); s.buffer = noiseBuf; s.playbackRate.value = tk; f.type = type; f.frequency.setValueAtTime(f1*tk, T); if(f2) f.frequency.exponentialRampToValueAtTime(f2*tk, T + dur); f.Q.value = o2.q || (type === 'bandpass' ? 3 : 1);
     if(swell){ gn.gain.setValueAtTime(.001, T); gn.gain.exponentialRampToValueAtTime(vol, T + dur*.95); gn.gain.linearRampToValueAtTime(0, T + dur); } else env(gn, T, vol, .002, dur);
@@ -738,7 +752,7 @@ G.trancheroute = { mount(stage, api){
       degs.forEach((d, i) => {
         const f = freq(d, 4), pan = (i - 1)*.35;
         if(kind === 'piano') pianoNote(music, at, f, .09, Math.max(.5, dur), {pan});
-        else if(kind === 'strings'){ for(const dt of [-14, -6, 0, 6, 14]) osc(music, 'sawtooth', f, at, .6, .011, {a: .35, sus: dur, detune: dt + i*2, lp: [2800, 1900, 1], vib: 5, pan: pan + dt/40, rev: .45}); }
+        else if(kind === 'strings'){ for(const dt of [-12, 0, 12]) osc(music, 'sawtooth', f, at, .6, .018, {a: .35, sus: dur, detune: dt + i*2, lp: [2800, 1900, 1], vib: dt ? 0 : 5, pan: pan + dt/40, rev: .45}); } // 3 scies (5 saturaient les téléphones)
         else if(kind === 'organ'){ osc(music, 'sine', f, at, .14, .05, {pan}); osc(music, 'sine', f*2, at, .12, .035, {pan}); osc(music, 'square', f*4, at, .06, .006, {pan}); }
         else if(kind === 'clav'){ osc(music, 'square', f*2, at, .12, .026, {hp: 600, lp: [4200, 1500, 4], pan}); }
         else if(kind === 'brass'){ for(const dt of [-8, 8]) osc(music, 'sawtooth', f, at, .2, .028, {a: .015, detune: dt, lp: [2600, 900, 2], pan, rev: .15}); }
@@ -3120,7 +3134,7 @@ G.trancheroute = { mount(stage, api){
 
   // les commandes de test (lancer un morceau, lire et changer l'état) : seulement pour la version de test, le robot et l'aperçu du GDD ;
   // un joueur n'a que l'écran en cours, lu par le rapport de bug
-  const K7TEST = {home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get trance(){ return trance; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return ppbNow(); }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(typeof i === 'string' ? byId(i) : TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
+  const K7TEST = {get voices(){ return [voiceEnds.length, voiceCut, VOICE_MAX]; }, home: () => showHome(), death: () => deathStart(), get deathInfo(){ return deathRun ? {songs: deathRun.songs, hearts, score, track: tr && tr.id} : null; }, art: storeArt, get recs(){ return Object.keys(recBuf); }, get outro(){ return outroBus ? outroBus.length : 0; }, get menuMusic(){ return MM.on ? MM.n : 0; }, get intro(){ return intro ? intro.stage + (intro.silent ? ' muet' : '') + (intro.shown ? ' vu' : '') + ' ' + (actx ? actx.state : 'pas-audio') : 'fini ' + (actx ? actx.state : ''); }, bars: () => Array.from({length: totalBars}, (_, b) => buildBar(b)), get bpm(){ return tr.bpm; }, get voice(){ return voiceBuf ? voiceBuf.duration : 0; }, get jumpT(){ return jumpT; }, get hs(){ return holdState; }, pick: t => pickAt(t), now: () => now(), get objs(){ return objs; }, get state(){ return state; }, get stats(){ return stats; }, get combo(){ return combo; }, get trance(){ return trance; }, get hearts(){ return hearts; }, set hearts(v){ hearts = v; }, get bpb(){ return bpb; }, get ppb(){ return ppbNow(); }, get rate(){ return rate; }, get kit(){ return kit ? Object.keys(kit).length : 0; }, get tuto(){ return tutoObj && state === 'tuto' ? tk(tutoObj) : null; }, get lost(){ return lostTime; }, start: (i, d) => { if(d != null) diff = DIFFS[d]; startTrack(typeof i === 'string' ? byId(i) : TRACKS[i]); }, lab: (i, d, a) => { if(d != null) diff = DIFFS[d]; auto = !!a; startTrack(LAB[i]); }, tracks: TRACKS, cv};
   window.__k7 = window.BS_TEST_BUILD || window.__k7bot || (window.Tuning && Tuning.preview) ? K7TEST : {get state(){ return state; }};
   // images de la boutique (icône, bannière), dessinées par le jeu : tests/store_art.py les enregistre
   function storeArt(w, h, kind){
