@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.35.0 — Nouveaux menus
+- **Menus** : nouvelle direction artistique d'après la maquette (accueil, campagne avec ses flèches et ses 4 niveaux, avant de jouer, chargement, fin de partie en deux temps, cassette de la mort, mes œuvres, options, pause, labo). Fond sombre, cartes crème, un seul bouton rose par écran.
+- **Ouverture** : après l'écran de lancement, une courte pause où l'accueil n'accepte aucun clic (les taps de martelage sont avalés).
+- **Pseudo** : il se règle dans les options.
+
 ## 0.34.0 — Musique explosive
 - **Musique** : montée avant chaque refrain (roulement de caisse claire, note qui grimpe, toms), impact à l'entrée du refrain et du final, basse doublée, cymbales, claps et toms au final ; coup sec sous les gestes parfaits, impact tous les 25 de combo, à chaque montée de transe et quand la bande repart.
 - **Labo** (version de test) : 11 morceaux à l'essai de tous styles ; ENVOYER MES ♥ donne un code à copier.
