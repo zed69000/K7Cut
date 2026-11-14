@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.34.0 — Musique explosive
+- **Musique** : montée avant chaque refrain (roulement de caisse claire, note qui grimpe, toms), impact à l'entrée du refrain et du final, basse doublée, cymbales, claps et toms au final ; coup sec sous les gestes parfaits, impact tous les 25 de combo, à chaque montée de transe et quand la bande repart.
+- **Labo** (version de test) : 11 morceaux à l'essai de tous styles ; ENVOYER MES ♥ donne un code à copier.
+- **Chargement** : nom de la cassette, halo au tempo, vraie bande avec cible, doigt qui montre le geste, éclats de peinture, barre rayée, bouton COMMENCER.
+
 ## 0.33.1 — Menus cohérents
 - **Boutons** : seul ce qui est cliquable a la forme d'un bouton ; infos, rangs, scores en verre sombre. Champ du pseudo bien visible (crayon, pointillés).
 - **Flèches** : un seul dessin pour retour et difficulté ; plus de ◀ ▶ ↗ qui deviennent des emojis bleus sur iPhone.
