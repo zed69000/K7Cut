@@ -52,7 +52,12 @@ function boot(){ try{ safeArea(); }catch(e){}
   // le trait gravé tremble légèrement, comme une animation dessinée image par image
   let step = 0; const boil = setInterval(() => { step = (step + 1) % 3; art.setAttribute('filter', 'url(#spWob' + (step + 1) + ')'); }, 170);
   // la fin de l'écran prévient le jeu, qui lance son intro (un toucher sur l'écran compte comme geste pour le son)
-  const end = () => { clearInterval(boil); root.classList.remove('splash'); window.dispatchEvent(new Event('bs-splash-end')); };
+  // juste après (passé au doigt ou fini seul) : une courte pause où l'accueil est visible mais n'accepte aucun clic. Le joueur qui martèle
+  // l'écran pour passer l'ouverture ne part pas par mégarde dans un menu ; ses taps sont avalés, pas rejoués.
+  const guard = () => { const g = document.createElement('div'); g.id = 'spGuard'; g.style.cssText = 'position:fixed;inset:0;z-index:69;touch-action:none'; document.body.appendChild(g);
+    // chaque tap avalé prolonge un peu la pause (1,5 s au plus) : elle dure tant que le joueur martèle
+    const t0g = performance.now(); let tm = setTimeout(() => g.remove(), 600); g.addEventListener('pointerdown', () => { clearTimeout(tm); tm = setTimeout(() => g.remove(), Math.max(0, Math.min(450, 1500 - (performance.now() - t0g)))); }); };
+  const end = () => { clearInterval(boil); guard(); root.classList.remove('splash'); window.dispatchEvent(new Event('bs-splash-end')); };
   const timer = setTimeout(end, 2850);
   el.addEventListener('pointerdown', () => { clearTimeout(timer); end(); }, {once: true});
 })();
