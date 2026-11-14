@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.33.1 — Menus cohérents
+- **Boutons** : seul ce qui est cliquable a la forme d'un bouton ; infos, rangs, scores en verre sombre. Champ du pseudo bien visible (crayon, pointillés).
+- **Flèches** : un seul dessin pour retour et difficulté ; plus de ◀ ▶ ↗ qui deviennent des emojis bleus sur iPhone.
+- **Menus épurés** : plus de bandeau « touche pour lancer », niveau sans phrase, cases vides des œuvres en pointillés, fin de partie plus courte, un seul message quand la bande ralentit.
+
 ## 0.33.0 — Noël et menus épurés
 - **Noël** (tout décembre, `?noel` pour le voir avant) : cassette « Traîneau turbo » (Jingle Bells, domaine public, grelots et cuivres), hors campagne et hors Cassette de la mort ; thème de Noël sur toutes les cassettes (guirlande, boules, houx, neige, sapins) ; K7 en bonnet, neige sur l'accueil et les menus, guirlandes sur les panneaux.
 - **Chargement** : fond noir, une barre, et les briques de la cassette qui font leur geste avec leur nom (tuto) ; la page d'explications avant la cassette disparaît.
