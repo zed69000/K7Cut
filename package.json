@@ -1,6 +1,6 @@
 {
   "name": "beat-splash",
-  "version": "0.35.1",
+  "version": "0.36.0",
   "private": true,
   "description": "BEAT SPLASH : jeu de rythme mobile en cassettes",
   "scripts": {

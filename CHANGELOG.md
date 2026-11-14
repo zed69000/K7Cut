@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.36.0 — Les compagnons
+- **Compagnons** : de petites boules qui suivent le héros sur la bande. Un compagnon tous les 10 de combo (7 au plus) ; quand on rate un geste, le dernier le rattrape (combo et transe sauvés) puis s'en va. Le geste compte quand même comme raté pour les disques. Pas dans la Cassette de la mort.
+- **Ronde** : les compagnons recrutés dansent en bas de l'écran à la place du public.
+
 ## 0.35.1 — Son qui saccadait
 - **Son** : plafond de sons simultanés (44 sur téléphone, les plus discrets sont écartés), cordes allégées, tampon audio plus grand sur téléphone.
 
