@@ -67,8 +67,8 @@
   function sleep(ms){ const g = gen; return new Promise(ok => setTimeout(ok, ms)).then(() => { if(g !== gen) throw STOP; }); }
   async function until(fn, maxMs){ const end = performance.now() + (maxMs || 600000); while(performance.now() < end){ if(fn()) return true; await sleep(50); } return false; }
   const click = s => { const el = typeof s === 'string' ? q(s) : s; if(el) el.click(); return !!el; };
-  const dropOverlays = () => document.querySelectorAll('#stage .k7sheet, #stage .k7brief').forEach(e => e.remove());
-  async function leaveReward(){ if(click('.k7rw .tomenu')) await sleep(120); }
+  const dropOverlays = () => document.querySelectorAll('#stage .u-page, #stage .k7sheet').forEach(e => e.remove());
+  async function leaveReward(){ if(click('.u-end .tomenu')) await sleep(120); }
   async function backToMenu(){
     const k = k7();
     if(k.state === 'play' || k.state === 'tuto'){ P.allowPause = true; click(document.querySelector('#stage > button')); await sleep(40); }
@@ -174,8 +174,8 @@
     P.on = true;
     await until(() => (o.stop && o.stop()) || k.state === 'over' || k.state === 'menu' || (!o.finish && k.state === 'play' && k.now()/k.bpb >= bars*4 - .5));
     restartRun = null;
-    if(o.finish){ await until(() => q('.k7rw'), 5000); P.on = false; }
-    else if(k.state === 'over' && !o.keepOver){ await until(() => q('.k7rw'), 2500); await leaveReward(); }
+    if(o.finish){ await until(() => q('.u-end'), 5000); P.on = false; }
+    else if(k.state === 'over' && !o.keepOver){ await until(() => q('.u-end'), 2500); await leaveReward(); }
     return bars;
   }
   const rhythm = s => { const tot = s.perfect + s.good + s.ok + s.miss; return tot ? Math.round((s.perfect + .8*s.good + .4*s.ok)/tot*100) : 0; };
@@ -279,7 +279,7 @@
       scene.live = () => 'ratés de suite ' + (k.stats ? Math.min(k.stats.miss, Tuning.num('niveau.roi.ko', 3)) : 0) + ' / ' + Tuning.num('niveau.roi.ko', 3);
       await play({i: 0, lvl: 3, parts: [[1, 16]], err: () => played++ < 8 ? 0 : null, stop: mecJump, keepOver: true, onStart(){ played = 0; }});
       if(mecJump()) return;
-      await until(() => q('.k7rw'), 4000); await sleep(1400); P.on = false; await leaveReward();
+      await until(() => q('.u-end'), 4000); await sleep(1400); P.on = false; await leaveReward();
     };
   }
   function mecFocusOf(key){
@@ -319,15 +319,15 @@
     await titleScreen(0);
     step('Accueil', 2600); await sleep(2600);
     step('Campagne', 2400); click('#k7tcamp'); await sleep(2400);
-    if(withExtras){ step('Cassettes', 3200); click('#k7hlvl'); await sleep(300); await glide(scroller(q('.k7sheet')), null, 2600); dropOverlays(); }
+    if(withExtras){ step('Cassettes', 3200); 0; await sleep(300); await glide(scroller(q('.u-page')), null, 2600); dropOverlays(); }
     step('Chargement'); click('#k7hplay'); // plus de page avant le niveau : le chargement montre les briques
     P.reset(); P.err = err; P.on = true;
     await until(() => k.state === 'play', 12000);
     step('Partie');
     if(withExtras){ await sleep(3500); step('Pause'); P.allowPause = true; click(document.querySelector('#stage > button')); await sleep(2400); click('.k7pause .go'); P.allowPause = false; step('Partie'); }
-    await until(() => q('.k7rw'), 90000);
+    await until(() => q('.u-end'), 90000);
     P.on = false;
-    step('Fin de partie'); await sleep(1200); await glide(scroller(q('.k7rw')), null, 4800);
+    step('Fin de partie'); await sleep(1200); await glide(scroller(q('.u-end')), null, 4800);
   }
 
   const SCENES = {
@@ -370,7 +370,7 @@
           scene.live = () => { const t = k.tracks[i]; return 'Face ' + t.face + ' · ' + t.name + ' · ' + t.label; };
           for(; i < k.tracks.length; i++){ await sleep(2300); if(i < k.tracks.length - 1) nextCassette(); }
           i = 0; scene.live = () => 'Liste des cassettes';
-          click('#k7hlvl'); await sleep(500); await glide(scroller(q('.k7sheet')), null, 7000); await sleep(1200); dropOverlays();
+          0; await sleep(500); await glide(scroller(q('.u-page')), null, 7000); await sleep(1200); dropOverlays();
         });
       }
     },
@@ -384,9 +384,9 @@
           freshSave({allOpen: false});
           await play({i: 0, lvl: 1, parts: [[1, 6]], finish: true, err: cycle([0, 90, 0, 170, 0, 90, 0, null, 0, 90, 170, 0, 90, 0])});
           last = rhythm(k.stats);
-          const rw = q('.k7rw'), panel = rw && rw.querySelector('.panel');
+          const rw = q('.u-end'), panel = rw && rw.querySelector('.u-rhy');
           await sleep(1000); if(panel) await glide(rw, panel.offsetTop - 12, 1200);
-          await sleep(5600); await leaveReward(); click('#k7hlvl'); await sleep(3800); dropOverlays();
+          await sleep(5600); await leaveReward(); 0; await sleep(3800); dropOverlays();
         });
       }
     },
@@ -401,7 +401,7 @@
           let n = 0; P.err = () => ++n % 14 === 0 ? null : 0;
           restartRun = () => { P.reset(); n = 0; k.death(); };
           restartRun(); P.on = true;
-          await until(() => q('.k7brief.fit'), 300000);
+          await until(() => q('.u-death'), 300000);
           restartRun = null; P.on = false;
           await sleep(5500);
         });
@@ -415,7 +415,7 @@
         await LOOP(async () => {
           cap = '';
           await play({i: i % k.tracks.length, lvl: 1, parts: [[2, 10]], finish: true, err: cycle([0, 0, -130, 0, 130, 0, 0, null, 0, -130, 0, 130])});
-          const c = q('.k7rw .cap b'); cap = c ? c.textContent : '';
+          const c = q('.u-artcap span'); cap = c ? c.textContent : '';
           await sleep(7000); await leaveReward(); click('#k7trophy'); cap = 'Mes œuvres'; await sleep(4500); dropOverlays(); i++;
         });
       }
@@ -467,7 +467,7 @@
           step('Mes œuvres'); click('#k7trophy'); await sleep(3000); dropOverlays();
           click('#k7hback'); await sleep(100);
           step('Records'); click('#k7trec'); await sleep(3200); dropOverlays();
-          step('Réglages'); click('#k7topt'); await sleep(300); await glide(scroller(q('.k7sheet')), null, 3000); dropOverlays();
+          step('Réglages'); click('#k7topt'); await sleep(300); await glide(scroller(q('.u-page')), null, 3000); dropOverlays();
         });
       }
     },
@@ -493,7 +493,7 @@
       title: 'Technique', texts: ['Pas d\'écran technique : le plus proche est Réglages, avec calage, labo, langues et version.'],
       async run(){
         await sleep(500); click('#k7topt'); await sleep(400);
-        await LOOP(async () => { const s = scroller(q('.k7sheet')); await glide(s, null, 5000); await sleep(2500); await glide(s, 0, 2000); await sleep(1500); });
+        await LOOP(async () => { const s = scroller(q('.u-page')); await glide(s, null, 5000); await sleep(2500); await glide(s, 0, 2000); await sleep(1500); });
       }
     }
   };

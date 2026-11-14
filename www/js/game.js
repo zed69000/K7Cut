@@ -18,7 +18,17 @@ const BSI = {
   phones: c => `<svg viewBox="0 0 34 30" width="34" height="30"><path d="M4 20v-4a13 13 0 0 1 26 0v4" fill="none" stroke="${c}" stroke-width="3.6"/><rect x="2" y="17" width="8" height="12" rx="3" fill="${c}"/><rect x="24" y="17" width="8" height="12" rx="3" fill="${c}"/></svg>`,
   crown: c => `<svg viewBox="0 0 40 30" width="36" height="27"><path d="M3 26V8l9 8 8-13 8 13 9-8v18z" fill="#ffd60a" stroke="${c}" stroke-width="3" stroke-linejoin="round"/></svg>`,
   redo: c => `<svg viewBox="0 0 30 30" width="30" height="30"><path d="M24 15a9 9 0 1 1-3-6.7" fill="none" stroke="${c}" stroke-width="4.2" stroke-linecap="round"/><path d="M16.5 3.5h8v8z" fill="${c}" stroke="${c}" stroke-width="2" stroke-linejoin="round"/></svg>`,
-  back: c => `<svg viewBox="0 0 28 30" width="26" height="28"><path d="M22 4 5 15l17 11z" fill="${c}" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
+  back: c => `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 12H5M11 5l-7 7 7 7" fill="none" stroke="${c}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chl: c => `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chr: c => `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 5l7 7-7 7" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  row: () => `<svg class="ch" viewBox="0 0 10 16"><path d="M2 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  go: () => `<svg viewBox="0 0 20 24"><path d="M3 2l15 10L3 22z" fill="#fff"/></svg>`,
+  user: () => `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#fff"/><circle cx="12" cy="9.5" r="4" fill="#16151c"/><path d="M4.5 20a8 8 0 0 1 15 0" fill="#16151c"/></svg>`,
+  disc: on => `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="${on ? '#ffd60a' : 'none'}" stroke="${on ? '#16151c' : 'currentColor'}" stroke-width="2"/>${on ? '<circle cx="12" cy="12" r="6.5" fill="none" stroke="#16151c" stroke-width="1.5"/><circle cx="12" cy="12" r="2.6" fill="#16151c"/>' : ''}</svg>`,
+  dl: c => `<svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  globe: c => `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="${c}" stroke-width="2.2"/><path d="M2.5 12h19M12 2.5c3.5 3 3.5 16 0 19M12 2.5c-3.5 3-3.5 16 0 19" fill="none" stroke="${c}" stroke-width="2"/></svg>`,
+  flask: c => `<svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M7.5 15h9" stroke="${c}" stroke-width="2.4"/></svg>`,
+  skull: () => `<svg viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="#fff"/><circle cx="8.7" cy="10.6" r="2.4" fill="#16151c"/><circle cx="15.3" cy="10.6" r="2.4" fill="#16151c"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="#16151c"/></svg>`,
   fwd: c => `<svg viewBox="0 0 28 30" width="26" height="28"><path d="M6 4l17 11L6 26z" fill="${c}" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/></svg>`,
   // petits triangles dans les liens et boutons texte (les caractères ◀ ▶ deviennent des emojis bleus sur iPhone)
   triL: () => `<svg viewBox="0 0 10 12" width=".62em" height=".75em" style="vertical-align:-.05em"><path d="M9 1 1 6l8 5z" fill="currentColor"/></svg>`,
@@ -37,6 +47,10 @@ const BSI = {
   dch: () => `<svg class="chev" viewBox="0 0 30 30" style="width:32px"><path d="M4 5l10 10-10 10M15 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 };
 // un bouton des menus : icône | libellé (classes : pink, yellow, dark, cta, pill)
+// les disques d'une cassette : n pleins sur 3
+const UDISCS = n => `<span class="u-discs">${[0, 1, 2].map(i => BSI.disc(i < n)).join('')}</span>`;
+// une ligne cliquable des menus (crème, ou sombre avec dark)
+const uRow = (cls, id, ic, label, sub, extra = '') => `<button class="u-row ${cls}"${id ? ` id="${id}"` : ''} ${extra}>${ic ? `<span class="ic">${ic}</span>` : ''}<span class="tx">${label}${sub ? `<small>${sub}</small>` : ''}</span>${BSI.row()}</button>`;
 const bsBtn = (cls, id, ic, label, extra = '') => `<button class="bs-btn ${cls}"${id ? ` id="${id}"` : ''} ${extra}>${ic ? `<span class="ic">${ic}</span><span class="sep"></span>` : ''}<span class="bl">${label}</span></button>`; // titres, boutons, chiffres : Bungee (lisible, enseigne de rue) ; le texte courant est en Rubik
 const MAJ = [0, 2, 4, 5, 7, 9, 11], MIN = [0, 2, 3, 5, 7, 8, 10];
 // Noël : en décembre, la cassette de Noël s'ajoute en tête de l'étagère et tout se décore (neige, bonnet de K7) ; ?noel pour la voir avant
@@ -1325,7 +1339,7 @@ G.trancheroute = { mount(stage, api){
     // un disque ou plus : on propose la même face au niveau au-dessus
     const harder = R.stars >= 1 ? DIFFS[DIFFS.indexOf(diff) + 1] : null;
     rwCss();
-    const old = stage.querySelector('.k7rw'); if(old) old.remove();
+    const old = stage.querySelector('.u-end'); if(old) old.remove();
     const at0 = useAudio ? qNext(clock() + .12, 1) : 0, delay = useAudio ? Math.max(0, (at0 - clock())/rate) : 0;
     const el = document.createElement('div'); el.className = 'k7rw'; el.style.setProperty('--b', bpb + 's'); el.style.setProperty('--d', delay + 's');
     const P = (n, html, cls) => `<div class="pop ${cls || ''}" style="--n:${n}">${html}</div>`;
@@ -1338,30 +1352,34 @@ G.trancheroute = { mount(stage, api){
     else if(R.nextT && !unlocked(R.nextT)) second.push(`<div class="cell"><div class="ic" style="background:#d8d2c6">◎</div><div><b>${R.nextT.name} :</b><div class="sm">${tx(R.nextT.cost - discs() > 1 ? 'encore {n} disques' : 'encore {n} disque', {n: '<b>' + (R.nextT.cost - discs()) + '</b>'})}</div></div></div>`);
     if(R.rec) second.push(`<div class="cell"><div class="ic" style="background:#e8344f;color:#fff">♛</div><div><div class="lb">${tx('NOUVEAU RECORD')}</div><div class="sm">${tx('sur {cassette}, niveau {niveau}', {cassette: tr.name, niveau: diff.name})}</div></div></div>`);
     if(second.length === 1) second.push(`<div class="cell"><div class="ic">◉</div><div><div class="lb">${tx('DISQUES')}</div><div class="vl">${discs()}</div></div></div>`);
-    el.innerHTML = `<canvas></canvas><div class="in">
-      ${P(0, `<h2>${TT}</h2>`)}
-      ${R.img ? P(1, `<div class="art"><img src="${R.img}" alt="${tx('Ta toile')}"><div class="cap"><b>« ${R.artTitle} »</b><span>${tr.name} · ${R.acc} %</span></div></div>`, 'artw') : ''}
-      ${R.img ? P(1, `<div class="bs-legend">${tx('Rond net = pile · jets = en avance · coulures = en retard')}</div>`) : ''}
-      <div class="top"><div class="ttl">${P(2, `<div class="band">${tr.name} ${R.mood}</div>`)}${P(2, `<div class="pct"><span data-count="${R.acc}">0</span> % ${tx('de super rythme')}</div>`)}</div></div>
-      ${P(3, `<div class="panel"><div class="ribbon">${ribbon}</div><div class="discs">${[0, 1, 2].map(i => `<div class="disc pop ${i < R.stars ? 'on' : ''}" style="--n:${4 + i}">${i < R.stars ? '<div class="burst"></div>' : ''}${discSvg(i < R.stars, '#ffd23f')}</div>`).join('')}</div>
-        <div class="next">${R.stars < 3 ? tx('PROCHAIN DISQUE À {n} %', {n: diff.disc[R.stars]}) : tx('LES 3 DISQUES, BRAVO !')}</div></div>`)}
-      ${R.worst ? P(6, `<div class="bs-miss"><span>${tx('Le plus raté :')} <b>${TUTO[R.worst[0]] ? TUTO[R.worst[0]].verb : ''}</b> ×${R.worst[1]}</span><button class="retuto">${tx('REVOIR LE TUTO')}</button></div>`) : ''}
-      ${P(7, `<div class="card"><div class="cell"><div class="ic">${BSI.cup(INK)}</div><div><div class="lb">${tx('SCORE')}</div><div class="vl" data-count="${score}">0</div><div class="sm">${tx('points')}</div></div></div><div class="cell"><div class="ic" style="background:#29c4ff">✸</div><div><div class="lb">${tx('COMBO MAX')}</div><div class="vl">${maxCombo}</div></div></div>
-        <div class="cell row2"><div class="ic" style="background:#e8344f;color:#fff">♪</div><div><b>${tx('+{n} talent ♪', {n: R.gained})}</b><div class="sm">${tx('total {n}', {n: bank()})}</div></div></div><div class="cell row2"><div class="ic" style="background:#d8d2c6">▭</div><div>${lostTime > .3 ? `${tx('Bande ralentie :')}<br><b>${tx('+{n} s perdues', {n: lostTime.toFixed(1).replace('.', ',')})}</b>` : `${tx('Bande intacte :')}<br><b>${tx('jamais ralentie')}</b>`}</div></div></div>`)}
-      ${P(8, `<div class="card">${second.slice(0, 2).join('')}</div>`)}
-      ${harder ? P(2, `<button class="harder"><span>${tx('ENCORE ? REJOUE EN')}</span><b>${harder.name.toUpperCase()} ▲</b><small>${harder.note}</small></button>`) : ''}
-      ${P(1, `<div class="btns"><button class="again">${tx('REJOUER')} ${BSI.triR()}</button>${R.img ? `<button class="keep">${tx('GARDER MON ŒUVRE')} ${BSI.disk(INK)}</button>` : `<button class="keep">${tx('CASSETTES')}</button>`}</div>`)}
-      ${P(1, `<div class="links"><button class="tomenu">${BSI.triL()} ${tx('CASSETTES')}</button>${R.nextT && unlocked(R.nextT) ? `<button class="next2">${tx('FACE')} ${R.nextT.face} : ${R.nextT.name.toUpperCase()} ${BSI.triR()}</button>` : ''}</div>`)}
-      </div>`;
+    el.className = 'u-page u-end';
+    const info = R.opened.length ? tx('Nouvelle cassette ouverte : {nom} !', {nom: R.opened.map(x => x.name).join(', ')}) : R.titleNew ? tx('Nouveau titre : {nom} !', {nom: R.titleNew}) : R.rec ? tx('Nouveau record !')
+      : R.stars < 3 ? tx('Prochain disque à {n} %', {n: diff.disc[R.stars]}) : tx('Les 3 disques, bravo !');
+    const bk = bests()[tr.id + '.' + diff.id], canNext = R.nextT && unlocked(R.nextT);
+    el.innerHTML = `<canvas class="fx"></canvas>
+      <div class="pg" data-p="1"><div class="u-title sp">${TT}</div>
+        ${R.img ? `<div class="u-art"><img src="${R.img}" alt="${tx('Ta toile')}"></div><div class="u-artcap"><span>${R.artTitle}</span><button class="u-pill keep">${BSI.dl(INK)} ${tx('Télécharger')}</button></div>` : ''}
+        <div class="u-box u-rhy"><span>${tx('RYTHME')}</span><b><span data-count="${R.acc}">0</span> %</b><span class="u-discs">${[0, 1, 2].map(i => `<span class="disc">${BSI.disc(i < R.stars)}</span>`).join('')}</span></div>
+        <div class="u-stats"><div><small>${tx('Score')}</small><b data-count="${score}">0</b></div><div><small>${tx('Combo')}</small><b>${maxCombo}</b></div><div><small>${tx('Talent')}</small><b>+${R.gained}</b></div></div>
+        <div class="u-info">${info}</div><span class="u-grow"></span>
+        <button class="u-cta" data-a="more">${tx('CONTINUER')} ${BSI.go()}</button></div>
+      <div class="pg" data-p="2" hidden><div class="u-title sp">${tx('ON CONTINUE ?')}</div>
+        <div class="u-next"><img src="${cassImg(tr).src}" alt=""><div><b>${tx('FACE')} ${tr.face} · ${tr.name}</b>${UDISCS(bk ? bk.discs || 0 : 0)}</div></div>
+        ${R.worst && TUTO[R.worst[0]] ? `<div class="u-note">${tx('Le plus raté :')} <b>${TUTO[R.worst[0]].verb}</b> ×${R.worst[1]}</div>` : ''}<span class="u-grow"></span>
+        ${harder ? `<button class="u-cta harder">${tx('NIVEAU SUPÉRIEUR')} ${BSI.go()}</button>` + uRow('again', '', BSI.redo(INK), tx('REJOUER')) : `<button class="u-cta again">${tx('REJOUER')} ${BSI.go()}</button>`}
+        ${canNext ? uRow('next2', '', BSI.lock(INK), tx('CASSETTE SUIVANTE'), R.nextT.name) : ''}
+        ${R.worst && TUTO[R.worst[0]] ? uRow('retuto', '', BSI.cap(INK), tx('REVOIR LE TUTO')) : ''}
+        ${uRow('tomenu', '', BSI.back(INK), tx('RETOUR AUX CASSETTES'))}</div><div class="u-corners"></div>`;
     stage.appendChild(el);
     const close = () => { alive = false; el.remove(); outroStop(); if(useAudio){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setTargetAtTime(0, actx.currentTime, .05); setTimeout(() => { if(music) music.gain.setValueAtTime(.8, actx.currentTime); }, 300); } };
     const leave = go => { close(); adBreak(TRACKS.includes(tr) ? TRACKS.indexOf(tr) : TRACKS.length).then(go); };
+    el.querySelector('[data-a=more]').onclick = () => { api.sfx.click(); el.querySelector('[data-p="1"]').hidden = true; el.querySelector('[data-p="2"]').hidden = false; el.scrollTop = 0; };
     el.querySelector('.again').onclick = () => leave(() => briefing(tr, () => startTrack(tr)));
     { const rt = el.querySelector('.retuto'); if(rt) rt.onclick = () => { api.save('tuto3.' + R.worst[0], false); leave(() => briefing(tr, () => startTrack(tr))); }; }
     const hd = el.querySelector('.harder'); if(hd) hd.onclick = () => leave(() => { diff = harder; dIdx = DIFFS.indexOf(harder); api.save('diff', dIdx); briefing(tr, () => startTrack(tr)); });
-    el.querySelector('.tomenu').onclick = () => leave(showMenu);
+    el.querySelector('.tomenu').onclick = () => leave(() => { showMenu(); showHome('camp'); });
     const nx = el.querySelector('.next2'); if(nx) nx.onclick = () => leave(() => briefing(R.nextT, () => startTrack(R.nextT)));
-    el.querySelector('.keep').onclick = R.img ? R.keep : () => leave(showMenu);
+    { const kp = el.querySelector('.keep'); if(kp) kp.onclick = R.keep; }
     outroMusic(at0, R.stars);
     if(useAudio && outroBus){ const sv = sendVia; sendVia = {rev: outroBus[3], dly: outroBus[4]}; applause(actx.currentTime + delay + .1, R.stars/3, outroBus[0]); sendVia = sv; }
     // compteurs qui défilent pendant les temps 2 à 4, confettis à chaque disque, foule qui saute sur le tempo
@@ -1375,10 +1393,7 @@ G.trancheroute = { mount(stage, api){
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W2, H2);
       // fond : bandes et giclées qui pulsent
       const kick = beat > 0 && beat < 29 ? Math.max(0, 1 - (beat % 1)*4) : 0;
-      g.save(); g.globalAlpha = .9; g.fillStyle = INK; g.translate(0, 0); g.rotate(-.5); g.fillRect(-80, 120, 46, 400); g.fillStyle = '#e8344f'; g.fillRect(-20, 120, 14, 400); g.restore();
-      g.fillStyle = 'rgba(28,27,25,.45)'; for(let i=0;i<40;i++){ const x = (i*97) % W2, y = (i*53) % 220; g.beginPath(); g.arc(W2 - 70 + (x % 70), y, 2.4*(1 - y/220), 0, 6.283); g.fill(); }
       // foule en bas qui saute
-      const base = H2 + 6; for(let i=0;i<Math.ceil(W2/30) + 2;i++){ const x = i*30 - 8, j = kick*(6 + (i % 3)*5), sz = 1 + ((i*37) % 10)/25; g.save(); g.translate(x, base - j); g.scale(sz, sz); g.fillStyle = INK; g.beginPath(); g.arc(0, -46, 11, 0, 6.283); g.fill(); g.beginPath(); g.ellipse(0, -16, 17, 22, 0, Math.PI, 0); g.fill(); g.fillRect(-17, -16, 34, 30); if(i % 2){ g.strokeStyle = INK; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(10, -28); g.lineTo(18 + Math.sin(beat*Math.PI + i)*5, -66); g.stroke(); } g.restore(); }
       const dt = 1/60; for(const p of parts){ p.vy += 700*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.l -= dt; p.r += .2; g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = Math.max(0, p.l); g.fillStyle = p.c; g.fillRect(-4, -2.5, 8, 5); g.restore(); } parts = parts.filter(p => p.l > 0);
       requestAnimationFrame(loop); })();
   }
@@ -2358,57 +2373,58 @@ G.trancheroute = { mount(stage, api){
     diff = DIFFS[dIdx]; startTrack(t);
   };
   ui.k7gear.onclick = () => {
-    const sh = document.createElement('div'); sh.className = 'k7sheet';
-    const muted0 = api.store.load('muted', false), vv = Math.round(voiceVol()*100);
-    // pour le joueur : son, voix, calage, tutos, langue, Premium ; les outils de test seulement dans la version de test
-    sh.innerHTML = `<div><div class="bs-top"><div class="k7badge">${home.querySelector('#k7htal').innerHTML}</div><div class="bs-r"><button class="k7sq" data-a="gal" aria-label="${tx('Mes œuvres')}">${BSI.gal(INK)}</button><button class="k7sq" data-a="x" aria-label="${tx('Fermer')}">${BSI.gear(INK)}</button></div></div>
-      <div class="bs-panel bs-set"><button class="bs-back x" id="k7x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><div class="bs-title">${tx('RÉGLAGES')}</div>
-      ${bsBtn('', 'k7mute', (muted0 ? BSI.mute : BSI.spk)(INK), tx(muted0 ? 'SON : COUPÉ' : 'SON : ACTIVÉ'))}
-      <label class="bs-vol"><span class="ic">${BSI.mic(INK)}</span><span class="sep"></span><span class="bl"><b>${tx('VOIX')}</b><small id="k7vv">${vv ? vv + ' %' : tx('COUPÉE')}</small></span><input id="k7voice" type="range" min="0" max="100" step="10" value="${vv}" aria-label="${tx('Volume de la voix')}"></label>
-      <div class="bs-cal"><div class="row"><b>${tx('Calage')}</b><div class="st"><button id="k7offm" aria-label="−">−</button><span id="k7off">${api.load('offset', 0)} ms</span><button id="k7offp" aria-label="+">+</button></div></div><p>${tx('Coupes « en retard » ? Monte le calage, ou laisse le jeu le trouver.')}</p>${bsBtn('yellow pill', 'k7calib', '', tx('TROUVER MON CALAGE'))}</div>
-      ${bsBtn('', 'k7tuto', BSI.cap(INK), tx('REVOIR LES TUTOS'))}
-      <div class="bs-langs">${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="${c === BSi18n.lang ? 'on' : ''}" data-lang="${c}" aria-label="${n}">${['zh', 'ja', 'ko'].includes(c) ? n : c.toUpperCase()}</button>`).join('')}</div>
-      ${window.BSPremium ? bsBtn('pink pill', 'k7prem', BSI.crown(INK), '') + `<button class="bs-link" id="k7rest">${tx('Restaurer mes achats')}</button>` : ''}
-      ${window.BS_TEST_BUILD ? `<div class="bs-testzone"><b>${tx('OUTILS DU DÉVELOPPEUR')}</b>
-        ${bsBtn('dark', 'k7all', BSI.lock('#fff'), tx(api.load('allOpen', false) ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'))}
-        ${bsBtn('yellow', 'k7labo', BSI.phones(INK), tx('LABO'))}</div>` : ''}
-      <div class="bs-ver">BEAT SPLASH · version ${VERSION}</div></div></div>`;
-    menu.appendChild(sh);
-    const close = () => { pageOut(sh); if(window.BSPremium) BSPremium.onChange = null; };
-    sh.querySelector('#k7x').onclick = close; sh.querySelector('[data-a=x]').onclick = close;
-    sh.querySelector('[data-a=gal]').onclick = () => { close(); home.querySelector('#k7trophy').onclick(); };
-    // Premium : un achat unique qui retire les pubs. Le bouton montre le prix (celui du magasin), puis « activé ».
+    const sh = document.createElement('div'); sh.className = 'u-page u-opt';
+    const tog = (id, ic, label, on) => `<button class="u-row plain${on ? ' on' : ''}" id="${id}" role="switch" aria-checked="${on}"><span class="ic">${ic}</span><span class="tx">${label}</span><span class="u-tog"></span></button>`;
+    sh.innerHTML = `<div class="u-top"><div class="u-title">${tx('OPTIONS')}</div><button class="u-ib" id="k7x" aria-label="${tx('Fermer')}">${BSI.close(INK)}</button></div>
+      ${tog('k7mute', BSI.spk(INK), tx('Son'), !api.store.load('muted', false))}
+      ${tog('k7voicet', BSI.mic(INK), tx('Voix des combos'), voiceVol() > 0)}
+      <div class="u-box u-cal"><b>${tx('Calage du rythme')}</b><div class="r"><button class="u-ib" id="k7offm" aria-label="−">−</button><span class="u-pill y" id="k7off">${api.load('offset', 0)} ms</span><button class="u-ib" id="k7offp" aria-label="+">+</button>
+        <button class="u-row dark plain" id="k7calib"><span class="ic">${BSI.triR()}</span><span class="tx">${tx('Tester le rythme')}</span></button></div></div>
+      ${uRow('plain', 'k7tuto', BSI.cap(INK), tx('Revoir les tutos'))}
+      <label class="u-field"><span>${tx('Ton pseudo')}</span><input id="k7pseudo" maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(pseudo()).replace(/"/g, '')}"></label>
+      ${uRow('plain', 'k7lang', BSI.globe(INK), tx('Langue') + ' · ' + BSi18n.LANGS[BSi18n.lang])}
+      <div class="u-langs" hidden>${Object.entries(BSi18n.LANGS).map(([c, n]) => `<button class="u-row plain center${c === BSi18n.lang ? ' on' : ''}" data-lang="${c}" style="${c === BSi18n.lang ? 'background:var(--u-yel)' : ''}"><span class="tx">${n}</span></button>`).join('')}</div>
+      ${window.BSPremium ? uRow('plain', 'k7prem', BSI.crown(INK), '') + `<button class="u-row dark plain center" id="k7rest"><span class="tx">${tx('Restaurer mes achats')}</span></button>` : ''}
+      ${window.BS_TEST_BUILD ? `<div class="u-test"><b>${tx('OUTILS DU DÉVELOPPEUR')}</b>${uRow('plain', 'k7labo', BSI.flask(INK), tx('Labo musical'))}${uRow('plain', 'k7all', BSI.lock(INK), tx(api.load('allOpen', false) ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'))}</div>` : ''}
+      <div class="u-ver">BEAT SPLASH · version ${VERSION}</div><div class="u-corners"></div>`;
+    stage.appendChild(sh);
+    const close = () => { pageOut(sh); if(window.BSPremium) BSPremium.onChange = null; refreshHome(); };
+    sh.querySelector('#k7x').onclick = close;
+    // Premium : un achat unique qui retire les pubs. La ligne montre le prix (celui du magasin), puis « activé ».
     if(window.BSPremium){
       const prem = sh.querySelector('#k7prem'), rest = sh.querySelector('#k7rest');
-      const showPrem = msg => { const on = BSPremium.isOn(); prem.querySelector('.bl').textContent = msg || tx(on ? 'PREMIUM ACTIVÉ ✓' : 'PREMIUM SANS PUB · {price}', {price: BSPremium.price()}); prem.disabled = on; rest.hidden = on; };
+      const showPrem = msg => { const on = BSPremium.isOn(); prem.querySelector('.tx').textContent = msg || tx(on ? 'PREMIUM ACTIVÉ ✓' : 'PREMIUM SANS PUB · {price}', {price: BSPremium.price()}); prem.disabled = on; rest.hidden = on; };
       showPrem(); BSPremium.onChange = () => showPrem(); // le prix local arrive du magasin après le lancement
       prem.onclick = async () => { if(BSPremium.isOn()) return; api.sfx.click();
         if(!BSPremium.canBuy){ showPrem(tx("Le Premium s'achète dans l'application BEAT SPLASH.")); return; }
         showPrem(await BSPremium.buy() ? tx('Premium activé. Merci !') : ''); };
       rest.onclick = async () => { api.sfx.click(); const ok = await BSPremium.restore(); showPrem(ok ? tx('Premium activé. Merci !') : tx('Aucun achat à restaurer.')); };
     }
-    sh.querySelector('#k7voice').oninput = e => { const v = +e.target.value; api.save('voiceVol', v); sh.querySelector('#k7vv').textContent = v ? v + ' %' : tx('COUPÉE'); if(vox && actx) vox.gain.setTargetAtTime(.8*v/100, actx.currentTime, .05); };
+    const flip = (b, on) => { b.classList.toggle('on', on); b.setAttribute('aria-checked', on); };
+    sh.querySelector('#k7mute').onclick = e => { const m = !api.store.load('muted', false); api.store.save('muted', m); flip(e.currentTarget, !m); };
+    sh.querySelector('#k7voicet').onclick = e => { const v = voiceVol() > 0 ? 0 : 100; api.save('voiceVol', v); flip(e.currentTarget, v > 0); if(vox && actx) vox.gain.setTargetAtTime(.8*v/100, actx.currentTime, .05); };
     sh.querySelector('#k7calib').onclick = () => { api.sfx.click(); calibrate(v => { sh.querySelector('#k7off').textContent = v + ' ms'; }); };
-    sh.querySelector('#k7mute').onclick = () => { const m = !api.store.load('muted', false); api.store.save('muted', m); sh.querySelector('#k7mute .bl').textContent = tx(m ? 'SON : COUPÉ' : 'SON : ACTIVÉ'); sh.querySelector('#k7mute .ic').innerHTML = (m ? BSI.mute : BSI.spk)(INK); };
     const setOff = d => { const v = Math.max(-200, Math.min(200, api.load('offset', 0) + d)); api.save('offset', v); sh.querySelector('#k7off').textContent = v + ' ms'; };
     sh.querySelector('#k7offm').onclick = () => setOff(-10); sh.querySelector('#k7offp').onclick = () => setOff(10);
+    { const pi = sh.querySelector('#k7pseudo'); pi.onchange = () => { const v = pi.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(v) sendScore(0, 0); }; }
+    sh.querySelector('#k7lang').onclick = () => { api.sfx.click(); const l = sh.querySelector('.u-langs'); l.hidden = !l.hidden; if(!l.hidden) l.scrollIntoView({block: 'nearest'}); };
     { const lb = sh.querySelector('#k7labo'); if(lb) lb.onclick = () => { close(); showLabo(); }; }
-    const all = sh.querySelector('#k7all'); if(all) all.onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); sh.querySelector('#k7all .bl').textContent = tx(v ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
+    const all = sh.querySelector('#k7all'); if(all) all.onclick = () => { const v = !api.load('allOpen', false); api.save('allOpen', v); api.sfx.coin(); all.querySelector('.tx').textContent = tx(v ? 'CASSETTES OUVERTES ✓' : 'TOUT DÉBLOQUER'); refreshUI(); refreshHome(); };
     sh.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { api.sfx.click(); BSi18n.setLang(b.dataset.lang); });
-    sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','CVR','CHR','CDR','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .bl').textContent = tx('TUTOS RÉACTIVÉS') + ' ✓'; api.sfx.coin(); };
+    sh.querySelector('#k7tuto').onclick = () => { ['CV','CH','CD','CVR','CHR','CDR','J','D','H','S'].forEach(k => api.save('tuto3.' + k, false)); sh.querySelector('#k7tuto .tx').textContent = tx('Tutos réactivés') + ' ✓'; api.sfx.coin(); };
   };
 
   /* calage guidé : le jeu joue des coups réguliers, le joueur tape dessus ; l'écart moyen entre ses taps et le moment où le son
      part donne le retard de son téléphone et de son casque, moins ce que le navigateur annonce déjà */
   function calibrate(done){
     try{ muted = api.store.load('muted', false); audioInit(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
-    const sh = document.createElement('div'); sh.className = 'k7sheet';
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('CALAGE')}</b><button class="bs-back" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
-      <div class="bs-card">${tx('Casque filaire conseillé. Tape pile sur chaque coup.')}</div>
+    const sh = document.createElement('div'); sh.className = 'u-page u-calp';
+    sh.innerHTML = `<div class="u-top"><button class="u-ib" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><div class="u-title">${tx('CALAGE')}</div></div>
+      <div class="u-note">${tx('Casque filaire conseillé. Tape pile sur chaque coup.')}</div>
       <button class="bs-pad" type="button" aria-label="${tx('Tape ici sur chaque coup')}"><i></i><b>${tx('TOUCHE POUR COMMENCER')}</b></button>
-      <div class="bs-rank" data-a="res">${tx('Calage actuel : {n} ms', {n: api.load('offset', 0)})}</div>
-      <div class="acts2" style="display:flex;gap:12px" hidden>${bsBtn('pink pill', '', '', tx('APPLIQUER'), 'data-a="ok"')}${bsBtn('pill', '', '', tx('RECOMMENCER'), 'data-a="again"')}</div></div>`;
-    menu.appendChild(sh);
+      <div class="u-note" data-a="res">${tx('Calage actuel : {n} ms', {n: api.load('offset', 0)})}</div>
+      <div class="acts2 u-pair" hidden><button class="u-cta" data-a="ok" style="font-size:18px;min-height:48px">${tx('APPLIQUER')}</button><button class="u-row center" data-a="again"><span class="tx">${tx('RECOMMENCER')}</span></button></div><div class="u-corners"></div>`;
+    stage.appendChild(sh);
     const pad = sh.querySelector('.bs-pad'), lab = pad.querySelector('b'), res = sh.querySelector('[data-a=res]'), acts = sh.querySelector('.acts2');
     const step = 60/96, lead = 4, count = 8; let run = null, prop = null;
     const close = () => { if(run) run.stop = true; pageOut(sh); };
@@ -2599,31 +2615,52 @@ G.trancheroute = { mount(stage, api){
   const CASS = `<svg width="42" height="28" viewBox="0 0 42 28"><rect x="2" y="2" width="38" height="24" rx="4" fill="${INK}"/><rect x="7" y="7" width="28" height="10" rx="2" fill="#f3ead7"/><circle cx="14" cy="12" r="3" fill="${INK}"/><circle cx="28" cy="12" r="3" fill="${INK}"/><path d="M11 26l3-5h14l3 5" fill="#f3ead7"/></svg>`;
   const GEAR = ui.k7gear.innerHTML, BARS = `<svg width="30" height="26" viewBox="0 0 30 26"><g fill="${INK}"><rect x="1" y="16" width="5" height="9"/><rect x="8" y="10" width="5" height="15"/><rect x="15" y="4" width="5" height="21"/><rect x="22" y="12" width="5" height="13"/></g></svg>`;
   const SKULL_HOME = `<svg width="30" height="30" viewBox="0 0 24 24"><path d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.5 1.1 4.2 2.5 5.2V19c0 .6.4 1 1 1h1.6v-2.2h1.6V20h3.6v-2.2h1.6V20H17c.6 0 1-.4 1-1v-3.6c1.4-1 2.5-2.7 2.5-5.2C20.5 5.6 17 2 12 2z" fill="#fff"/><circle cx="8.7" cy="10.6" r="2.4" fill="${INK}"/><circle cx="15.3" cy="10.6" r="2.4" fill="${INK}"/><path d="M12 13.3l-1.4 2.4h2.8z" fill="${INK}"/></svg>`;
-  home.insertAdjacentHTML('beforeend', `
+  home.classList.add('u3');
+  home.insertAdjacentHTML('beforeend', `<div class="u-hwrap">
+    <div class="u-top"><button id="k7hback" class="u-ib" aria-label="${tx('Retour')}" hidden>${BSI.back(INK)}</button>
+      <div class="u-chip" id="k7hchip">${BSI.user()}<b id="k7hname"></b><span class="u-pill y sm" id="k7htitle"></span></div>
+      <div class="u-title" id="k7hcamp" hidden>${tx('CAMPAGNE')}</div><span class="sp"></span>
+      <div class="u-chip" id="k7htal"></div></div>
     <div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div></div>
-    <div class="ui" style="top:14px;justify-content:space-between;align-items:flex-start">
-      <div style="display:flex;gap:10px;align-items:flex-start"><button id="k7hback" class="k7btn k7sq bs-back" aria-label="${tx('Retour')}" hidden>${BSI.back(INK)}</button><div id="k7htal" class="k7badge" style="transform:rotate(-1.5deg)"></div></div>
-      <div style="display:flex;gap:10px"><button id="k7trophy" class="k7btn k7sq" aria-label="${tx('Mes œuvres')}" style="position:relative"><svg width="26" height="26" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="15" rx="1.5" fill="none" stroke="${INK}" stroke-width="2.4"/><path d="M5 16l4.5-5 3.5 3.5 2.5-2.5L19 16z" fill="${INK}"/><circle cx="15.5" cy="8.5" r="1.8" fill="#e8344f"/></svg><span class="k7dot" hidden></span></button><button id="k7hgear" class="k7btn k7sq" aria-label="${tx('Options')}">${GEAR}</button></div></div>
-    <div class="ui k7hbtns" style="flex-direction:column;gap:14px;padding:0 34px">
-      <button id="k7hplay" class="k7plate big"><span class="lbl"></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
-      <button id="k7hlvl" class="k7plate mid"><span class="ico">${CASS}</span><span class="lbl">${tx('CASSETTES')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button id="k7hopt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-    <div class="ui k7tbtns" style="flex-direction:column;gap:14px;padding:0 34px">
-      <button id="k7tcamp" class="k7plate big"><span class="lbl">${tx('CAMPAGNE')}<small id="k7tcsub"></small></span><svg width="38" height="40" viewBox="0 0 34 36"><path d="M5 4l25 14L5 32z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg><svg class="drips" viewBox="0 0 200 30" preserveAspectRatio="none"><g fill="#e8344f" stroke="${INK}" stroke-width="2.5"><path d="M14 0v14a5 5 0 0 0 10 0V0z"/><path d="M70 0v22a4 4 0 0 0 8 0V0z"/><path d="M128 0v10a5 5 0 0 0 10 0V0z"/><path d="M176 0v18a4 4 0 0 0 8 0V0z"/></g></svg></button>
-      <button id="k7tdeath" class="k7plate mid death"><span class="ico" style="color:#fff">${SKULL_HOME}</span><span class="lbl">${tx('CASSETTE DE LA MORT')}</span>${BSI.dch()}</button>
-      <button id="k7trec" class="k7plate mid"><span class="ico">${TROPHY}</span><span class="lbl">${tx('RECORDS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button id="k7topt" class="k7plate opt"><span class="ico">${GEAR}</span><span class="lbl">${tx('OPTIONS')}</span><svg class="chev" viewBox="0 0 22 30"><path d="M6 5l10 10-10 10" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`);
-  const hb = home.querySelector('.k7hbtns'), tb = home.querySelector('.k7tbtns'); const shortH = H < 740; if(shortH) home.classList.add('short'); /* petit écran : tout se resserre pour laisser voir la scène */
-  for(const b of [hb, tb]){ b.style.top = Math.round(shortH ? Math.max(H*.39, 236) : Math.max(H*.4, 300)) + 'px'; b.style.gap = shortH ? '11px' : '16px'; } let hbBottom = H*.62;
-  home.querySelector('.bs-logo').style.top = (shortH ? 74 : 76) + 'px';
-  // un libellé trop long pour son bouton (selon la langue) : la police rétrécit jusqu'à ce qu'il tienne sur une ligne
-  const fitLabels = root => root.querySelectorAll('.k7plate:not(.big) .lbl').forEach(l => { l.style.fontSize = ''; let fs = parseFloat(getComputedStyle(l).fontSize); while(l.scrollWidth > l.clientWidth + 1 && fs > 11){ fs -= .5; l.style.fontSize = fs + 'px'; } });
-  const layoutHome = () => { fitLabels(home); const r = (homeMode === 'camp' ? hb : tb).getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height) hbBottom = (r.bottom - m.top)*H/m.height; };
+    <div class="u-hstage" id="k7hstage"></div>
+    <div class="u-hbtns k7tbtns">
+      <button id="k7tcamp" class="u-cta">${tx('CAMPAGNE')} ${BSI.go()}</button>
+      ${uRow('dark', 'k7tdeath', BSI.skull(), tx('CASSETTE DE LA MORT'), tx('Survie sans fin'))}
+      <div class="u-pair">${uRow('dark', 'k7trec', BSI.cup('#fff'), tx('RECORDS'))}${uRow('dark', 'k7topt', BSI.gear('#fff'), tx('OPTIONS'))}</div>
+      <button class="u-row plain" id="k7trophy"><img class="u-thumb" id="k7hthumb" alt=""><span class="tx">${tx('Mes œuvres')}</span><span class="u-dot k7dot" hidden></span>${BSI.row()}</button></div>
+    <div class="u-hbtns k7hbtns" hidden style="flex:1 1 auto">
+      <div class="u-card"><button class="u-ib round l" id="k7cprev" aria-label="${tx('Cassette précédente')}">${BSI.chl(INK)}</button><button class="u-ib round r" id="k7cnext" aria-label="${tx('Cassette suivante')}">${BSI.chr(INK)}</button>
+        <div class="hole" id="k7hcass"></div><div class="nm" id="k7cname"></div><div id="k7cdiscs"></div></div>
+      <div class="u-lv"><span>${tx('NIVEAU')}</span>${DIFFS.map((d, i) => `<button data-d="${i}" aria-label="${d.name}">${i + 1}</button>`).join('')}</div>
+      <div class="u-note" id="k7lvnote"></div>
+      <button id="k7hplay" class="u-cta"><span class="lbl"></span> ${BSI.go()}</button>
+      ${uRow('dark plain', 'k7hnext', BSI.lock('#fff'), '', '', 'disabled')}
+      <div class="u-note">${tx('Les disques restent acquis.')}</div></div>
+    <span id="k7tcsub" hidden></span><button id="k7hlvl" hidden></button><button id="k7hopt" hidden></button><button id="k7hgear" hidden></button></div><div class="u-corners"></div>`);
+  const hb = home.querySelector('.k7hbtns'), tb = home.querySelector('.k7tbtns'); const shortH = H < 740; if(shortH) home.classList.add('short');
+  let hTick = 0, hbBottom = H*.62, hRect = {x: W*.2, y: H*.3, w: W*.6, h: H*.2};
+  const fitLabels = () => {};
+  // où dessiner la cassette : dans la zone libre de l'accueil, ou dans la carte de la campagne
+  const layoutHome = () => { const ph = home.querySelector(homeMode === 'camp' ? '#k7hcass' : '#k7hstage'), r = ph.getBoundingClientRect(), m = home.getBoundingClientRect(); if(m.height && r.height) hRect = {x: (r.left - m.left)*W/m.width, y: (r.top - m.top)*H/m.height, w: r.width*W/m.width, h: r.height*H/m.height}; };
+  window.addEventListener('resize', () => requestAnimationFrame(layoutHome));
   let homeOn = false, hTime = 0, homeMode = 'title', hSnow = []; home.hidden = true;
-  const showHome = mode => { if(mode) homeMode = mode; homeOn = true; home.hidden = false; hb.hidden = homeMode !== 'camp'; tb.hidden = homeMode === 'camp'; home.querySelector('#k7hback').hidden = homeMode !== 'camp'; refreshHome(); };
-  function refreshHome(){ requestAnimationFrame(layoutHome); home.querySelector('#k7tcsub').textContent = tx('{n} cassettes', {n: SHELF.length}) + ' · ' + discs() + ' ◉'; home.querySelector('#k7htal').innerHTML = `◉ ${discs()} &nbsp;♪ ${bank()}<small>${titleOf(bank())}</small>`; home.querySelector('.k7dot').hidden = !api.load('artNew', false);
-    const t = SHELF[cur], open = unlocked(t), afford = !open && discs() >= t.cost, pb = home.querySelector('#k7hplay');
-    pb.querySelector('.lbl').innerHTML = `${open ? tx('JOUER') : afford ? tx('OUVRIR !') : t.cost + ' ◉'}<small>${t.name} · ${DIFFS[dIdx].name}</small>`; pb.style.filter = open || afford ? '' : 'grayscale(.7)'; }
+  const showHome = mode => { if(mode) homeMode = mode; homeOn = true; home.hidden = false; const camp = homeMode === 'camp'; hb.hidden = !camp; tb.hidden = camp;
+    for(const [id, on] of [['#k7hback', camp], ['#k7hcamp', camp], ['#k7hchip', !camp], ['.bs-logo', !camp], ['#k7hstage', !camp]]) home.querySelector(id).hidden = !on; refreshHome(); };
+  function refreshHome(){
+    home.querySelector('#k7hname').textContent = pseudo() || tx('Joueur'); home.querySelector('#k7htitle').textContent = titleOf(bank());
+    home.querySelector('#k7htal').innerHTML = `${BSI.disc(true)}<span>${discs()} / ${TRACKS.length*3}</span>`; home.querySelector('.k7dot').hidden = !api.load('artNew', false);
+    { const th = home.querySelector('#k7hthumb'), a = SHELF.map(x => artsOf(x.id)[0]).find(Boolean); if(a) th.src = a.img; else th.removeAttribute('src'); th.style.visibility = a ? '' : 'hidden'; }
+    const t = SHELF[cur], open = unlocked(t), afford = !open && discs() >= t.cost, pb = home.querySelector('#k7hplay'), d = DIFFS[dIdx], bk = bests()[t.id + '.' + d.id];
+    pb.querySelector('.lbl').textContent = open ? tx('JOUER') : afford ? tx('OUVRIR !') : tx('{n} disques', {n: t.cost}); pb.disabled = !(open || afford);
+    home.querySelector('#k7cname').textContent = tx('FACE') + ' ' + t.face + ' · ' + t.name; home.querySelector('#k7cdiscs').innerHTML = UDISCS(bk ? bk.discs || 0 : 0);
+    home.querySelectorAll('.u-lv button').forEach((b, i) => b.classList.toggle('on', i === dIdx));
+    home.querySelector('#k7lvnote').innerHTML = `<b>${d.name}</b> · ×${d.mult} · ${tx('disques à {a}, {b} et {c} %', {a: d.disc[0], b: d.disc[1], c: d.disc[2]})}`;
+    const nx = SHELF.find(x => !unlocked(x)), nr = home.querySelector('#k7hnext'); nr.hidden = !nx;
+    if(nx) nr.querySelector('.tx').innerHTML = `${nx.name}<small>${tx('{m} / {n} disques pour ouvrir', {m: Math.min(discs(), nx.cost), n: nx.cost})}</small>`;
+    requestAnimationFrame(layoutHome); }
+  home.querySelectorAll('.u-lv button').forEach(b => b.onclick = () => { dIdx = +b.dataset.d; api.save('diff', dIdx); api.sfx.click(); refreshHome(); });
+  home.querySelector('#k7cprev').onclick = () => pickCass(cur - 1); home.querySelector('#k7cnext').onclick = () => pickCass(cur + 1);
+  home.querySelector('#k7hcass').onclick = () => playCur();
   home.addEventListener('pointerdown', introGo, true);
   // changer de cassette : elle saute au centre de la scène
   let hSel = 1, hDir = 0;
@@ -2636,11 +2673,6 @@ G.trancheroute = { mount(stage, api){
   }
   // la scène : glisser pour changer, toucher une voisine pour l'amener, toucher celle du centre pour la lancer
   let hDrag = null;
-  hcv.addEventListener('pointerdown', e => { const r = hcv.getBoundingClientRect(); hDrag = {x: e.clientX, y: (e.clientY - r.top)*H/r.height, xi: (e.clientX - r.left)*W/r.width}; });
-  hcv.addEventListener('pointerup', e => { if(!hDrag) return; const dx = e.clientX - hDrag.x, d = hDrag; hDrag = null; if(d.y < hbBottom) return; if(homeMode !== 'camp'){ api.sfx.click(); showHome('camp'); return; }
-    if(Math.abs(dx) > 40) return pickCass(cur + (dx < 0 ? 1 : -1));
-    if(d.xi < W*.27) pickCass(cur - 1); else if(d.xi > W*.73) pickCass(cur + 1); else playCur(); });
-  hcv.addEventListener('pointercancel', () => { hDrag = null; });
   // CASSETTES : un volet par-dessus l'accueil, avec la liste et la difficulté
   home.querySelector('#k7hlvl').onclick = () => { api.sfx.click();
     const sh = document.createElement('div'); sh.className = 'k7sheet';
@@ -2737,80 +2769,69 @@ G.trancheroute = { mount(stage, api){
   // les astuces de l'écran de chargement
   // les astuces du chargement : c'est K7, la cassette mascotte, qui parle (et Bobine, la petite roue qui file sur la bande)
   const TIPS = [tx("Glisse pile quand la brique touche la ligne rouge : c'est là que je chante le plus fort !"), tx("Enchaîne sans rater et je pars en transe. Les disques suivent !"), tx("Tes coupes arrivent en retard ? Mets un casque filaire et cale le rythme dans les réglages."), tx("Sur une note longue, garde le doigt posé jusqu'au bout. Bobine compte sur toi !"), tx("Bleu, violet, vert menthe : la brique descend. Orange, rose, jaune : elle monte."), tx("Rate une note et la bande ralentit. Six réussites et on repart à fond !")];
-  /* écran de chargement : sobre mais soigné. Fond noir avec un halo de la couleur de la cassette qui bat au tempo, le nom de la cassette,
-     une vraie bande où ses briques arrivent sur la cible ; là, un doigt montre le geste et la brique éclate en peinture. Une barre en bas. */
-  function loadingScreen(t, d, death, go){
-    const el = document.createElement('div'); el.className = 'bs-load bs-load2';
-    const col = death ? '#e8344f' : (TRACKS.includes(t) ? SPRAY[TRACKS.indexOf(t) % SPRAY.length] : t.bg[0]), bpm = death ? 120 : t.bpm;
-    el.innerHTML = `<canvas></canvas>
-      <div class="bs-lhead"><small>${death ? tx('3 cœurs') : tx('FACE') + ' ' + t.face + ' · ' + d.name}</small><b>${death ? tx('Cassette de la mort') : t.name}</b></div>
-      <div class="bs-lcap"><i hidden>${tx('NOUVEAU')}</i><b></b><small></small></div>
-      <div class="bs-ldots"></div>
-      <div class="bs-lbar" role="progressbar" aria-label="${tx('Chargement…')}"><i></i></div>
-      <button class="bs-lgo" type="button" hidden>${tx('COMMENCER')} ${BSI.triR()}</button>`;
-    stage.appendChild(el);
-    const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bs-lbar i'), t0l = performance.now();
-    // c'est aussi le tuto des briques : les nouvelles d'abord, chacune passe une fois sur la cible avec son nom
-    const isNew = k => !api.load('tuto3.' + k, false), ks = brickKinds(death ? TRACKS : [t]).sort((a, b) => isNew(b) - isNew(a)), img = {};
-    const cap = el.querySelector('.bs-lcap'), goBtn = el.querySelector('.bs-lgo'), dots = el.querySelector('.bs-ldots'); let skip = false, capK = null; goBtn.onclick = () => { skip = true; };
-    dots.innerHTML = ks.map(() => '<i></i>').join('');
-    for(const k of ks){ const im = new Image(); im.src = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">${BRICK[k]}</svg>`); img[k] = im; }
+  /* une brique qui arrive sur la ligne, le doigt qui fait son geste, la peinture qui gicle : la démo de la page « Avant de jouer » */
+  function laneDemo(cv, getK, col){
+    const g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), img = {}, t0l = performance.now(), parts = [];
     const DIR = {CV: [0, -1], CH: [1, 0], CD: [.71, -.71], CVR: [0, 1], CHR: [-1, 0], CDR: [-.71, .71]};
     const INKOF = {CV: CUTCOL.tall, CH: CUTCOL.wide, CD: CUTCOL.diag, CVR: CUTREV.tall, CHR: CUTREV.wide, CDR: CUTREV.diag, J: '#e8344f', D: '#e8344f', H: '#ffd23f', S: '#29c4ff'};
-    const GAP = 1.2, SPEED = 250, parts = [], fired = new Set();
-    // le doigt qui montre le geste : un rond blanc cerclé de noir, avec sa traînée
-    const finger = (x, y, a, x0, y0) => { g.save(); g.globalAlpha = a; if(x0 != null){ g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 12; g.lineCap = 'round'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x, y); g.stroke(); }
-      g.fillStyle = '#fff'; g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 15, 0, 6.283); g.fill(); g.stroke(); g.fillStyle = 'rgba(28,27,25,.18)'; g.beginPath(); g.arc(x - 3, y - 3, 6, 0, 6.283); g.fill(); g.restore(); };
-    let done = false, last = t0l;
-    (function frame(){ if(!el.isConnected) return; const nowP = performance.now(), el2 = nowP - t0l, tt = el2/1000, dt = Math.min(.05, (nowP - last)/1000); last = nowP;
+    const pic = k => img[k] || (img[k] = Object.assign(new Image(), {src: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">${BRICK[k]}</svg>`)}));
+    const finger = (x, y, a, x0, y0) => { g.save(); g.globalAlpha = Math.max(0, a); if(x0 != null){ g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x, y); g.stroke(); }
+      g.fillStyle = '#fff'; g.strokeStyle = INK; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 11, 0, 6.283); g.fill(); g.stroke(); g.restore(); };
+    let last = t0l, lastN = -1;
+    (function frame(){ if(!cv.isConnected) return; const nowP = performance.now(), tt = (nowP - t0l)/1000, dt = Math.min(.05, (nowP - last)/1000); last = nowP;
       const w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-      const y = h*.47, lx = w*.3, S = Math.min(100, w*.25), beat = tt*bpm/60, pulse = Math.max(0, 1 - (beat % 1)*2.5);
-      cap.style.top = Math.round(y + S*.95 + 26) + 'px'; dots.style.top = Math.round(y - S*.95 - 34) + 'px';
-      // le halo de la cassette, qui bat au tempo, et une trame de points
-      { const R = Math.max(w, h)*(.62 + pulse*.05), gr = g.createRadialGradient(lx, y, 10, lx, y, R); gr.addColorStop(0, col + '66'); gr.addColorStop(.45, col + '1c'); gr.addColorStop(1, col + '00'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-        g.fillStyle = 'rgba(255,255,255,.05)'; for(let yy = 6; yy < h; yy += 14) for(let xx = (yy/14 % 2)*7; xx < w; xx += 14){ g.beginPath(); g.arc(xx, yy, 1.1, 0, 6.283); g.fill(); } }
-      // la bande : un ruban sombre bordé, avec ses repères qui défilent
-      { const top = y - S*.72, bh = S*1.44; g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(0, top, w, bh); g.fillStyle = col; g.fillRect(0, top - 4, w, 4); g.fillRect(0, top + bh, w, 4);
-        g.fillStyle = 'rgba(255,255,255,.16)'; const off = (tt*SPEED) % 46; for(let x = w - off; x > -10; x -= 46){ g.fillRect(x, top + 6, 3, 9); g.fillRect(x, top + bh - 15, 3, 9); } }
-      // la cible : la ligne rouge et son anneau
-      g.strokeStyle = '#e8344f'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(lx, y - S*.98); g.lineTo(lx, y + S*.98); g.stroke();
-      g.strokeStyle = `rgba(255,255,255,${.35 + pulse*.4})`; g.lineWidth = 3; g.beginPath(); g.arc(lx, y, S*.5 + pulse*5, 0, 6.283); g.stroke();
-      // chaque brique arrive de la droite ; sur la cible, le doigt fait le geste et elle éclate en peinture
-      const n0 = Math.floor(tt/GAP), arrive = (w + S - lx)/SPEED; let atLine = null;
-      for(let n = Math.max(0, n0 - 6); n <= n0; n++){
-        const k = ks[n % ks.length], age = tt - n*GAP, im = img[k]; if(!im || !im.complete) continue;
-        let x = w + S - age*SPEED, yy = y, a = 1, sc = 1, rot = 0; const after = age - arrive;
-        if(age > arrive - .4 && after < .8) atLine = n;
-        if(after > 0){ x = lx; const u = Math.min(1, after/.45), dv = DIR[k];
-          if(!fired.has(n)){ fired.add(n); const pc = INKOF[k] || '#fff'; for(let i = 0; i < 22; i++){ const an = dv ? Math.atan2(dv[1], dv[0]) + (Math.random() - .5)*1.6 : Math.random()*6.283, sp = 120 + Math.random()*320; parts.push({x: lx, y, vx: Math.cos(an)*sp, vy: Math.sin(an)*sp, r: 3 + Math.random()*7, c: i % 5 ? pc : '#fff', life: 1}); } }
-          if(dv){ x += dv[0]*u*S*1.5; yy += dv[1]*u*S*1.5; a = 1 - u; rot = (dv[0] || 1)*u*.5; finger(lx + dv[0]*S*(-.5 + u*2), y + dv[1]*S*(-.5 + u*2), 1 - u*u, lx - dv[0]*S*.5, y - dv[1]*S*.5); }
-          else if(k === 'H'){ const v = Math.min(1, after/.9); a = after > .9 ? Math.max(0, 1 - (after - .9)/.3) : 1; g.save(); g.globalAlpha = a; g.strokeStyle = '#ffd23f'; g.lineWidth = 7; g.beginPath(); g.arc(lx, y, S*.62, -Math.PI/2, -Math.PI/2 + v*6.283); g.stroke(); g.restore(); finger(lx, y + S*.1, a); }
-          else if(k === 'S'){ rot = Math.sin(after*18)*.6; a = after > .7 ? Math.max(0, 1 - (after - .7)/.3) : 1; const fy = y + Math.sin(after*18)*S*.4; finger(lx + S*.1, fy, a, lx + S*.1, y); }
-          else { sc = 1 + u*.5; a = 1 - u; g.save(); g.globalAlpha = 1 - u; g.strokeStyle = '#fff'; g.lineWidth = 5; g.beginPath(); g.arc(lx, y, S*(.45 + u*.7), 0, 6.283); g.stroke(); g.restore();
-            if(k === 'D'){ finger(lx - S*.3, y + S*.05, 1 - u); finger(lx + S*.3, y + S*.05, 1 - u); } else finger(lx, y + S*.05, 1 - u); }
-          if(a <= 0) continue; }
-        else { // la traînée de la brique qui arrive
-          for(let q = 3; q >= 1; q--){ g.save(); g.globalAlpha = .1*(4 - q)/3; g.drawImage(im, x + q*16 - S/2, yy - S/2, S, S); g.restore(); } }
-        g.save(); g.globalAlpha = a; g.translate(x, yy + Math.sin(tt*5 + n)*2); g.rotate(rot); g.scale(sc, sc); g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 14; g.shadowOffsetY = 6; g.drawImage(im, -S/2, -S/2, S, S); g.restore();
-      }
-      // la peinture qui gicle
-      for(const q of parts){ q.vy += 500*dt; q.x += q.vx*dt; q.y += q.vy*dt; q.life -= dt*1.5; if(q.life <= 0) continue; g.globalAlpha = Math.min(1, q.life*1.6); g.fillStyle = q.c; g.beginPath(); g.arc(q.x, q.y, q.r*Math.max(.3, q.life), 0, 6.283); g.fill(); }
+      const y = h/2, lx = w*.3, S = Math.min(64, h*.6), PER = 1.7, n = Math.floor(tt/PER), age = tt - n*PER, arrive = .75, k = getK(), im = pic(k), dv = DIR[k];
+      g.strokeStyle = col; g.lineWidth = 4; g.lineCap = 'round'; g.shadowColor = col; g.shadowBlur = 10; g.beginPath(); g.moveTo(lx, y - h*.42); g.lineTo(lx, y + h*.42); g.stroke(); g.shadowBlur = 0;
+      g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = 2; g.beginPath(); g.arc(lx, y, S*.52, 0, 6.283); g.stroke();
+      let x = lx + (w - lx + S)*(1 - Math.min(1, age/arrive)), yy = y, a = 1, sc = 1, rot = 0; const after = age - arrive;
+      if(after > 0){ const u = Math.min(1, after/.45);
+        if(n !== lastN){ lastN = n; const pc = INKOF[k] || '#fff'; for(let i = 0; i < 16; i++){ const an = dv ? Math.atan2(dv[1], dv[0]) + (Math.random() - .5)*1.6 : Math.random()*6.283, sp = 90 + Math.random()*220; parts.push({x: lx, y, vx: Math.cos(an)*sp, vy: Math.sin(an)*sp, r: 2 + Math.random()*5, c: i % 5 ? pc : '#fff', life: 1}); } }
+        if(dv){ x += dv[0]*u*S*1.3; yy += dv[1]*u*S*1.3; a = 1 - u; finger(lx + dv[0]*S*(-.5 + u*1.8), y + dv[1]*S*(-.5 + u*1.8), 1 - u*u, lx - dv[0]*S*.5, y - dv[1]*S*.5); }
+        else if(k === 'H'){ const v = Math.min(1, after/.7); a = after > .7 ? 1 - (after - .7)/.25 : 1; g.save(); g.globalAlpha = Math.max(0, a); g.strokeStyle = '#ffd23f'; g.lineWidth = 5; g.beginPath(); g.arc(lx, y, S*.62, -Math.PI/2, -Math.PI/2 + v*6.283); g.stroke(); g.restore(); finger(lx, y + 4, a); }
+        else if(k === 'S'){ rot = Math.sin(after*18)*.6; a = after > .6 ? 1 - (after - .6)/.3 : 1; finger(lx + 6, y + Math.sin(after*18)*S*.4, a, lx + 6, y); }
+        else { sc = 1 + u*.4; a = 1 - u; g.save(); g.globalAlpha = 1 - u; g.strokeStyle = '#fff'; g.lineWidth = 4; g.beginPath(); g.arc(lx, y, S*(.45 + u*.6), 0, 6.283); g.stroke(); g.restore(); if(k === 'D'){ finger(lx - S*.3, y + 3, 1 - u); finger(lx + S*.3, y + 3, 1 - u); } else finger(lx, y + 3, 1 - u); } }
+      if(a > 0 && im.complete){ g.save(); g.globalAlpha = a; g.translate(x, yy); g.rotate(rot); g.scale(sc, sc); g.drawImage(im, -S/2, -S/2, S, S); g.restore(); }
+      for(const q of parts){ q.vy += 400*dt; q.x += q.vx*dt; q.y += q.vy*dt; q.life -= dt*1.7; if(q.life <= 0) continue; g.globalAlpha = Math.min(1, q.life*1.6); g.fillStyle = q.c; g.beginPath(); g.arc(q.x, q.y, q.r*Math.max(.3, q.life), 0, 6.283); g.fill(); }
       g.globalAlpha = 1; for(let i = parts.length - 1; i >= 0; i--) if(parts[i].life <= 0) parts.splice(i, 1);
-      if(atLine != null){ const k = ks[atLine % ks.length]; if(k !== capK){ capK = k; cap.querySelector('i').hidden = !isNew(k); cap.querySelector('b').textContent = TUTO[k].verb; cap.querySelector('small').textContent = TUTO[k].hint; cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop'); }
-        dots.querySelectorAll('i').forEach((n, i) => n.className = i === atLine % ks.length ? 'on' : i < atLine || atLine >= ks.length ? 'ok' : ''); }
-      // le son est prêt, et chaque brique est passée une fois (7 s au plus) ; COMMENCER fait démarrer plus tôt
-      const need = Math.min(7, (ks.length - 1)*GAP + arrive + .7)*1000, ready = el2 > 1700 && (Object.keys(recBuf).length >= 2 || el2 > 4500);
-      const ok = ready && (el2 >= need || skip), pct = ok ? 100 : Math.round(Math.min(ready ? 99 : 90, el2/Math.max(need, 1700)*100)); goBtn.hidden = !ready || ok;
-      bar.style.width = pct + '%';
-      if(ok && !done){ done = true; api.after(450, () => { if(!el.isConnected) return; el.remove(); go(); }); }
       requestAnimationFrame(frame); })();
   }
-  // plus de page d'explications avant la cassette : le chargement montre ses briques et leur geste
+  /* avant de jouer : les briques de la cassette, une démo du geste choisi, C'EST PARTI */
   function briefing(t, go, death){
-    pageUnder('.k7brief'); const d = death ? DIFFS[1] : DIFFS[dIdx];
+    pageUnder('.u-brief, .u-death');
+    const el = document.createElement('div'); el.className = 'u-page u-brief';
+    const d = death ? DIFFS[1] : DIFFS[dIdx], isNew = k => !api.load('tuto3.' + k, false), ks = brickKinds(death ? TRACKS : [t]).sort((a, b) => isNew(b) - isNew(a)); let sel = ks[0];
+    const col = death ? '#ff1f7a' : (TRACKS.includes(t) ? SPRAY[TRACKS.indexOf(t) % SPRAY.length] : t.bg[0]);
+    el.innerHTML = `<div class="u-top"><button class="u-ib back" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><span class="u-pill">${death ? tx('Cassette de la mort') : tx('FACE') + ' ' + t.face + ' · ' + t.name}</span><span class="sp"></span></div>
+      <div class="u-title sp">${tx('AVANT DE JOUER')}</div>
+      <div class="u-note">${tx('Fais le geste quand la brique touche la ligne.')}</div>
+      <div class="u-box u-demo"><canvas></canvas></div>
+      <div class="u-bricks u-grow">${ks.map(k => `<button class="u-row plain" data-k="${k}"><span class="ic"><svg viewBox="0 0 60 60">${BRICK[k]}</svg></span><span class="tx">${TUTO[k].verb}<small>${TUTO[k].hint}</small></span>${isNew(k) ? `<span class="u-pill pk sm">${tx('NOUVEAU')}</span>` : ''}<span class="go">${BSI.triR()}</span></button>`).join('')}</div>
+      <button class="u-cta" data-go>${tx('C\'EST PARTI')} ${BSI.go()}</button><div class="u-corners"></div>`;
+    stage.appendChild(el);
+    const mark = () => el.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('on', b.dataset.k === sel)); mark();
+    el.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { sel = b.dataset.k; api.sfx.click(); mark(); });
+    laneDemo(el.querySelector('canvas'), () => sel, col);
+    // pendant qu'on lit : le son se prépare
     try{ muted = api.store.load('muted', false); audioInit(); loadRecs(); if(actx && actx.state === 'suspended') actx.resume(); }catch(e){}
-    loadingScreen(t, d, death, go);
+    el.querySelector('[data-go]').onclick = () => { api.sfx.coin(); loadingScreen(t, d, death, go); pageUnder('.u-brief'); };
+    el.querySelector('.back').onclick = () => { api.sfx.click(); if(menu.hidden){ pageOut(el); showMenu(); if(death) showHome('title'); } else if(death) deathBoard(null); else pageOut(el); };
+  }
+  /* chargement : le logo, la cassette qui danse, une barre. Le niveau démarre tout seul quand le son est prêt */
+  function loadingScreen(t, d, death, go){
+    const el = document.createElement('div'); el.className = 'u-load'; const mt = t || SHELF[cur], mi = Math.max(0, SHELF.indexOf(mt));
+    el.innerHTML = `<div class="bs-logo"><div class="bs-title bolt">BEAT<span class="p">SPLASH</span></div></div>
+      <span class="u-pill">${death ? tx('Cassette de la mort') : tx('FACE') + ' ' + t.face + ' · ' + t.name}</span>
+      <canvas></canvas><div class="u-note">${tx('Préparation du son…')}</div><div class="bar" role="progressbar" aria-label="${tx('Chargement…')}"><i></i></div>`;
+    stage.appendChild(el);
+    const cv = el.querySelector('canvas'), g = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), bar = el.querySelector('.bar i'), t0l = performance.now(); let done = false;
+    (function frame(){ if(!el.isConnected) return; const el2 = performance.now() - t0l, tt = el2/1000;
+      const w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); const sc = Math.min(w/400, h/350);
+      g.save(); g.translate(w/2, h/2 - 26*sc); g.scale(sc, sc); mascot(g, mt, mi, true, true, tt, {x: Math.sin(tt*1.3)*.5, y: -.3}); g.restore();
+      const k = Math.min(1, el2/1700), ok = k >= 1 && (Object.keys(recBuf).length >= 2 || el2 > 4500), pct = ok ? 100 : Math.round(Math.min(95, k*100)); bar.style.width = pct + '%';
+      if(ok && !done){ done = true; api.after(450, () => { if(!el.isConnected) return; el.remove(); go(); }); }
+      requestAnimationFrame(frame); })();
   }
 
   /* ---------- la cassette de la mort : 3 cœurs, les morceaux enchaînés du plus lent au plus rapide, un classement ---------- */
@@ -2862,22 +2883,24 @@ G.trancheroute = { mount(stage, api){
     api.after(900, () => deathBoard(me, top));
   }
   function deathBoard(me, top){
-    pageUnder('.k7brief'); top = top || deathTop();
-    const el = document.createElement('div'); el.className = 'k7brief fit bs-spk';
+    pageUnder('.u-brief, .u-death'); top = top || deathTop();
+    const el = document.createElement('div'); el.className = 'u-page u-death';
     const list = () => top.length ? top.map((e, i) => `<div class="${e === me ? 'me' : ''}"><b>${i + 1}</b><span>${String(e.name).replace(/[<>&]/g, '')}<small>♪${e.songs}</small></span><b>${e.score.toLocaleString('fr-FR')}</b></div>`).join('') : `<div><span></span><span>${tx('Personne n\'a encore tenu : à toi !')}</span><span></span></div>`;
-    // une page lisible : un titre, une ligne de règle (ou ton résultat), le classement qui a de la place, ton pseudo, LANCER ; le retour est en haut
-    el.innerHTML = `<div class="in"><div class="bs-panel bs-rec"><button class="bs-back x" data-a="x" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><span class="bs-badge" style="color:#16151c">${SKULL('#ffd60a')}</span>
-      <div class="bs-title">${twoTone(me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort'))}</div>
-      ${me ? `<div class="bs-card bs-res"><b>${me.score.toLocaleString('fr-FR')}</b><span>${tx(me.songs > 1 ? '{n} morceaux tenus' : '{n} morceau tenu', {n: me.songs})}</span></div>`
-        : `<div class="bs-card bs-rule">${tx('3 cœurs : chaque raté en coûte un. Les morceaux s\'enchaînent, de plus en plus vite.')}</div>`}
-      <div class="bs-rhead">${BSI.cup(INK)}<b>${tx('RECORDS')}</b><span class="nt bs-rank"></span></div><div class="lb">${list()}</div>
-      <label class="bs-pseudo"><span>${tx('Ton pseudo')}</span><input class="bs-input" maxlength="14" placeholder="${tx('Ton pseudo')}" value="${String(api.load('pseudo', '')).replace(/"/g, '')}"></label>
-      <div class="acts2">${bsBtn('pink cta', '', '', tx(me ? 'REJOUER' : 'LANCER') + ' ' + BSI.play(INK), 'data-a="go"')}</div></div></div>`;
+    const best = Math.max(0, ...deathTop().map(e => e.score || 0));
+    el.innerHTML = `<div class="hd">${BSI.skull()}<div class="u-title">${twoTone(me ? tx('LA BANDE A CASSÉ') : tx('Cassette de la mort'))}</div></div>
+      <div class="u-center"><span class="u-pill">${tx('Survie sans fin')}</span></div>
+      ${me ? '' : `<div class="u-note">${tx('3 cœurs. Les cassettes s\'enchaînent : va le plus loin possible.')}</div>`}
+      <div class="u-box u-rec"><small>${me ? tx('TON SCORE') : tx('MON RECORD')}</small><b>${(me ? me.score : best).toLocaleString('fr-FR')}</b>${me ? `<span>${tx(me.songs > 1 ? '{n} morceaux tenus' : '{n} morceau tenu', {n: me.songs})} · ${tx('record : {n}', {n: best.toLocaleString('fr-FR')})}</span>` : ''}</div>
+      <div class="nt u-note"></div><div class="lb u-lb u-grow">${list()}</div>
+      ${pseudo() ? '' : `<label class="u-field"><span>${tx('Ton pseudo')}</span><input maxlength="14" placeholder="${tx('Ton pseudo')}"></label>`}
+      <button class="u-cta" data-a="go">${tx(me ? 'REJOUER' : 'LANCER')} ${BSI.go()}</button>
+      <button class="u-row dark center" data-a="x"><span class="ic">${BSI.back('#fff')}</span><span class="tx">${tx('Retour')}</span></button><div class="u-corners"></div>`;
     stage.appendChild(el); const box = el.querySelector('.lb'), nt = el.querySelector('.nt'); api.after(me ? 700 : 0, () => fillBoard(box, nt)); // le temps que le score arrive sur le serveur
-    const inp = el.querySelector('input'); inp.onchange = async () => { const v = inp.value.trim().slice(0, 14); if(v === pseudo()) return; api.save('pseudo', v); if(me && v){ me.name = v; api.save('deathTop', top); } if(v){ await sendScore(0, 0); fillBoard(box, nt); } };
+    const inp = el.querySelector('input'), saveName = async () => { if(!inp) return; const v = inp.value.trim().slice(0, 14); if(!v || v === pseudo()) return; api.save('pseudo', v); if(me){ me.name = v; api.save('deathTop', top); } await sendScore(0, 0); fillBoard(box, nt); };
+    if(inp) inp.onchange = saveName;
     const after = go => me ? adBreak(TRACKS.length).then(go) : go(); // après une Cassette de la mort, comme après un morceau
-    el.querySelector('[data-a=go]').onclick = () => { inp.onchange(); after(() => briefing(null, deathStart, true)); };
-    el.querySelector('[data-a=x]').onclick = () => { inp.onchange(); pageOut(el); if(me) after(() => { showMenu(); showHome('title'); }); };
+    el.querySelector('[data-a=go]').onclick = () => { saveName(); after(() => briefing(null, deathStart, true)); };
+    el.querySelector('[data-a=x]').onclick = () => { saveName(); pageOut(el); refreshHome(); if(me) after(() => { showMenu(); showHome('title'); }); };
   }
   home.querySelector('#k7tdeath').onclick = () => { api.sfx.click(); deathBoard(null); };
   home.querySelector('#k7tcamp').onclick = () => { api.sfx.click(); showHome('camp'); };
@@ -2887,15 +2910,18 @@ G.trancheroute = { mount(stage, api){
 
   home.querySelector('#k7trophy').onclick = () => {
     api.sfx.click(); api.save('artNew', false); refreshHome(); { const bd = menu.querySelector('#k7bdot'); if(bd) bd.hidden = true; }
-    const sh = document.createElement('div'); sh.className = 'k7sheet'; const b = bests();
-    const cells = (artsOf('noel').length && !XMAS ? [...TRACKS, NOEL] : SHELF).map(t => { const arts = artsOf(t.id), n = discsOf(t), pct = Math.max(0, ...DIFFS.map(d => (b[t.id + '.' + d.id] || {}).pct || 0)), cap = `<span>${t.name}</span><span>${DISC(n)}${pct ? ' ' + pct + '%' : ''}</span>`;
-      if(!arts.length) return `<figure data-id="${t.id}"><div class="empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div><figcaption>${cap}</figcaption></figure>`;
-      return arts.map((a, k) => `<figure data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><figcaption>${a.title ? `<span style="flex-basis:100%">« ${a.title} »</span>` : ''}${k ? `<span>${t.name}</span><span>${a.acc} %</span>` : cap}</figcaption></figure>`).join(''); }).join('');
-    sh.innerHTML = `<div><div style="display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:14px"><b class="bs-ptitle">${tx('MES ŒUVRES')}</b><button class="bs-back" id="k7gx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button></div>
-      <div class="bs-desc">${tx('Rond net = pile · jets = en avance · coulures = en retard')}</div><div class="k7gal">${cells}</div></div>`;
-    menu.appendChild(sh); const close = () => pageOut(sh); sh.onclick = e => { if(e.target === sh) close(); }; sh.querySelector('#k7gx').onclick = close;
-    sh.querySelectorAll('figure img').forEach(im => im.onclick = async () => { const id = im.closest('figure').dataset.id, name = `k7cut-${id}.jpg`;
-      shareArt(im.src, name); });
+    const sh = document.createElement('div'); sh.className = 'u-page u-galp';
+    const list = artsOf('noel').length && !XMAS ? [...TRACKS, NOEL] : SHELF; let gi = Math.max(0, list.findIndex(t => artsOf(t.id).length)); if(artsOf(SHELF[cur].id).length) gi = list.indexOf(SHELF[cur]);
+    sh.innerHTML = `<div class="u-top"><button class="u-ib" id="k7gx" aria-label="${tx('Retour')}">${BSI.back(INK)}</button><div class="u-title">${tx('MES ŒUVRES')}</div></div>
+      <div class="u-sel"><button class="u-ib round" data-a="p" aria-label="${tx('Cassette précédente')}">${BSI.chl(INK)}</button><span class="u-pill"></span><button class="u-ib round" data-a="n" aria-label="${tx('Cassette suivante')}">${BSI.chr(INK)}</button></div>
+      <div class="u-note">${tx('Les 3 dernières toiles de cette cassette.')}</div><div class="gc u-grow"></div><div class="u-corners"></div>`;
+    const fill = () => { const t = list[gi], arts = artsOf(t.id); sh.querySelector('.u-pill').textContent = tx('FACE') + ' ' + t.face + ' · ' + t.name;
+      sh.querySelector('.gc').innerHTML = arts.length ? `<div class="u-gal">${arts.map((a, k) => `<figure class="${k ? '' : 'big'}" data-id="${t.id}"><img src="${a.img}" alt="${tx('Toile')} ${t.name}"><button class="dl" aria-label="${tx('Télécharger')}">${BSI.dl(INK)}</button><figcaption>${a.title ? a.title : t.name}${a.acc ? ' · ' + a.acc + ' %' : ''}</figcaption></figure>`).join('')}</div>`
+        : `<div class="u-empty">${tx(unlocked(t) ? 'Pas encore peinte' : 'Cassette fermée')}</div>`;
+      sh.querySelectorAll('.dl').forEach(b => b.onclick = () => { const f = b.closest('figure'); shareArt(f.querySelector('img').src, `k7cut-${f.dataset.id}.jpg`); }); };
+    stage.appendChild(sh); fill(); sh.querySelector('#k7gx').onclick = () => pageOut(sh);
+    sh.querySelector('[data-a=p]').onclick = () => { gi = (gi - 1 + list.length) % list.length; api.sfx.click(); fill(); };
+    sh.querySelector('[data-a=n]').onclick = () => { gi = (gi + 1) % list.length; api.sfx.click(); fill(); };
   };
   // titre TOUCHÉ : jaune, le É en rouge, les lettres giclent avec la voix
   function homePop(i){ if(!intro) return 1; if(intro.stage !== 'play') return intro.shown ? 1 : .001; /* le titre attend son cri */ const dt2 = intro.t - .08 - POPT[Math.min(i, 9)]; if(dt2 < 0) return .001; const last = intro.t - 1.25; const b = 1 + Math.exp(-dt2*9)*Math.sin(dt2*30)*.5 + (dt2 < .06 ? .7 - dt2*10 : 0); return last > 0 ? b + Math.exp(-last*6)*.4 : b; }
@@ -2984,25 +3010,21 @@ G.trancheroute = { mount(stage, api){
     if(XMAS) xmasGarland(g, W, H*.025, H*.035, H*.03, null, k => ((k + Math.floor(beat)) % 3 === 0 ? 1 : .35));
     if(XMAS){ if(!hSnow.length) for(let i=0;i<46;i++) hSnow.push({x: Math.random()*W, y: Math.random()*H, s: 1.4 + Math.random()*2.6, v: 22 + Math.random()*40, ph: Math.random()*6.283});
       g.fillStyle = '#fff'; for(const f of hSnow){ f.y += f.v*dt; f.x += Math.sin(hTime*1.2 + f.ph)*14*dt; if(f.y > H + 6){ f.y = -6; f.x = Math.random()*W; } g.globalAlpha = .8; g.beginPath(); g.arc(f.x, f.y, f.s, 0, 6.283); g.fill(); } g.globalAlpha = 1; }
-    // éclairs jaunes autour de la cassette, qui claquent sur le temps
-    const room = H - 40 - hbBottom, sc = Math.max(.26, Math.min(.6, W/640, room/330)), jump = Math.sin(beat*Math.PI*.5)*3, mx2 = W*.5, my2 = hbBottom + 40 + 130*sc;
-    g.save(); g.fillStyle = '#ffd60a'; g.strokeStyle = INK; g.lineWidth = 2.5; g.globalAlpha = .9 + kick*.1;
-    for(const [ax, ay, ar] of [[mx2 - 150*sc, my2 - 120*sc, -.6], [mx2 + 160*sc, my2 - 140*sc, .5], [mx2 + 190*sc, my2 + 10*sc, 1.2]]){ g.save(); g.translate(ax, ay); g.rotate(ar); g.scale(1 + kick*.2, 1 + kick*.2); g.beginPath(); g.moveTo(-5, -22); g.lineTo(6, -22); g.lineTo(2, 22); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    // la cassette se dessine dans la zone prévue par la page (zone libre de l'accueil, carte de la campagne)
+    if((hTick = (hTick + 1) % 12) === 0) layoutHome();
+    const camp = homeMode === 'camp', R0 = hRect, sc = Math.max(.2, Math.min(.62, R0.w/400, R0.h/(camp ? 300 : 330))), jump = Math.sin(beat*Math.PI*.5)*3, mx2 = R0.x + R0.w/2, my2 = R0.y + R0.h/2 - 28*sc;
+    const isOpen = t => unlocked(t) || discs() >= t.cost;
+    g.save(); if(camp){ g.beginPath(); g.rect(R0.x, R0.y, R0.w, R0.h); g.clip(); }
+    // des giclées de peinture derrière elle, et trois éclairs qui claquent sur le temps
+    { if(!bgSplat) bgSplat = makeBgSplat(); const z = sc*(camp ? 1.5 : 1.25)*(1 + kick*.03); g.drawImage(bgSplat, mx2 - 210*z, my2 + 20*sc - 210*z, 420*z, 420*z); }
+    g.save(); g.fillStyle = '#ffd60a'; g.strokeStyle = INK; g.lineWidth = 2.5;
+    for(const [ax, ay, ar] of [[mx2 - 170*sc, my2 - 110*sc, -.6], [mx2 + 175*sc, my2 - 130*sc, .5], [mx2 + 200*sc, my2 + 30*sc, 1.2]]){ g.save(); g.translate(ax, ay); g.rotate(ar); g.scale(1 + kick*.2, 1 + kick*.2); g.beginPath(); g.moveTo(-5, -22); g.lineTo(6, -22); g.lineTo(2, 22); g.closePath(); g.fill(); g.stroke(); g.restore(); }
     g.restore();
-    // les voisines dansent sur les enceintes : on les touche pour les amener au centre
-    const isOpen = t => unlocked(t) || discs() >= t.cost, iL = wrapI(cur - 1), iR = wrapI(cur + 1);
-    // en campagne seulement : les voisines posées sur les enceintes, immobiles (on les touche pour les amener au centre)
-    if(homeMode === 'camp'){ const s2 = sc*.45;
-      g.save(); g.translate(W*.12, H*.84 - 6); g.rotate(-.18); g.scale(s2, s2); mascot(g, SHELF[iL], iL, isOpen(SHELF[iL]), false, 0, {x: .6, y: -.3}); g.restore();
-      g.save(); g.translate(W*.88, H*.86 - 6); g.rotate(.16); g.scale(s2, s2); mascot(g, SHELF[iR], iR, isOpen(SHELF[iR]), false, 0, {x: -.6, y: -.3}); g.restore(); }
-    // la grande cassette qui saute au milieu : celle qu'on va jouer ; elle arrive en rebondissant quand on en change
-    { const gl = g.createRadialGradient(mx2, my2 + 150*sc, 4, mx2, my2 + 150*sc, 170*sc); gl.addColorStop(0, 'rgba(255,31,122,.55)'); gl.addColorStop(1, 'rgba(255,31,122,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(mx2, my2 + 150*sc, 190*sc, 40*sc, 0, 0, 6.283); g.fill();
-      g.strokeStyle = 'rgba(255,31,122,.85)'; g.lineWidth = 3; g.beginPath(); g.ellipse(mx2, my2 + 158*sc, 150*sc, 22*sc, 0, 0, 6.283); g.stroke(); }
     hSel = Math.min(1, hSel + dt*3); const e2 = 1 - Math.pow(1 - hSel, 3), pop = 1 + Math.sin(hSel*Math.PI)*.12, slide = (1 - e2)*hDir*W*.5;
     g.save(); g.translate(mx2 + slide, my2 - jump); g.rotate(-.08 + Math.sin(beat*Math.PI*.5)*.025 + (1 - e2)*hDir*.4); g.scale(sc*pop, sc*pop); mascot(g, SHELF[cur], cur, isOpen(SHELF[cur]), false, hTime, {x: .4, y: -.4});
     // couronne jaune posée dessus
     g.save(); g.translate(-118, -96); g.rotate(-.45 + Math.sin(hTime*3)*.06); const cw = 70; g.beginPath(); g.moveTo(-cw/2, 0); g.lineTo(-cw/2, -cw*.55); g.lineTo(-cw/4, -cw*.2); g.lineTo(0, -cw*.7); g.lineTo(cw/4, -cw*.2); g.lineTo(cw/2, -cw*.55); g.lineTo(cw/2, 0); g.closePath(); g.lineJoin = 'round'; g.lineWidth = 8; g.strokeStyle = INK; g.stroke(); g.fillStyle = '#ffd23f'; g.fill(); g.restore();
-    g.restore();
+    g.restore(); g.restore();
   }
   let mLast = performance.now();
   /* ---------- musique des menus : de la french house filtrée, 118 BPM ---------- */
@@ -3044,7 +3066,7 @@ G.trancheroute = { mount(stage, api){
   (function mLoop(t){ const dt = Math.min(.05, (t - mLast)/1000); mLast = t; if(!menu.hidden){ if(homeOn) homeFrame(dt); else menuFrame(dt); } try{ menuMusic(); }catch(e){ window.__mmErr = String(e && e.stack || e); } requestAnimationFrame(mLoop); })(mLast);
 
   function showMenu(){
-    outroStop(); { const rw = stage.querySelector('.k7rw'); if(rw) rw.remove(); }
+    outroStop(); { const rw = stage.querySelector('.u-end'); if(rw) rw.remove(); }
     api.closeEnd(); state = 'menu'; tutoOpen = false; { const ov = stage.querySelector('#k7tutoov'); if(ov) ov.remove(); } if(useAudio && music) music.gain.setValueAtTime(.8, actx.currentTime);
     api.hud(''); for(const k in imgCache) delete imgCache[k];
     mPos = mTarget = cur; mVel = 0; refreshUI(true);
@@ -3053,7 +3075,7 @@ G.trancheroute = { mount(stage, api){
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; pauseEl.hidden = true; paused = false; }
   function showLabo(){
     laboOn = true; state = 'menu'; auto = false; menu.hidden = true; stopBtn.hidden = true; homeOn = false; home.hidden = true; api.hud(''); api.closeEnd();
-    for(const q of stage.querySelectorAll('.k7rw, .k7lab')) q.remove();
+    for(const q of stage.querySelectorAll('.u-end, .k7lab')) q.remove();
     if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setValueAtTime(.8, actx.currentTime); }
     if(!document.getElementById('k7-lab-css')){ const st = document.createElement('style'); st.id = 'k7-lab-css'; st.textContent = `
       .k7lab{position:absolute;inset:0;z-index:12;overflow-y:auto;background:#efe5cf;color:${INK};font-family:"Rubik",sans-serif;-webkit-overflow-scrolling:touch}

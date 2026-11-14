@@ -1,0 +1,161 @@
+/* BEAT SPLASH — menus, direction artistique de la maquette de novembre 2026 (v3).
+   Fond sombre uni, panneaux au trait fin, cartes crème, un seul bouton rose par écran, jaune pour ce qui est choisi.
+   Règle : seul ce qui est cliquable a la forme d'un bouton. Tout est préfixé u- pour ne pas croiser les anciens styles. */
+:root{--u-bg:#0e0d15;--u-panel:#16151e;--u-line:rgba(255,255,255,.82);--u-cream:#f6efdc;--u-ink:#16151c;--u-pink:#ff1f7a;--u-pink2:#b3104f;--u-yel:#ffd60a;--u-cyan:#22d3ee}
+
+/* ---------- la page ---------- */
+#stage .u-page{position:absolute;inset:0;z-index:30;background:var(--u-bg);color:#fff;font-family:"Rubik",sans-serif;display:flex;flex-direction:column;gap:12px;padding:14px 16px 20px;box-sizing:border-box;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;animation:k7pgin .28s cubic-bezier(.2,.9,.3,1)}
+#stage .u-page.k7out{animation:k7pgout .3s ease-in forwards}
+#stage .u-page > *{flex:none}
+#stage .u-page > .u-grow{flex:1 1 auto;min-height:0}
+.u-corners{position:absolute;left:0;right:0;bottom:0;height:16px;pointer-events:none;z-index:1}
+.u-corners::before,.u-corners::after{content:"";position:absolute;bottom:0;width:64px;height:16px}
+.u-corners::before{left:0;background:var(--u-cyan);clip-path:polygon(0 0,100% 100%,0 100%)}
+.u-corners::after{right:0;background:var(--u-pink);clip-path:polygon(100% 0,100% 100%,0 100%)}
+.u-page button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+
+/* ---------- barre du haut, titres ---------- */
+.u-top{display:flex;align-items:center;gap:10px;min-height:42px}
+.u-top .sp{flex:1}
+.u-ib{flex:none;width:42px;height:40px;border-radius:12px;background:var(--u-cream);border:2px solid var(--u-ink);box-shadow:0 0 0 1.5px rgba(255,255,255,.55);display:grid;place-items:center;padding:0;cursor:pointer;color:var(--u-ink)}
+.u-ib.round{border-radius:50%;width:40px}
+.u-ib svg{width:22px;height:22px;display:block}
+.u-ib:active,.u-row:active,.u-lv button:active{transform:translateY(2px)}
+.u-title{position:relative;display:block;text-align:center;font:italic 900 min(28px,7.4vw)/1 "Rubik",sans-serif;text-transform:uppercase;color:#fff;padding:2px 26px 9px;transform:rotate(-2deg)}
+.u-title::after{content:"";position:absolute;left:24%;right:16%;bottom:0;height:6px;background:var(--u-cyan);clip-path:polygon(0 45%,100% 0,97% 100%,3% 92%)}
+.u-title .p{color:var(--u-pink)}
+.u-title.sp::before{content:"";position:absolute;left:0;top:-2px;width:22px;height:22px;background:linear-gradient(var(--u-yel),var(--u-yel)) 0 0/100% 100%;clip-path:polygon(0 30%,55% 52%,38% 62%,0 46%,30% 0,62% 44%,50% 54%,18% 6%,78% 12%,86% 46%,74% 48%,66% 14%)}
+.u-top .u-title{flex:1;text-align:left;padding-left:4px;font-size:min(24px,6.4vw)}
+.u-top .u-title::after{left:8%;right:20%}
+.u-note{font:500 13.5px/1.35 "Rubik",sans-serif;color:rgba(255,255,255,.78);text-align:center}
+.u-note b{color:#fff}
+.u-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--u-cream);color:var(--u-ink);border-radius:999px;padding:6px 16px;font:italic 800 15px/1 "Rubik",sans-serif;white-space:nowrap}
+.u-pill.y{background:var(--u-yel)}.u-pill.pk{background:var(--u-pink);color:#fff}.u-pill.sm{font-size:11px;padding:3px 8px}
+.u-center{display:flex;justify-content:center}
+
+/* ---------- boutons ---------- */
+.u-cta{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:56px;border:0;border-radius:14px;background:var(--u-pink);color:#fff;font:italic 900 min(28px,7.2vw)/1 "Rubik",sans-serif;text-transform:uppercase;box-shadow:0 4px 0 var(--u-pink2);cursor:pointer;padding:6px 16px;box-sizing:border-box}
+.u-cta:active{transform:translateY(3px);box-shadow:0 1px 0 var(--u-pink2)}
+.u-cta svg{width:20px;height:24px;flex:none}
+.u-cta[disabled]{filter:grayscale(.8);opacity:.7}
+.u-row{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;border:2px solid var(--u-ink);border-radius:12px;background:var(--u-cream);color:var(--u-ink);font:italic 800 16.5px/1.1 "Rubik",sans-serif;text-transform:uppercase;padding:6px 12px;text-align:left;cursor:pointer;box-shadow:0 0 0 1.5px rgba(255,255,255,.4);box-sizing:border-box;position:relative}
+.u-row .ic{flex:none;width:28px;display:grid;place-items:center}.u-row .ic svg{width:24px;height:24px;display:block}
+.u-row .tx{flex:1;min-width:0}
+.u-row small{display:block;font:600 12px/1.2 "Rubik",sans-serif;text-transform:none;opacity:.72;margin-top:2px}
+.u-row .ch{flex:none;width:10px;height:16px}
+.u-row.dark{background:var(--u-panel);color:#fff;border:1.5px solid var(--u-line);box-shadow:none}
+.u-row.plain{text-transform:none;font:700 16px/1.15 "Rubik",sans-serif}
+.u-row.center{justify-content:center}.u-row.center .tx{flex:none}
+.u-row[disabled]{opacity:.6}
+.u-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.u-pair .u-row{gap:8px;padding:6px 10px}
+
+/* ---------- boîtes d'information (jamais cliquables) ---------- */
+.u-box{border:1.5px solid var(--u-line);border-radius:14px;background:var(--u-panel);padding:10px 12px;box-sizing:border-box}
+.u-chip{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--u-line);border-radius:999px;background:var(--u-panel);padding:4px 12px 4px 5px;font:700 14px/1 "Rubik",sans-serif;color:#fff;min-height:30px;box-sizing:border-box;white-space:nowrap}
+.u-chip svg{width:22px;height:22px;display:block;flex:none}
+.u-discs{display:inline-flex;gap:5px;align-items:center}.u-discs svg{width:22px;height:22px;display:block}
+.u-info{background:var(--u-yel);color:var(--u-ink);border-radius:10px;padding:8px 12px;font:italic 800 14.5px/1.2 "Rubik",sans-serif;text-align:center}
+
+/* ---------- accueil et campagne ---------- */
+#stage .k7home.u3{background:var(--u-bg)}
+#stage .k7home.u3::before,#stage .k7home.u3::after{display:none}
+#stage .k7home.u3 canvas{z-index:6;pointer-events:none}
+.u-hwrap{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px;padding:12px 16px 22px;box-sizing:border-box;color:#fff;font-family:"Rubik",sans-serif}
+.u-hwrap > *{flex:none}
+#stage .k7home.u3 .bs-logo{position:static;margin:2px 0 0;z-index:auto}
+#stage .k7home.u3 .bs-logo .bs-title{font-size:min(56px,14.5vw);padding:10px 4px 14px;margin:0 30px}
+.u-hstage{flex:1 1 auto !important;min-height:90px}
+.u-hbtns{display:flex;flex-direction:column;gap:10px}
+.u-hbtns[hidden]{display:none}
+.u-thumb{flex:none;width:44px;height:36px;border-radius:6px;background:linear-gradient(135deg,#ff3d7f,#ffd23f 50%,#29c4ff);border:2px solid var(--u-ink);object-fit:cover}
+.u-dot{position:absolute;right:30px;top:8px;width:11px;height:11px;border-radius:50%;background:var(--u-pink);border:2px solid var(--u-ink)}
+.u-card{position:relative;background:var(--u-cream);color:var(--u-ink);border-radius:16px;padding:10px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 auto !important;min-height:150px}
+.u-card .hole{flex:1 1 auto;align-self:stretch;min-height:100px;border-radius:12px;background:#efe5cf}
+.u-card .nm{font:italic 900 min(22px,5.8vw)/1 "Rubik",sans-serif;text-transform:uppercase;text-align:center}
+.u-card .u-ib{position:absolute;top:38%;z-index:7}.u-card .u-ib.l{left:-8px}.u-card .u-ib.r{right:-8px}
+.u-lv{display:flex;align-items:center;gap:8px;font:italic 900 17px/1 "Rubik",sans-serif;text-transform:uppercase}
+.u-lv button{flex:1;min-height:36px;border:2px solid var(--u-ink);border-radius:10px;background:var(--u-cream);color:var(--u-ink);font:italic 900 18px/1 "Rubik",sans-serif;cursor:pointer;box-shadow:0 0 0 1.5px rgba(255,255,255,.35)}
+.u-lv button.on{background:var(--u-yel)}
+@media (max-height:700px){.u-hwrap{gap:9px;padding-top:8px}#stage .k7home.u3 .bs-logo .bs-title{font-size:min(44px,12vw);padding:6px 4px 10px}.u-hbtns{gap:8px}.u-cta{min-height:50px}.u-row{min-height:44px}#stage .u-page{gap:9px;padding:10px 14px 16px}}
+
+/* ---------- avant de jouer ---------- */
+.u-demo{height:112px;border-radius:12px}
+.u-demo canvas{width:100%;height:100%;display:block}
+.u-bricks{display:flex;flex-direction:column;gap:8px;overflow-y:auto;overscroll-behavior:contain}
+.u-bricks .u-row{min-height:46px;padding:4px 10px 4px 6px}
+.u-bricks .u-row.on{background:var(--u-yel)}
+.u-bricks .u-row .ic{width:40px}.u-bricks .u-row .ic svg{width:40px;height:40px}
+.u-bricks .go{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--u-ink);display:grid;place-items:center}.u-bricks .go svg{width:10px;height:12px}
+
+/* ---------- chargement ---------- */
+#stage .u-load{position:absolute;inset:0;z-index:31;background:var(--u-bg);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px 24px;box-sizing:border-box;font-family:"Rubik",sans-serif}
+#stage .u-load .bs-title{font-size:min(52px,13.5vw);padding:10px 4px 14px;margin:0 30px}
+.u-load canvas{width:min(230px,58vw);height:min(210px,30vh)}
+.u-load .bar{width:min(240px,64%);height:12px;border-radius:999px;background:#2a2934;border:1.5px solid var(--u-line);overflow:hidden}
+.u-load .bar i{display:block;height:100%;width:0;background:var(--u-pink);border-radius:999px;transition:width .2s linear}
+
+/* ---------- fin de partie ---------- */
+.u-end canvas.fx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.u-end .u-art{position:relative;align-self:center;width:min(100%,46vh);aspect-ratio:1;border-radius:10px;background:var(--u-cream);overflow:hidden;flex:0 1 auto !important;min-height:120px}
+.u-end .u-art img{width:100%;height:100%;object-fit:cover;display:block}
+.u-artcap{display:flex;align-items:center;gap:10px;font:700 14px/1.2 "Rubik",sans-serif}.u-artcap span{flex:1;min-width:0}
+.u-artcap button{flex:none;border:0;cursor:pointer;min-height:32px}
+.u-rhy{display:flex;align-items:center;gap:10px;font:italic 900 22px/1 "Rubik",sans-serif;text-transform:uppercase}
+.u-rhy b{color:var(--u-yel);font-size:26px}.u-rhy .u-discs{margin-left:auto}.u-rhy .u-discs svg{width:26px;height:26px}
+.u-stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--u-cream);color:var(--u-ink);border-radius:12px;padding:8px 4px;text-align:center}
+.u-stats > div + div{border-left:1.5px solid rgba(22,21,28,.35)}
+.u-stats small{display:block;font:600 12px/1 "Rubik",sans-serif;opacity:.75;margin-bottom:4px}.u-stats b{font:italic 900 20px/1 "Rubik",sans-serif}
+.u-end .pg[hidden]{display:none}
+.u-end .pg{display:flex;flex-direction:column;gap:12px;flex:1 1 auto !important;min-height:0}
+.u-end .pg > *{flex:none}
+.u-next{background:var(--u-cream);color:var(--u-ink);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.u-next img{width:96px;height:60px;object-fit:contain;flex:none}
+.u-next b{display:block;font:italic 900 19px/1.05 "Rubik",sans-serif;text-transform:uppercase;margin-bottom:6px}
+.u-end .u-art.sm{width:min(52%,24vh)}
+
+/* ---------- cassette de la mort ---------- */
+.u-death .hd{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px}
+.u-death .hd svg{width:54px;height:54px;flex:none}
+.u-death .hd .u-title{text-align:left;padding:0 0 8px;font-size:min(30px,7.8vw)}
+.u-rec{text-align:center;padding:10px 12px 12px}
+.u-rec small{display:block;font:italic 900 15px/1 "Rubik",sans-serif;text-transform:uppercase;margin-bottom:6px}
+.u-rec b{font:italic 900 min(40px,10vw)/1 "Rubik",sans-serif;color:var(--u-yel)}
+.u-rec span{display:block;font:600 13px/1.2 "Rubik",sans-serif;opacity:.75;margin-top:4px}
+.u-lb{display:flex;flex-direction:column;gap:5px;overflow-y:auto;overscroll-behavior:contain;min-height:96px}
+.u-lb > div{flex:none;display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;background:var(--u-cream);color:var(--u-ink);border-radius:8px;padding:7px 12px;font:700 16px/1.1 "Rubik",sans-serif}
+.u-lb > div.me{background:var(--u-yel)}
+.u-lb small{opacity:.5;font-weight:700;margin-left:6px}.u-lb b{font-weight:900}.u-lb .fl{font-style:normal}
+.u-field{display:flex;align-items:center;gap:10px;font:700 14px/1.1 "Rubik",sans-serif}
+.u-field input{flex:1;min-width:0;box-sizing:border-box;background:#fff;color:var(--u-ink);border:2px dashed var(--u-ink);border-radius:10px;padding:9px 12px;font:800 17px "Rubik",sans-serif;box-shadow:0 0 0 1.5px rgba(255,255,255,.5);user-select:text;-webkit-user-select:text}
+.u-field input:focus{border-style:solid;outline:3px solid var(--u-yel);outline-offset:2px}
+
+/* ---------- mes œuvres ---------- */
+.u-sel{display:flex;align-items:center;gap:10px}.u-sel .u-pill{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:16px;padding:9px 12px}
+.u-gal{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.u-gal figure{margin:0;position:relative}.u-gal figure.big{grid-column:1/-1;justify-self:center;width:min(100%,42vh)}
+.u-gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;background:var(--u-cream)}
+.u-gal figcaption{font:600 13px/1.2 "Rubik",sans-serif;text-align:center;margin-top:5px}
+.u-gal .dl{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:9px;border:2px solid var(--u-ink);background:var(--u-cream);display:grid;place-items:center;cursor:pointer;padding:0}
+.u-gal .dl svg{width:18px;height:18px}
+.u-empty{border:2px dashed rgba(255,255,255,.3);border-radius:12px;padding:34px 12px;text-align:center;font:700 15px/1.3 "Rubik",sans-serif;color:rgba(255,255,255,.6)}
+
+/* ---------- options ---------- */
+.u-tog{flex:none;width:46px;height:26px;border-radius:999px;background:#b9b2a2;position:relative;transition:background .15s}
+.u-tog::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.u-row.on .u-tog{background:var(--u-pink)}.u-row.on .u-tog::after{left:23px}
+.u-cal > b{display:block;font:italic 900 16px/1 "Rubik",sans-serif;text-transform:uppercase;margin-bottom:10px}
+.u-cal .r{display:flex;align-items:center;gap:8px}
+.u-cal .r .u-ib{width:34px;height:32px;border-radius:9px;font:900 20px/1 "Rubik",sans-serif}
+.u-cal .r .u-pill{min-width:74px}
+.u-cal .r .u-row{flex:1;min-height:40px;font-size:14px;width:auto}
+.u-langs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.u-ver{font:500 12px/1 "Rubik",sans-serif;opacity:.5;text-align:center}
+.u-test{border:1.5px dashed rgba(255,255,255,.4);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.u-test > b{font:800 12px/1 "Rubik",sans-serif;letter-spacing:.1em;opacity:.6}
+#k7hchip{min-width:0;flex:0 1 auto}#k7htitle{min-width:0;overflow:hidden;text-overflow:ellipsis;display:block;max-width:44vw}#k7hname{flex:none}
+#stage .u-load .bs-logo{position:static;margin:0}
+.u-title.sp::before{display:none}
+.u-artcap span{overflow-wrap:anywhere}
+.u-end .pg{position:relative;z-index:1}
+.u-lb .fl{font-family:"Twemoji Country Flags","Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:4px}

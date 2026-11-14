@@ -12,6 +12,7 @@ try{if(!sessionStorage.getItem("bs_splash")){sessionStorage.setItem("bs_splash",
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/menus.css">
+<link rel="stylesheet" href="css/ui3.css">
 </head>
 <body>
 <div id="stage"></div>
@@ -34,7 +35,7 @@ window.BS_TEST_BUILD = true;</script>
 window.GameKit = {
   lang: () => window.BSi18n && BSi18n.lang,
   scene: () => (window.__k7 && __k7.state) || "",
-  isIdle: () => !!window.__k7 && __k7.state === "menu" && !document.querySelector(".k7sheet, .k7brief, .bs-load, #stage .end, #k7tutoov") && !document.documentElement.classList.contains("splash"),
+  isIdle: () => !!window.__k7 && __k7.state === "menu" && !document.querySelector(".k7sheet, .k7brief, .bs-load, .u-page, .u-load, #stage .end, #k7tutoov") && !document.documentElement.classList.contains("splash"),
 };
 </script>
 </body>
