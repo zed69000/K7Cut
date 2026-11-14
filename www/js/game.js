@@ -963,7 +963,7 @@ G.trancheroute = { mount(stage, api){
     if(t.song){ let last = t.song.hook.find(x => x != null); const full = t.song.hook.map(x => last = x == null ? last : x); motif = Array.from({length: 32}, (_, i) => full[songIdx(Math.floor(i/8), i % 8)]); }
     hookMask = [[1,0,0,1,0,1,0,0],[1,0,1,1,0,1,1,0],[1,1,0,1,0,0,1,0],[1,0,1,0,1,1,0,1]][Math.floor(r()*4)];
     for(const k in barCache) delete barCache[k];
-    frescoInit(); paintEv = []; gulp = 0; swallows = []; objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = 3; missBy = {}; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0;
+    frescoInit(); paintEv = []; gulp = 0; swallows = []; objs = []; bits = []; judges = []; score = 0; combo = 0; maxCombo = 0; hearts = 3; missBy = {}; stats = {perfect: 0, good: 0, ok: 0, miss: 0}; notesRun = 0; pals = 0; palFx = []; palPop = 0;
     beatNow = 0; nextStep = 0; jumpT = 9; hurtT = 0; energy = {kick: 0, snare: 0, hat: 0, bass: 0, chords: 0, lead: 0}; events = []; bump = 0; flashR = 0; gestures.clear(); holdState = null; scratchState = null; rot = 0; finished = false; spawned = 1; secShown = -1;
     outroStop(); hideMenu(); api.closeEnd(); api.hud(`${tx('FACE')} ${t.face} · ${t.name.toUpperCase()}`);
     muted = api.store.load('muted', false); audioInit(); useAudio = !!actx && !muted; loadRecs();
@@ -1005,6 +1005,9 @@ G.trancheroute = { mount(stage, api){
     if(slowed && g === 'perfect') g = 'good'; // au ralenti, pas de « parfait » : ça rapporte moins
     o.done = true; o.result = g; stats[g]++; if(g === 'miss' && 'CJHSD'.includes(o.k)){ const k = tk(o); missBy[k] = (missBy[k] || 0) + 1; } cueLearn(o, g); if(!window.__nofresco) try{ const p0 = performance.now(); paint(o, g, dir); if(window.__pt) window.__pt.push(performance.now() - p0); }catch(e){}
     const x = xOf(Math.min(o.beat, Math.max(o.beat, beatNow))), y = objY(o);
+    if(g === 'miss' && pals > 0 && !deathRun && !auto && 'CJHSD'.includes(o.k)){
+      pals--; palFx.push({x, y, t: 0, c: PALC[pals], i: pals}); judges.push({txt: tx('RATTRAPÉ !'), sub: tx('un compagnon sauve ton combo'), x: Math.max(90, x), y: Y0 - 74, t: 0});
+      osc(master, 'triangle', 660, t, .12, .16, {glide: 990, gt: .1, rev: .2}); api.vibe(24); return; }
     if(g === 'miss'){
       if(trance >= 1) tapeStop(t); setTrance(0, t);
       combo = 0; hurtT = .6; flashR = .6; bump = 1; missRun++; stemCut = t + (diff.easy ? 2 : 4)*bpb; if(diff.ko && missRun >= diff.ko && !auto){ judges.push({txt: tx('LA BANDE A CASSÉ'), sub: tx('{n} ratés de suite', {n: diff.ko}), x: W/2, y: H*.22, t: 0, big: true}); api.after(400, fail); } if(deathRun && !auto){ hearts--; deathHud(); if(hearts <= 0) api.after(400, fail); } if(missRun >= 2 && !slowed) loseThread(t);
@@ -1014,7 +1017,8 @@ G.trancheroute = { mount(stage, api){
       missRun = 0;
       if(slowed){ recHits++; rateTgt = SLOW + (1 - SLOW)*Math.min(1, recHits/REC()); if(recHits >= REC()){ slowed = false; rateTgt = 1; judges.push({txt: tx('ÇA REPART !'), x: W/2, y: H*.2, t: 0, big: true}); I.crash(Math.max(t, o.time)); I.boom(Math.max(t, o.time), .8); } }
       if(o.k === 'H' && useAudio && tr.song){ const d0 = chordOf(Math.floor(beatNow/4)), m0 = music; music = master; try{ I.chord(t, [d0, d0 + 4], bpb*.5, STAB[tr.style] || 'brass', 3000); } finally { music = m0; } }
-      combo++; maxCombo = Math.max(maxCombo, combo); comboVoice(o.k !== 'H' && o.k !== 'S' ? Math.max(t, o.time) : t); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(tiers().filter(x => combo >= x).length - 1, t);
+      combo++; maxCombo = Math.max(maxCombo, combo);
+      if(combo % 10 === 0 && pals < PALMAX && !deathRun && !auto){ pals++; palPop = 1; judges.push({txt: tx('+1 COMPAGNON'), x: HXs + 46, y: Y0 - 104, t: 0}); osc(master, 'sine', 880, t, .14, .12, {glide: 1320, gt: .1, rev: .25}); } comboVoice(o.k !== 'H' && o.k !== 'S' ? Math.max(t, o.time) : t); try{ rewardBeat(o.k === 'H' || o.k === 'S' ? {time: t, beat: beatNow} : o, g, t); }catch(e){} setTrance(tiers().filter(x => combo >= x).length - 1, t);
       const base = g === 'perfect' ? 100 : g === 'good' ? 60 : 25; score += Math.round(base*(1 + Math.min(combo, 50)/10)*TMULT[trance]*(slowed ? .5 : 1));
       const when = Math.max(t, o.time);
       // le joueur joue la mélodie
@@ -1139,6 +1143,15 @@ G.trancheroute = { mount(stage, api){
   }
   function confetti(x, y, cols, n, power){ for(let i=0;i<n;i++){ const a = Math.random()*6.283, sp = (120 + Math.random()*260)*power; bits.push({x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp - 120, rot: Math.random()*6, vr: (Math.random() - .5)*14, w: 4 + Math.random()*6, h: 3 + Math.random()*3, c: cols[i % cols.length], life: .8 + Math.random()*.5}); } }
   let gulp = 0, swallows = [];
+  /* les compagnons : de petites boules comme le héros, qui le suivent sur la bande. On en gagne un tous les 10 de combo (7 au plus) ;
+     quand on rate un geste, le dernier se jette dessus et le rattrape : le combo est sauvé, le compagnon s'en va.
+     Pas dans la Cassette de la mort : le classement reste le même pour tous. */
+  const PALC = ['#ff3d7f', '#2fd3b0', '#b6ff3b', '#ffd23f', '#29c4ff', '#ff8a2b', '#a35cff'], PALMAX = 7; let pals = 0, palFx = [], palPop = 0;
+  function palFace(g, r, mood){ g.fillStyle = INK; g.strokeStyle = INK; g.lineCap = 'round'; g.lineWidth = Math.max(1.2, r*.16);
+    if(mood < 0){ for(const ex of [-r*.32, r*.32]){ g.beginPath(); g.arc(ex, -r*.12, r*.11, 0, 6.283); g.fill(); } g.beginPath(); g.moveTo(-r*.25, r*.34); g.lineTo(r*.25, r*.34); g.stroke(); }
+    else { for(const ex of [-r*.32, r*.32]){ g.beginPath(); g.arc(ex, -r*.1, r*.2, Math.PI*1.1, Math.PI*1.9); g.stroke(); } g.beginPath(); g.arc(0, r*.12, r*.34, .15, Math.PI - .15); g.stroke(); } }
+  function palBall(g, x, y, r, col, mood){ g.save(); g.translate(x, y); g.fillStyle = col; g.strokeStyle = INK; g.lineWidth = Math.max(1.6, r*.14); g.beginPath(); g.arc(0, 0, r, 0, 6.283); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.4)'; g.beginPath(); g.arc(-r*.35, -r*.4, r*.22, 0, 6.283); g.fill(); palFace(g, r, mood); g.restore(); }
   function collect(o, t){
     o.done = true; o.result = 'got'; swallows.push({x: xOf(o.beat), y: objY(o), t: 0, gold: o.k === 'A'});
     { notesRun++; paintNote(o); const at = Math.max(t, o.time), fr = freq(chordOf(Math.floor(o.beat/4)) + (o.k === 'A' ? 4 : 0), 3); I.bell(at, freq(o.deg + 7, 4), .05); score += 10; }
@@ -1832,7 +1845,22 @@ G.trancheroute = { mount(stage, api){
     for(let i=0;i<3;i++){ const x = w*(.3 + i*.2), len = 14 + r()*26; g.fillRect(x - 2.5, h*.7, 5, len); g.beginPath(); g.arc(x, h*.7 + len, 4, 0, 6.283); g.fill(); }
     for(let i=0;i<18;i++){ g.beginPath(); g.arc(w/2 + (r() - .5)*w, h*.45 + (r() - .5)*h*.8, r()*3, 0, 6.283); g.fill(); }
     return c; }
+  // la ronde des compagnons : 7 places en bas de l'écran ; ceux qu'on a recrutés dansent en se tenant la main, les autres attendent en gris
+  function drawPals(ek){
+    const r = Math.min(25, W/17), gap = W/PALMAX, base = H - r - 34, sad = slowed;
+    ctx.strokeStyle = 'rgba(28,27,25,.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(18, H - 27); ctx.quadraticCurveTo(W/2, H - 33, W - 18, H - 27); ctx.stroke();
+    const pos = i => ({x: gap*(i + .5), y: base - (i < pals && !sad ? Math.abs(Math.sin(beatNow*Math.PI/2 + i*.9))*(8 + ek*8 + trance*2) : 0)});
+    // les mains qui se tiennent
+    ctx.lineCap = 'round'; for(let i = 0; i < pals - 1; i++){ const a = pos(i), b = pos(i + 1); ctx.strokeStyle = INK; ctx.lineWidth = 5.5; ctx.beginPath(); ctx.moveTo(a.x + r*.8, a.y + 2); ctx.quadraticCurveTo((a.x + b.x)/2, Math.max(a.y, b.y) + 9, b.x - r*.8, b.y + 2); ctx.stroke(); ctx.strokeStyle = PALC[i]; ctx.lineWidth = 3; ctx.stroke(); }
+    for(let i = 0; i < PALMAX; i++){ const q = pos(i);
+      if(i >= pals){ ctx.save(); ctx.globalAlpha = .28; ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(q.x, q.y + 4, r*.8, 0, 6.283); ctx.fill(); ctx.restore(); continue; }
+      // les petites jambes, puis la boule
+      const st = sad ? 0 : Math.sin(beatNow*Math.PI + i)*4; ctx.strokeStyle = INK; ctx.lineWidth = 3.5; for(const sd of [-1, 1]){ ctx.beginPath(); ctx.moveTo(q.x + sd*r*.35, q.y + r*.8); ctx.lineTo(q.x + sd*r*.45 + sd*st, H - 30); ctx.stroke(); }
+      palBall(ctx, q.x, q.y, r, PALC[i], sad ? -1 : 1);
+      if(!sad && (i + Math.floor(beatNow/2)) % 3 === 0){ const ny = q.y - r - 12 - Math.abs(Math.sin(beatNow*Math.PI))*5; ctx.fillStyle = PALC[(i + 3) % PALMAX]; ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(q.x + 8, ny + 8, 5, 3.8, -.4, 0, 6.283); ctx.fill(); ctx.stroke(); ctx.fillStyle = INK; ctx.fillRect(q.x + 11.5, ny - 7, 2.4, 15); } }
+  }
   function drawCrowd(ek){
+    if(!deathRun && !auto){ drawPals(ek); return; }
     const n = Math.ceil(W/30) + 2, base = H + 6, rims = TH().rim, sad = slowed ? 1 - Math.min(1, recHits/REC()) : 0;
     for(const pass of [0, 1]) for(let i=0;i<n;i++){
       const x = i*30 - 8 + (i % 2)*9, sz = 1 + ((i*37) % 10)/22, up = slowed ? (i*7 % 5) < 5*(1 - sad) - .5 : (i*7 % 5) < 1 + trance + (ek > .6 ? 1 : 0), jump = ek*(trance >= 2 ? 8 : 3)*((i % 3) ? 1 : .5)*(1 - sad), y = base - jump - (i % 2)*6 + sad*7;
@@ -2022,6 +2050,14 @@ G.trancheroute = { mount(stage, api){
       if('CJOWD'.includes(o.k) && state === 'play') drawCue(o, x, y);
       if((o.k === 'C' || o.k === 'J') && bd < .7 && bd > -.1){ const a2 = 1 - bd/.7; ctx.strokeStyle = `rgba(28,27,25,${a2})`; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; const top = o.shape === 'tall' ? 32 : 18; for(let q=0;q<3;q++){ const an = -1.1 + q*.45; ctx.beginPath(); ctx.moveTo(x + Math.cos(an)*(top + 4), y + Math.sin(an)*(top + 4)); ctx.lineTo(x + Math.cos(an)*(top + 11 + a2*4), y + Math.sin(an)*(top + 11 + a2*4)); ctx.stroke(); } }
     }
+    // les compagnons, à la queue leu leu derrière le héros : ils sautillent en vague sur le tempo
+    { palPop = Math.max(0, palPop - 1/60*3); const sp = Math.min(17, (HXs - 20)/PALMAX), r = 9;
+      for(let i = pals - 1; i >= 0; i--){ const hop = Math.abs(Math.sin(beatNow*Math.PI - i*.55))*7*(slowed ? .3 : 1), pop = i === pals - 1 ? 1 + palPop*.7 : 1;
+        ctx.fillStyle = 'rgba(40,20,0,.22)'; ctx.beginPath(); ctx.ellipse(HXs - 24 - i*sp, Y0 - 1, r*.9, 2, 0, 0, 6.283); ctx.fill(); palBall(ctx, HXs - 24 - i*sp, Y0 - r*pop - 1 - hop, r*pop, PALC[i], slowed ? -1 : 1); }
+      // celui qui rattrape un geste raté : il bondit sur la brique, puis éclate en confettis
+      for(const f of palFx){ f.t += 1/60; const u = Math.min(1, f.t/.22), e = 1 - (1 - u)*(1 - u), sx = HXs - 24 - f.i*sp, x = sx + (f.x - sx)*e, y = Y0 - 10 + (f.y - (Y0 - 10))*e - Math.sin(u*Math.PI)*34;
+        if(u < 1) palBall(ctx, x, y, r*(1 + u*.8), f.c, 1); else if(!f.done){ f.done = true; confetti(f.x, f.y, [f.c, PAPER, '#fff'], 14, .9); } }
+      palFx = palFx.filter(f => f.t < .5); }
     // héros
     const jp = 0, popE = jumpT < .45 ? Math.exp(-jumpT*9)*(1 + Math.sin(jumpT*38)*.35) : 0; if(stretch){ stretch.t += 1/60; if(stretch.t > .4) stretch = null; }
     // la petite roue grossit avec les notes avalées (et gonfle à chaque bouchée)
