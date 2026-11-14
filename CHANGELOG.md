@@ -1,5 +1,8 @@
 # Journal des versions
 
+## 0.35.1 — Son qui saccadait
+- **Son** : plafond de sons simultanés (44 sur téléphone, les plus discrets sont écartés), cordes allégées, tampon audio plus grand sur téléphone.
+
 ## 0.35.0 — Nouveaux menus
 - **Menus** : nouvelle direction artistique d'après la maquette (accueil, campagne avec ses flèches et ses 4 niveaux, avant de jouer, chargement, fin de partie en deux temps, cassette de la mort, mes œuvres, options, pause, labo). Fond sombre, cartes crème, un seul bouton rose par écran.
 - **Ouverture** : après l'écran de lancement, une courte pause où l'accueil n'accepte aucun clic (les taps de martelage sont avalés).
