@@ -2,5 +2,10 @@
   "appId": "com.zed69000.beatsplash",
   "appName": "BEAT SPLASH",
   "webDir": "www",
-  "backgroundColor": "#f2cd4c"
+  "backgroundColor": "#f2cd4c",
+  "plugins": {
+    "PlayCloudSave": {
+      "appId": ""
+    }
+  }
 }
