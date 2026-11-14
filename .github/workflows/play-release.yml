@@ -1,4 +1,4 @@
-# Envoie BEAT SPLASH sur Google Play (tests internes) par la chaîne commune zed69000/game-pipeline.
+# Envoie BEAT SPLASH sur Google Play (test fermé Alpha, où sont les testeurs) par la chaîne commune zed69000/game-pipeline.
 # Se lance tout seul quand VERSION change dans www/js/game.js, ou à la main : Actions > « Android · Google Play » > Run workflow.
 # Secrets du dépôt : voir game-pipeline/README.md (clé d'envoi + compte de service).
 # Le numéro de version Play (versionCode) vient de VERSION : 0.24.0 -> 2400.
@@ -34,6 +34,8 @@ jobs:
     uses: zed69000/game-pipeline/.github/workflows/android-play.yml@main
     with:
       package-name: com.zed69000.beatsplash
+      # les testeurs sont inscrits sur « Tests fermés - Alpha » : on envoie là, pas sur « Tests internes »
+      track: alpha
       aab-path: android/app/build/outputs/bundle/release/app-release.aab
       # l'appli n'est pas encore publiée en production : la release arrive en brouillon, il reste à cliquer « Déployer »
       release-status: draft
