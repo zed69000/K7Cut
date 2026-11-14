@@ -159,3 +159,25 @@
 .u-artcap span{overflow-wrap:anywhere}
 .u-end .pg{position:relative;z-index:1}
 .u-lb .fl{font-family:"Twemoji Country Flags","Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;margin-right:4px}
+
+/* ---------- pause ---------- */
+#stage .k7pause{background:rgba(14,13,21,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#stage .u-pcard{width:min(320px,calc(100% - 48px));display:flex;flex-direction:column;gap:12px;padding:20px 16px 18px;font-family:"Rubik",sans-serif;color:#fff}
+#stage .u-pcard .u-title{font-size:min(40px,10vw);color:var(--u-pink)}
+#stage .u-pcard .k7psub{white-space:normal;text-align:center;font-size:13px;margin:0;text-transform:none;letter-spacing:0;color:var(--u-ink)}
+#stage .u-pcard .k7pb{min-height:50px;box-shadow:none;border-radius:12px;-webkit-text-stroke:0;text-shadow:none;justify-content:flex-start}
+#stage .u-pcard .u-cta.k7pb{background:var(--u-pink);border:0;box-shadow:0 4px 0 var(--u-pink2);justify-content:center;font:italic 900 min(26px,6.8vw)/1 "Rubik",sans-serif;color:#fff;min-height:56px}
+#stage .u-pcard .u-row.k7pb{font:italic 800 16.5px/1.1 "Rubik",sans-serif;background:var(--u-cream);color:var(--u-ink);border:2px solid var(--u-ink)}
+#stage .u-pcard .u-row.dark.k7pb{background:var(--u-panel);color:#fff;border:1.5px solid var(--u-line)}
+/* ---------- labo (version de test) ---------- */
+#stage .u-lab{z-index:12;background:var(--u-bg);color:#fff}
+.u-labl{display:flex;flex-direction:column;gap:10px;overflow-y:auto;overscroll-behavior:contain}
+.u-song{flex:none;display:flex;flex-direction:column;gap:8px}
+.u-song .h{display:flex;align-items:center;gap:10px}.u-song .h > div{flex:1;min-width:0}
+.u-song b{display:block;font:italic 900 18px/1.05 "Rubik",sans-serif;text-transform:uppercase}
+.u-song small{display:block;font:600 12px/1.2 "Rubik",sans-serif;opacity:.7;margin-top:2px}
+.u-song p{margin:0;font:500 13px/1.3 "Rubik",sans-serif;color:rgba(255,255,255,.75)}
+.u-song .u-row{min-height:40px;font-size:14px}.u-song .u-row .ic svg{width:14px;height:16px}.u-song .u-row.game .ic svg{width:24px;height:18px}
+.u-song .like{color:#b9b2a2}.u-song .like.on{background:var(--u-pink);color:#fff}
+.u-lab .code{display:flex;flex-direction:column;gap:6px}.u-lab .code[hidden]{display:none}
+.u-lab .code input{font:800 22px "Rubik",sans-serif;text-align:center;border:2px solid var(--u-ink);border-radius:10px;padding:8px;width:100%;box-sizing:border-box;background:var(--u-yel);color:var(--u-ink);user-select:all;-webkit-user-select:all}

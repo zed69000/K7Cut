@@ -2087,7 +2087,7 @@ G.trancheroute = { mount(stage, api){
   // la pause fige tout : l'horloge du jeu est celle de l'audio, on suspend l'audio
   let paused = false, pausedFrom = 'play', pauseAt = 0;
   const pauseEl = document.createElement('div'); pauseEl.className = 'k7pause'; pauseEl.hidden = true;
-  pauseEl.innerHTML = `<div class="k7pcard"><div class="k7ptitle">${tx('PAUSE')}</div><div class="k7psub"></div><button class="k7pb go bs-sparks">${tx('REPRENDRE')} ${BSI.play(INK)}</button><button class="k7pb re">${BSI.redo(INK)}<span class="sep"></span>${tx('RECOMMENCER')}</button><button class="k7pb out">${BSI.back(INK)}<span class="sep"></span>${tx('QUITTER')}</button></div>`;
+  pauseEl.innerHTML = `<div class="u-box u-pcard"><div class="u-title">${tx('PAUSE')}</div><div class="u-center"><span class="u-pill k7psub"></span></div><button class="u-cta k7pb go">${tx('REPRENDRE')} ${BSI.go()}</button>${uRow('k7pb re', '', BSI.redo(INK), tx('RECOMMENCER'))}${uRow('dark k7pb out', '', BSI.back('#fff'), tx('QUITTER'))}</div>`;
   // le style de la pause est posé au premier appui (les polices sont définies plus bas)
   const pauseCss = () => { if(!document.getElementById('k7-pause-css')){ const st = document.createElement('style'); st.id = 'k7-pause-css'; st.textContent = `
     .k7pause{position:absolute;inset:0;z-index:8;background:rgba(28,27,25,.72);display:grid;place-items:center;padding:20px;animation:fade .2s}
@@ -3075,7 +3075,7 @@ G.trancheroute = { mount(stage, api){
   function hideMenu(){ menu.hidden = true; stopBtn.hidden = false; pauseEl.hidden = true; paused = false; }
   function showLabo(){
     laboOn = true; state = 'menu'; auto = false; menu.hidden = true; stopBtn.hidden = true; homeOn = false; home.hidden = true; api.hud(''); api.closeEnd();
-    for(const q of stage.querySelectorAll('.u-end, .k7lab')) q.remove();
+    for(const q of stage.querySelectorAll('.u-end, .u-lab')) q.remove();
     if(useAudio && music){ music.gain.cancelScheduledValues(actx.currentTime); music.gain.setValueAtTime(.8, actx.currentTime); }
     if(!document.getElementById('k7-lab-css')){ const st = document.createElement('style'); st.id = 'k7-lab-css'; st.textContent = `
       .k7lab{position:absolute;inset:0;z-index:12;overflow-y:auto;background:#efe5cf;color:${INK};font-family:"Rubik",sans-serif;-webkit-overflow-scrolling:touch}
@@ -3095,23 +3095,26 @@ G.trancheroute = { mount(stage, api){
       .k7lab .code{background:#fff;border:3px dashed ${INK};border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
       .k7lab .code input{font:800 22px 'Rubik',sans-serif;text-align:center;border:3px solid ${INK};border-radius:10px;padding:8px;width:100%;background:#ffd23f;color:${INK};user-select:all;-webkit-user-select:all}
       .k7lab .code em{font-style:normal;font-weight:700;opacity:.75}`; document.head.appendChild(st); }
-    const likes = new Set(api.load('labo.likes', [])), el = document.createElement('div'); el.className = 'k7lab';
+    const likes = new Set(api.load('labo.likes', [])), el = document.createElement('div'); el.className = 'u-page u-lab';
     const code = () => 'LABO-' + LAB.map((t, i) => likes.has(t.id) ? i + 1 : 0).filter(Boolean).join('-');
-    const sum = () => likes.size ? `${likes.size} ♥ : ${LAB.map((t, i) => likes.has(t.id) ? t.name : null).filter(Boolean).join(' · ')}` : 'Mets un ♥ aux morceaux qui te plaisent, puis ENVOYER';
-    el.innerHTML = `<div class="in"><h2>LABO MUSIQUE</h2>
-      <div class="intro"><b>ÉCOUTER</b> : le jeu joue tout seul. <b>JOUER</b> : tu joues en Apprenti. Le bouton pause te ramène ici. Mets des ♥, puis <b>ENVOYER</b> te donne un code à copier à Claude.</div>
-      ${LAB.map((t, i) => `<div class="card" data-i="${i}"><div class="num" style="background:${t.bg[0]}">${i + 1}</div><div class="nm">${t.name}</div><div class="gn">${t.label.toUpperCase()}${t.ref ? ' · ' + t.ref.toUpperCase() : ''}</div>
-        <div class="ds">${t.desc}</div><div class="bt"><button class="play">${BSI.triR()} ÉCOUTER</button><button class="game">${BSI.pad(INK)} JOUER</button><button class="like ${likes.has(t.id) ? 'on' : ''}">♥</button></div></div>`).join('')}
-      <div class="sum"></div><button class="send">ENVOYER MES ♥</button><div class="code" hidden><span>Ton code, à copier à Claude :</span><input readonly><em></em></div><button class="back">${BSI.triL()} RETOUR AUX CASSETTES</button></div>`;
+    const sum = () => likes.size ? likes.size + ' ♥ : ' + LAB.map((t, i) => likes.has(t.id) ? t.name : null).filter(Boolean).join(' · ') : 'Mets un ♥ aux morceaux qui te plaisent, puis ENVOYER.';
+    const HEART = `<svg viewBox="0 0 24 24"><path d="M12 21C5 15 2 11.5 2 8a5 5 0 0 1 10-1.5A5 5 0 0 1 22 8c0 3.5-3 7-10 13z" fill="currentColor"/></svg>`;
+    el.innerHTML = `<div class="u-top"><button class="u-ib back" aria-label="Retour">${BSI.back(INK)}</button><div class="u-title">LABO MUSICAL</div></div>
+      <div class="u-note">ÉCOUTER : le jeu joue tout seul. JOUER : tu joues en Apprenti. Le bouton pause te ramène ici.</div>
+      <div class="u-labl u-grow">${LAB.map((t, i) => `<div class="u-box u-song" data-i="${i}"><div class="h"><span class="u-pill y sm">${i + 1}</span><div><b>${t.name}</b><small>${t.label}</small></div><button class="u-ib like${likes.has(t.id) ? ' on' : ''}" aria-label="J'aime">${HEART}</button></div>
+        <p>${t.desc}</p><div class="u-pair"><button class="u-row center play"><span class="ic">${BSI.triR()}</span><span class="tx">ÉCOUTER</span></button><button class="u-row dark center game"><span class="ic">${BSI.pad('#fff')}</span><span class="tx">JOUER</span></button></div></div>`).join('')}</div>
+      <div class="u-note sum"></div>
+      <div class="u-box code" hidden><div class="u-note">Ton code, à copier à Claude :</div><input readonly><div class="u-note em"></div></div>
+      <button class="u-cta send">ENVOYER MES ♥</button><div class="u-corners"></div>`;
     stage.appendChild(el); el.querySelector('.sum').textContent = sum();
-    el.querySelectorAll('.card').forEach(c => { const t = LAB[+c.dataset.i];
+    el.querySelectorAll('.u-song').forEach(c => { const t = LAB[+c.dataset.i];
       c.querySelector('.play').onclick = () => { el.remove(); diff = DIFFS[1]; auto = true; startTrack(t); auto = true; };
       c.querySelector('.game').onclick = () => { el.remove(); diff = DIFFS[0]; auto = false; startTrack(t); };
-      c.querySelector('.like').onclick = e => { likes.has(t.id) ? likes.delete(t.id) : likes.add(t.id); api.save('labo.likes', [...likes]); e.target.classList.toggle('on'); el.querySelector('.sum').textContent = sum(); }; });
-    el.querySelector('.send').onclick = () => { const box = el.querySelector('.code'), inp = box.querySelector('input'), em = box.querySelector('em'); box.hidden = false;
+      c.querySelector('.like').onclick = e => { likes.has(t.id) ? likes.delete(t.id) : likes.add(t.id); api.save('labo.likes', [...likes]); e.currentTarget.classList.toggle('on'); el.querySelector('.sum').textContent = sum(); }; });
+    el.querySelector('.send').onclick = () => { const box = el.querySelector('.code'), inp = box.querySelector('input'), em = box.querySelector('.em'); box.hidden = false;
       if(!likes.size){ inp.value = ''; em.textContent = 'Mets au moins un ♥ avant d\'envoyer.'; return; }
       inp.value = code(); inp.focus(); inp.select(); em.textContent = 'Appuie longtemps sur le code pour le copier.';
-      try{ navigator.clipboard.writeText(inp.value).then(() => { em.textContent = 'Code copié ✓ Colle-le à Claude.'; }).catch(() => {}); }catch(e){} box.scrollIntoView({block: 'center'}); };
+      try{ navigator.clipboard.writeText(inp.value).then(() => { em.textContent = 'Code copié ✓ Colle-le à Claude.'; }).catch(() => {}); }catch(e){} };
     el.querySelector('.back').onclick = () => { el.remove(); laboOn = false; showMenu(); };
   }
 
