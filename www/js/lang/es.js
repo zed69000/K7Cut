@@ -9,6 +9,8 @@ BSi18n.add("es", {
   "Robots de minuit": "Robots de medianoche",
   "French house · 122 BPM": "French house · 122 BPM",
   "Couper · Taper": "Cortar · Tocar",
+  "COMMENCER": "EMPEZAR",
+  "3 cœurs": "3 corazones",
   "Le plus raté :": "Lo más fallado:",
   "REVOIR LE TUTO": "VER EL TUTORIAL",
   "Calage": "Calibración",

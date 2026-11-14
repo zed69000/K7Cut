@@ -364,3 +364,15 @@ html.xmas .bs-panel::before{content:"";position:absolute;left:18px;right:18px;to
 #stage .k7rw .card small,#stage .k7rw .card .lb{color:rgba(255,255,255,.75)}
 #stage .k7sheet .k7gal figure:has(.empty){background:none;border:3px dashed rgba(255,255,255,.22);box-shadow:none;color:rgba(255,255,255,.7)}
 #stage .k7sheet .k7gal figure:has(.empty) .empty{background:none;color:rgba(255,255,255,.55)}
+/* chargement, version soignée : nom de la cassette, repères des briques, barre épaisse, bouton COMMENCER */
+.bs-lhead{position:absolute;left:0;right:0;top:calc(7% + var(--sat,0px)*0);text-align:center;color:#fff;padding:0 20px;pointer-events:none}
+.bs-lhead small{display:block;font:800 13px/1 "Rubik",sans-serif;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-bottom:8px}
+.bs-lhead b{display:block;font:italic 900 min(38px,9.6vw)/.95 "Rubik",sans-serif;text-transform:uppercase;-webkit-text-stroke:6px var(--bs-ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--bs-ink);transform:rotate(-3deg)}
+#stage .bs-lcap{top:60%}
+.bs-ldots{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:8px;pointer-events:none}
+.bs-ldots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.2);transition:transform .2s,background .2s}
+.bs-ldots i.ok{background:rgba(255,255,255,.6)}.bs-ldots i.on{background:var(--bs-yellow);transform:scale(1.5)}
+#stage .bs-lbar{height:16px;width:min(280px,70%);bottom:calc(15% + var(--sab,0px));background:#16151c;border:3px solid #fff;box-shadow:0 0 0 3px var(--bs-ink);border-radius:999px}
+#stage .bs-lbar i{background:repeating-linear-gradient(-55deg,#ffd60a 0 10px,#ffe566 10px 20px);border-radius:999px}
+#stage .bs-load .bs-lgo{width:auto;max-width:none;position:absolute;left:50%;bottom:calc(15% + var(--sab,0px) - 62px);transform:translateX(-50%);min-height:44px;padding:8px 26px;border:3px solid #fff;border-radius:999px;background:var(--bs-pink);color:#fff;font:italic 900 18px/1 "Rubik",sans-serif;text-transform:uppercase;box-shadow:0 0 0 3px var(--bs-ink),0 5px 0 3px var(--bs-ink);cursor:pointer;white-space:nowrap}
+@media (max-height:620px){.bs-lhead{top:4%}.bs-lhead b{font-size:min(30px,8vw)}}

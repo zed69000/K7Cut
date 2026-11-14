@@ -9,6 +9,8 @@ BSi18n.add("ko", {
   "Robots de minuit": "한밤의 로봇",
   "French house · 122 BPM": "프렌치 하우스 · 122 BPM",
   "Couper · Taper": "자르기 · 탭",
+  "COMMENCER": "시작",
+  "3 cœurs": "하트 3개",
   "Le plus raté :": "가장 많이 놓친 것:",
   "REVOIR LE TUTO": "튜토리얼 보기",
   "Calage": "싱크 조절",
