@@ -8,3 +8,7 @@ dist/
 keystore.properties
 *.jks
 *.keystore
+
+# le plugin commun de sauvegarde en ligne a ses sources Android dans le dépôt (le dossier android/ du jeu, lui, est régénéré)
+!native/play-cloud-save/android/
+native/play-cloud-save/android/build/
